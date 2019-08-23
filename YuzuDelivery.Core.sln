@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2035
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YuzuDelivery.Core", "YuzuDelivery.Core\YuzuDelivery.Core.csproj", "{A9B8F2AC-90F9-4219-BCDA-7FF6E8266C19}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YuzuDelivery.Core.Tests", "YuzuDelivery.Core.Test\YuzuDelivery.Core.Tests.csproj", "{B8CC0CA6-24DE-4153-AFA5-F9F5EA62F683}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A9B8F2AC-90F9-4219-BCDA-7FF6E8266C19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9B8F2AC-90F9-4219-BCDA-7FF6E8266C19}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9B8F2AC-90F9-4219-BCDA-7FF6E8266C19}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9B8F2AC-90F9-4219-BCDA-7FF6E8266C19}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8CC0CA6-24DE-4153-AFA5-F9F5EA62F683}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8CC0CA6-24DE-4153-AFA5-F9F5EA62F683}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8CC0CA6-24DE-4153-AFA5-F9F5EA62F683}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8CC0CA6-24DE-4153-AFA5-F9F5EA62F683}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {226AF1B5-DBE5-4581-8F9A-368634F97D6A}
+	EndGlobalSection
+EndGlobal

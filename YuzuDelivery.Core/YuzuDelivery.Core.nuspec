@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>YuzuDelivery.Core</id>
+    <version>$version$</version>
+    <authors>Phil Whittaker</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Yuzu Framework - core CMS independent setup</description>
+    <copyright>Copyright 2019 HiFi Ltd</copyright>
+	<dependencies>
+    <dependency id="Automapper" version="8.1.1" />
+		<dependency id="Handlebars.Net" version="1.10.1" />
+	</dependencies>
+  </metadata>
+  <files>
+     <file src="bin\Release\YuzuDelivery.Umbraco.Blocks.dll" target="lib\net472" />
+  </files>
+</package>

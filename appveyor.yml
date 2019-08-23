@@ -1,0 +1,22 @@
+version: 1.0.{build}
+image: Visual Studio 2017
+configuration: Release
+cache: packages/
+assembly_info:
+  patch: true
+  file: AssemblyInfo.*
+  assembly_version: "{version}"
+  assembly_file_version: "{version}"
+  assembly_informational_version: "{version}"
+before_build:
+- cmd: nuget restore YuzuDelivery.Core.sln
+build:
+  publish_nuget: true
+  publish_nuget_symbols: true
+  verbosity: minimal
+deploy:
+  - provider: NuGet
+    server: https://www.myget.org/F/hifiagency/api/v2/package
+    symbol_server: https://www.myget.org/F/hifiagency/symbols/api/v2/package
+    api_key:
+      secure: a83Z0hBpBzA7FP6WdMtb6RgvXSzUjU/giPFVH/PPGaJIac1cfXh1f74M+Q+ftfws
