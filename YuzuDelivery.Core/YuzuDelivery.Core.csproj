@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{A9B8F2AC-90F9-4219-BCDA-7FF6E8266C19}</ProjectGuid>
+    <ProjectGuid>{9A998EA1-26C6-4100-B915-D520551CD463}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>YuzuDelivery.Core</RootNamespace>
