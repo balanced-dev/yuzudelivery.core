@@ -26,6 +26,9 @@ namespace YuzuDelivery.Umbraco.Blocks
                 else
                     enumValue = string.Empty;
 
+                if (enumValue.StartsWith("_"))
+                    enumValue = enumValue.Substring(1);
+
                 writer.WriteSafeString(enumValue);
             });
         }
