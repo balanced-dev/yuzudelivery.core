@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Rhino.Mocks;
-using YuzuDelivery.Umbraco.Blocks;
+using YuzuDelivery.Core;
 using System.IO;
 
 namespace YuzuDelivery.Blocks.Test
