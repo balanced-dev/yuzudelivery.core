@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace YuzuDelivery.Umbraco.Blocks
+namespace YuzuDelivery.Core
 {
     public class DynPartial
     {

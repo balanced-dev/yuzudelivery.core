@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using YuzuDelivery.Umbraco.Blocks;
+using YuzuDelivery.Core;
 
 namespace System.Web.Mvc
 {

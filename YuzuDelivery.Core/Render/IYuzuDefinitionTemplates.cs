@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace YuzuDelivery.Umbraco.Blocks
+namespace YuzuDelivery.Core
 {
     public interface IYuzuDefinitionTemplates
     {

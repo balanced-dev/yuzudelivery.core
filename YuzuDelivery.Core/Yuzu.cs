@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace YuzuDelivery.Umbraco.Blocks
+namespace YuzuDelivery.Core
 {
 
     public class Yuzu

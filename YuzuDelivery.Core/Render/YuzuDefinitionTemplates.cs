@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 using AutoMapper;
 using System.Web;
 
-namespace YuzuDelivery.Umbraco.Blocks
+namespace YuzuDelivery.Core
 {
     public class YuzuDefinitionTemplates : IYuzuDefinitionTemplates
     {

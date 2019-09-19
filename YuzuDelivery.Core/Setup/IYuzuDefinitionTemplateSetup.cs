@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace YuzuDelivery.Umbraco.Blocks
+namespace YuzuDelivery.Core
 {
     public interface IYuzuDefinitionTemplateSetup
     {

@@ -7,7 +7,7 @@ using HandlebarsDotNet;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace YuzuDelivery.Umbraco.Blocks
+namespace YuzuDelivery.Core
 {
     public class Enum
     {

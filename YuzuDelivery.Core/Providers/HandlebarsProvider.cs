@@ -4,7 +4,7 @@ using System.Linq;
 using System.IO;
 using HandlebarsDotNet;
 
-namespace YuzuDelivery.Umbraco.Blocks
+namespace YuzuDelivery.Core
 {
     public interface IHandlebarsProvider
     {

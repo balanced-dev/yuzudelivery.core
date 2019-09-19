@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using HandlebarsDotNet;
 
-namespace YuzuDelivery.Umbraco.Blocks
+namespace YuzuDelivery.Core
 {
     public class Array
     {

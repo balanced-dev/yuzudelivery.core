@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using HandlebarsDotNet;
 using Newtonsoft.Json;
 
-namespace YuzuDelivery.Umbraco.Blocks
+namespace YuzuDelivery.Core
 {
     public class ToString
     {

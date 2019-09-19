@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace YuzuDelivery.Umbraco.Blocks
+namespace YuzuDelivery.Core
 {
     public interface IRenderSettings
     {

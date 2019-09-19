@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace YuzuDelivery.Umbraco.Blocks
+namespace YuzuDelivery.Core
 {
     public interface IYuzuConfiguration
     {
@@ -13,5 +13,8 @@ namespace YuzuDelivery.Umbraco.Blocks
 
         Func<Dictionary<string, Func<object, string>>> GetTemplatesCache { get; set; }
         Func<Dictionary<string, Func<object, string>>> SetTemplatesCache { get; set; }
+
+        List<string> ExcludeViewmodelsAtGeneration { get; set; }
+        List<string> AddNamespacesAtGeneration { get; set; }
     }
 }
