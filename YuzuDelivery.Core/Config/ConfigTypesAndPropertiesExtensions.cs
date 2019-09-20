@@ -17,7 +17,7 @@ namespace YuzuDelivery.Core
             }
         }
 
-        public static void Add<TSource, TProperty>(this Dictionary<string, string> config, Expression<Func<TSource, TProperty>> propertyLambda)
+        public static void Add<TSource, TProperty>(this List<KeyValuePair<string,string>> config, Expression<Func<TSource, TProperty>> propertyLambda)
         {
             Type type = typeof(TSource);
 
@@ -34,6 +34,12 @@ namespace YuzuDelivery.Core
                     propertyLambda.ToString()));
 
             config.Add(type.Name, propInfo.Name);
+        }
+
+        public static void Add(this List<KeyValuePair<string, string>> config, string key, string value)
+        {
+            var element = new KeyValuePair<string, string>(key, value);
+            config.Add(element);
         }
     }
 }
