@@ -16,6 +16,7 @@ namespace YuzuDelivery.Core
             PagePrefix = "vmPage_";
             BlockRefPrefix = "/par";
 
+            SchemaMetaLocations = new List<IDataLocation>();
             TemplateLocations = new List<ITemplateLocation>();
             TemplateFileExtension = ".hbs";
             ExcludeViewmodelsAtGeneration = new List<string>();
@@ -46,6 +47,7 @@ namespace YuzuDelivery.Core
         public string BlockRefPrefix { get; set; }
 
         public List<ITemplateLocation> TemplateLocations { get; set; }
+        public List<IDataLocation> SchemaMetaLocations { get; set; }
         public string TemplateFileExtension { get; set; }
 
         public Func<Dictionary<string, Func<object, string>>> GetTemplatesCache { get; set; }
@@ -57,6 +59,18 @@ namespace YuzuDelivery.Core
         public List<string> ExcludeViewmodelsAtGeneration { get; set; }
         public List<string> AddNamespacesAtGeneration { get; set; }
 
+    }
+
+    public interface IDataLocation
+    {
+        string Name { get; set; }
+        string Path { get; set; }
+    }
+
+    public class DataLocation : IDataLocation
+    {
+        public string Name { get; set; }
+        public string Path { get; set; }
     }
 
 }

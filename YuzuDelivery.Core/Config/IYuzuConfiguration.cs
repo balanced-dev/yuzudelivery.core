@@ -17,6 +17,7 @@ namespace YuzuDelivery.Core
         string BlockRefPrefix { get; set; }
 
         string TemplateFileExtension { get; set; }
+        List<IDataLocation> SchemaMetaLocations { get; set; }
         List<ITemplateLocation> TemplateLocations { get; set; }
 
         Func<IRenderSettings, string> GetRenderedHtmlCache { get; set; }
