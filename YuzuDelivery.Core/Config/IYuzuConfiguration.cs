@@ -9,8 +9,6 @@ namespace YuzuDelivery.Core
         IEnumerable<Type> ViewModels { get; }
         Assembly[] ViewModelAssemblies { get; set; }
 
-        string ViewModelQualifiedTypeName { get; set; }
-
         string BlockPrefix { get; set; }
         string SubPrefix { get; set; }
         string PagePrefix { get; set; }

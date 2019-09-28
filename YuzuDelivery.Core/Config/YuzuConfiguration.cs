@@ -38,9 +38,6 @@ namespace YuzuDelivery.Core
             }
         }
 
-        public string ViewModelQualifiedTypeName { get; set; }
-        public string UmbracoModelsQualifiedTypeName { get; set; }
-
         public string BlockPrefix { get; set; }
         public string SubPrefix { get; set; }
         public string PagePrefix { get; set; }

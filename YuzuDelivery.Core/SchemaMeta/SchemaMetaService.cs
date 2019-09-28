@@ -9,6 +9,12 @@ namespace YuzuDelivery.Core
 {
     public class SchemaMetaService : ISchemaMetaService
     {
+        protected ISchemaMetaPropertyService schemaMetaPropertyService;
+
+        public SchemaMetaService(ISchemaMetaPropertyService schemaMetaPropertyService)
+        {
+            this.schemaMetaPropertyService = schemaMetaPropertyService;
+        }
 
         public virtual string GetOfType(PropertyInfo property, string area)
         {
@@ -50,13 +56,12 @@ namespace YuzuDelivery.Core
 
         public virtual string[] Get(PropertyInfo property, string area)
         {
-            var pathData = GetPathFileData(property.DeclaringType.GetComponent());
+            var component = schemaMetaPropertyService.Get(property);
+            var pathData = GetPathFileData(component.Type);
 
-            var pathPropertyName = string.Format("/{0}", property.Name.FirstCharacterToLower());
-
-            if (pathData[area] != null && pathData[area][pathPropertyName] != null)
+            if (pathData[area] != null && pathData[area][component.Path] != null)
             {
-                var allowedTypes = pathData[area][pathPropertyName].ToObject<string[]>();
+                var allowedTypes = pathData[area][component.Path].ToObject<string[]>();
                 return allowedTypes.Select(x => x.BlockRefToVmTypeName()).ToArray();
             }
             else

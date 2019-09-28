@@ -14,6 +14,7 @@ namespace YuzuDelivery.Core.Test
 {
     public class SchemaMetaServiceTests
     {
+        public ISchemaMetaPropertyService schemaMetaPropertyService;
 
         public SchemaMetaService svc;
 
@@ -31,8 +32,9 @@ namespace YuzuDelivery.Core.Test
         [SetUp]
         public void Setup()
         {
+            schemaMetaPropertyService = MockRepository.GenerateStub<ISchemaMetaPropertyService>();
 
-            svc = MockRepository.GeneratePartialMock<SchemaMetaService>();
+            svc = MockRepository.GeneratePartialMock<SchemaMetaService>(new object[] { schemaMetaPropertyService });
 
             jsonPaths = @"{
                 'refs': {
@@ -70,6 +72,7 @@ namespace YuzuDelivery.Core.Test
             var p = CreatePropertyInfo("ContentRows", "vmBlock_Test");
             var pathsJson = JObject.Parse(jsonPaths);
 
+            schemaMetaPropertyService.Stub(x => x.Get(p)).Return((p.DeclaringType, "/contentRows"));
             svc.Stub(x => x.GetPathFileData(p.DeclaringType)).Return(pathsJson);
 
             var output = svc.Get(p, "refs");

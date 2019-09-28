@@ -8,9 +8,10 @@ namespace YuzuDelivery.Core
     public class SchemaMetaPropertyService : ISchemaMetaPropertyService
     {
 
-        public virtual string Get(PropertyInfo property)
+        public virtual (Type Type, string Path) Get(PropertyInfo property)
         {
-            var isRootComponent = property.PropertyType.Name.IsComponentVm();
+            var isRootComponent = property.DeclaringType.Name.IsComponentVm();
+            var componentType = property.DeclaringType;
             var path = string.Empty;
 
             if(isRootComponent)
@@ -19,13 +20,16 @@ namespace YuzuDelivery.Core
             }
             else
             {
-                var root = property.DeclaringType.GetComponent();
+                componentType = property.DeclaringType.GetComponent();
                 List<string> paths = null;
-                FindSubVmPropertyPath(root, new List<PropertyInfo>(), property, ref paths);
+                FindSubVmPropertyPath(componentType, new List<PropertyInfo>(), property, ref paths);
 
                 path = string.Join(StringExtensions.PathDelimiter, paths);
             }
-            return string.Format("{0}{1}", StringExtensions.PathDelimiter, path);
+
+            path = string.Format("{0}{1}", StringExtensions.PathDelimiter, path);
+
+            return (componentType, path);
         }
 
         public void FindSubVmPropertyPath(Type type, List<PropertyInfo> properties, PropertyInfo toFind, ref List<string> outputPath)
