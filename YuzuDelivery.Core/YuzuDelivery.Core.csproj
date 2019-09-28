@@ -109,6 +109,7 @@
     <Compile Include="Render\IYuzuDefinitionTemplates.cs" />
     <Compile Include="Render\YuzuDefinitionTemplates.cs" />
     <Compile Include="Render\IRenderSettings.cs" />
+    <Compile Include="SchemaMeta\SchemaMetaService.cs" />
     <Compile Include="Setup\ITemplateLocation.cs" />
     <Compile Include="Config\IYuzuConfiguration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -117,6 +118,8 @@
     <Compile Include="Setup\YuzuDefinitionTemplateSetup.cs" />
     <Compile Include="Setup\TemplateLocation.cs" />
     <Compile Include="Config\YuzuConfiguration.cs" />
+    <Compile Include="StringExtensions.cs" />
+    <Compile Include="ViewmodelHelperExtensions.cs" />
     <Compile Include="Yuzu.cs" />
     <Compile Include="Render\RenderSettings.cs" />
   </ItemGroup>

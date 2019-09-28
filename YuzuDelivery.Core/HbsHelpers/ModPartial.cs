@@ -21,7 +21,7 @@ namespace YuzuDelivery.Core
         {
             HandlebarsDotNet.Handlebars.RegisterHelper("modPartial", (writer, context, parameters) =>
             {
-                if (parameters.Length == 3)
+                if (parameters.Length >= 3)
                 {
                     var _ref = string.Empty;
                     if (parameters[0] != null)
@@ -47,22 +47,24 @@ namespace YuzuDelivery.Core
 
                     if (r != null)
                     {
+                        var modifiers = parameters.Where((source, index) => index > 1).Select(x => x != null ? x.ToString() : string.Empty).ToList();
+
                         if (parameters[1] is ExpandoObject)
                         {
                             dynamic outputContext = parameters[1];
-                            outputContext.modifier = parameters[2];
+                            outputContext._modifiers = parameters[2];
                             r(writer, outputContext);
                         }
-                        else if (parameters[1].GetType().GetProperties().Any(x => x.Name.ToLower() == "modifier"))
+                        else if (parameters[1].GetType().GetProperties().Any(x => x.Name.ToLower() == "_modifiers"))
                         {
-                            var modifier = parameters[1].GetType().GetProperties().Where(x => x.Name.ToLower() == "modifier").FirstOrDefault();
-                            modifier.SetValue(parameters[1], parameters[2]);
+                            var modifier = parameters[1].GetType().GetProperties().Where(x => x.Name.ToLower() == "_modifiers").FirstOrDefault();
+                            modifier.SetValue(parameters[1], modifiers);
                             r(writer, parameters[1]);
                         }
                         else
                         {
-                            var contentWithModifier = parameters[1].AddProperty("modifier", parameters[2]);
-                            r(writer, parameters[1]);
+                            var contentWithModifiers = parameters[1].AddProperty("_modifiers", modifiers);
+                            r(writer, contentWithModifiers);
                         }
                     }
                     else

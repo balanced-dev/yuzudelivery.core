@@ -11,11 +11,39 @@ namespace YuzuDelivery.Core
     {
         public YuzuConfiguration()
         {
+            BlockPrefix = "vmBlock_";
+            SubPrefix = "vmSub_";
+            PagePrefix = "vmPage_";
+            BlockRefPrefix = "/par";
+
             TemplateLocations = new List<ITemplateLocation>();
             TemplateFileExtension = ".hbs";
             ExcludeViewmodelsAtGeneration = new List<string>();
             AddNamespacesAtGeneration = new List<string>();
         }
+
+        public virtual IEnumerable<Type> ViewModels { get; private set; }
+        private Assembly[] viewModelAssemblies;
+        public Assembly[] ViewModelAssemblies
+        {
+            get
+            {
+                return viewModelAssemblies;
+            }
+            set
+            {
+                viewModelAssemblies = value;
+                ViewModels = value.SelectMany(x => x.GetTypes().Where(y => y.Name.IsComponentVm()));
+            }
+        }
+
+        public string ViewModelQualifiedTypeName { get; set; }
+        public string UmbracoModelsQualifiedTypeName { get; set; }
+
+        public string BlockPrefix { get; set; }
+        public string SubPrefix { get; set; }
+        public string PagePrefix { get; set; }
+        public string BlockRefPrefix { get; set; }
 
         public List<ITemplateLocation> TemplateLocations { get; set; }
         public string TemplateFileExtension { get; set; }
