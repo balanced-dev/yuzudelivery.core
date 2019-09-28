@@ -109,6 +109,7 @@
     <Compile Include="Render\IYuzuDefinitionTemplates.cs" />
     <Compile Include="Render\YuzuDefinitionTemplates.cs" />
     <Compile Include="Render\IRenderSettings.cs" />
+    <Compile Include="SchemaMeta\ISchemaMetaService.cs" />
     <Compile Include="SchemaMeta\SchemaMetaService.cs" />
     <Compile Include="Setup\ITemplateLocation.cs" />
     <Compile Include="Config\IYuzuConfiguration.cs" />

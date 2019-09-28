@@ -63,8 +63,6 @@ namespace YuzuDelivery.Core
             FindSubVmPropertyPath(type, childProperties, toFind, ref outputPath);
         }
 
-        
-
     }
         
 }
