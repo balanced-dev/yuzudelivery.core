@@ -7,7 +7,7 @@ using NUnit.Framework;
 using Rhino.Mocks;
 using System.Reflection;
 
-namespace YuzuDelivery.Umbraco.Import.Tests.Schema.Extensions
+namespace YuzuDelivery.Core.Test
 {
     public class VmHelperExtensionsTests_GetComponent
     {
@@ -41,11 +41,11 @@ namespace YuzuDelivery.Umbraco.Import.Tests.Schema.Extensions
             ViewModels = new List<Type>();
             ViewModels.Add(blockType);
 
-            var config = MockRepository.GeneratePartialMock<YuzuDeliveryImportConfiguration>();
+            var config = MockRepository.GeneratePartialMock<YuzuConfiguration>();
             config.Stub(x => x.ViewModels).Return(ViewModels);
 
-            YuzuDeliveryImport.Reset();
-            YuzuDeliveryImport.Initialize(config);
+            Yuzu.Reset();
+            Yuzu.Initialize(config);
         }
 
         [Test]

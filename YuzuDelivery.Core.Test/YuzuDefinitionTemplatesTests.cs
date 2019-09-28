@@ -8,7 +8,7 @@ using Rhino.Mocks;
 using YuzuDelivery.Core;
 using AutoMapper;
 
-namespace YuzuDelivery.Blocks.Test
+namespace YuzuDelivery.Core.Test
 {
     [TestFixture]
     public class YuzuDefinitionTemplatesTests
