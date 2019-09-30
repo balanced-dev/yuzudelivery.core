@@ -7,7 +7,7 @@
     <description>Yuzu Framework - core CMS independent setup</description>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">MIT</license>
-    <icon>https://balanced.dev/media/1100/yuzu-package-icon.png</icon>
+    <iconUrl>https://balanced.dev/media/1100/yuzu-package-icon.png</iconUrl>
     <copyright>Copyright 2019 HiFi Ltd</copyright>
     <Tags>umbraco cms</Tags>
 	<dependencies>
