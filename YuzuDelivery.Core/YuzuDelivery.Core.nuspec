@@ -9,7 +9,7 @@
     <license type="expression">MIT</license>
     <iconUrl>https://balanced.dev/media/1100/yuzu-package-icon.png</iconUrl>
     <copyright>Copyright 2019 HiFi Ltd</copyright>
-    <Tags>umbraco cms</Tags>
+    <tags>umbraco cms</tags>
 	<dependencies>
     <dependency id="Automapper" version="8.1.1" />
 		<dependency id="Handlebars.Net" version="1.10.1" />
