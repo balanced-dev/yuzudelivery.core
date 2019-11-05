@@ -56,6 +56,14 @@ namespace YuzuDelivery.Core
             return output;
         }
 
+        public static int ToInt(this object obj)
+        {
+            if (obj != null)
+                return obj.ToString().ToInt();
+            else
+                return 0;
+        }
+
         public static int ToInt(this string str)
         {
             int output;
@@ -63,6 +71,25 @@ namespace YuzuDelivery.Core
                 return output;
             else
                 return 0;
+        }
+
+        public static bool ToBool(this object obj)
+        {
+            if (obj != null)
+                return obj.ToString().ToBool();
+            else
+                return false;
+        }
+
+        public static bool ToBool(this string str)
+        {
+            bool output;
+            if (str == "1")
+                return true;
+            else if (bool.TryParse(str, out output))
+                return output;
+            else
+                return false;
         }
 
     }
