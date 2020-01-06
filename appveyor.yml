@@ -11,9 +11,12 @@ assembly_info:
 before_build:
 - cmd: nuget restore YuzuDelivery.Core.sln
 build:
-  publish_nuget: true
-  publish_nuget_symbols: true
   verbosity: minimal
+on_finish:
+- cmd: >-
+    nuget pack YuzuDelivery.Core/YuzuDelivery.Core.nuspec -Version %APPVEYOR_BUILD_VERSION%
+
+    appveyor PushArtifact YuzuDelivery.Core.%APPVEYOR_BUILD_VERSION%.nupkg  
 deploy:
   - provider: NuGet
     server: https://www.myget.org/F/hifiagency/api/v2/package
