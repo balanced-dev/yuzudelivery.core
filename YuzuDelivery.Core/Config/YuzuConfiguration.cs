@@ -38,6 +38,8 @@ namespace YuzuDelivery.Core
             }
         }
 
+        public IEnumerable<Type> CMSModels { get; set; }
+
         public string BlockPrefix { get; set; }
         public string SubPrefix { get; set; }
         public string PagePrefix { get; set; }
