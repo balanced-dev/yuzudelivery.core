@@ -20,9 +20,9 @@ namespace YuzuDelivery.Core
                     var param1 = string.Empty;
                     var param2 = string.Empty;
 
-                    try { param0 = parameters[0].ToString(); } catch { }
+                    try { param0 = EnumResolver.Convert(parameters[0]).ToString(); } catch { }
                     try { param1 = parameters[1].ToString(); } catch { }
-                    try { param2 = parameters[2].ToString(); } catch { }
+                    try { param2 = EnumResolver.Convert(parameters[2]).ToString(); } catch { }
 
                     if (checkCondition(param0, param1, param2))
                         options.Template(writer, context);

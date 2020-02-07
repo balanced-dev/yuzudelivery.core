@@ -99,6 +99,7 @@
     <Compile Include="Api\ApiBasicFilter.cs" />
     <Compile Include="Api\IAuthoriseApi.cs" />
     <Compile Include="Config\ConfigTypesAndPropertiesExtensions.cs" />
+    <Compile Include="HbsHelpers\EnumResolver.cs" />
     <Compile Include="HbsHelpers\PictureSource.cs" />
     <Compile Include="HbsHelpers\Enum.cs" />
     <Compile Include="HbsHelpers\Array.cs" />
