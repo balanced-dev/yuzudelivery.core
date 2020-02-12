@@ -16,6 +16,7 @@ namespace YuzuDelivery.Core.Test
         private YuzuDefinitionTemplateSetup svc;
 
         private IHandlebarsProvider hbs;
+        private IYuzuConstantsConfig constantsConfig;
         private IYuzuConfiguration config;
 
         private List<ITemplateLocation> templateLocations;
@@ -32,15 +33,16 @@ namespace YuzuDelivery.Core.Test
         [TestFixtureSetUp]
         public void FixtureSetup()
         {
-            config = MockRepository.GenerateStub<IYuzuConfiguration>();
-            Yuzu.Reset();
-            Yuzu.Initialize(config);
+            constantsConfig = MockRepository.GenerateStub<IYuzuConstantsConfig>();
+            YuzuConstants.Reset();
+            YuzuConstants.Initialize(constantsConfig);
         }
 
         [SetUp]
         public void Setup()
         {
             hbs = MockRepository.GenerateStub<IHandlebarsProvider>();
+            config = MockRepository.GenerateStub<IYuzuConfiguration>();
 
             templates = new Dictionary<string, Func<object, string>>();
             templateLocations = new List<ITemplateLocation>();
@@ -52,10 +54,10 @@ namespace YuzuDelivery.Core.Test
 
             directory.Stub(x => x.GetDirectories()).Return(new DirectoryInfo[] { subdirectory });
 
-            Yuzu.Configuration.TemplateLocations = templateLocations;
-            Yuzu.Configuration.TemplateFileExtension = fileExtension;
+            config.TemplateLocations = templateLocations;
+            constantsConfig.TemplateFileExtension = fileExtension;
 
-            svc = MockRepository.GeneratePartialMock<YuzuDefinitionTemplateSetup>(new object[] { hbs });
+            svc = MockRepository.GeneratePartialMock<YuzuDefinitionTemplateSetup>(new object[] { hbs, config });
         }
 
         #region register_all
@@ -63,7 +65,7 @@ namespace YuzuDelivery.Core.Test
         [Test, ExpectedException()]
         public void given_template_locations_not_set_then_throw_excpetion()
         {
-            Yuzu.Configuration.TemplateLocations = null;
+            config.TemplateLocations = null;
             svc.RegisterAll();
         }
 

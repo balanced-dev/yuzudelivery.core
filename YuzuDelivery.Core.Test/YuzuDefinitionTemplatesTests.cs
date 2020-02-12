@@ -29,21 +29,13 @@ namespace YuzuDelivery.Core.Test
         private string templateName;
         private Func<object, string> templateRenderer;
 
-        [TestFixtureSetUp]
-        public void FixtureSetup()
-        {
-            config = MockRepository.GenerateStub<IYuzuConfiguration>();
-            Yuzu.Reset();
-            Yuzu.Initialize(config);
-
-        }
-
         [SetUp]
         public void Setup()
         {
             mapper = MockRepository.GenerateStub<IMapper>();
+            config = MockRepository.GenerateStub<IYuzuConfiguration>();
 
-            svc = MockRepository.GeneratePartialMock<YuzuDefinitionTemplates>(new object[] { mapper });
+            svc = MockRepository.GeneratePartialMock<YuzuDefinitionTemplates>(new object[] { mapper, config });
             settings = new RenderSettings();
 
             config.GetRenderedHtmlCache = null;

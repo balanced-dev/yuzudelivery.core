@@ -17,24 +17,27 @@ namespace YuzuDelivery.Core.Test
         public ISchemaMetaPropertyService schemaMetaPropertyService;
 
         public SchemaMetaService svc;
+        public IYuzuConfiguration config;
 
         public string jsonPaths;
         public string jsonOfTypeParent;
         public string jsonOfTypeChild;
 
         [TestFixtureSetUp]
-        public void TestFixtureSetUp()
+        public void FixtureSetup()
         {
-            Yuzu.Reset();
-            Yuzu.Initialize(new YuzuConfiguration());
+            YuzuConstants.Reset();
+            YuzuConstants.Initialize(new YuzuConstantsConfig());
         }
 
         [SetUp]
         public void Setup()
         {
             schemaMetaPropertyService = MockRepository.GenerateStub<ISchemaMetaPropertyService>();
+            config = MockRepository.GenerateStub<IYuzuConfiguration>();
+            config.SchemaMetaLocations = new List<IDataLocation>();
 
-            svc = MockRepository.GeneratePartialMock<SchemaMetaService>(new object[] { schemaMetaPropertyService });
+            svc = MockRepository.GeneratePartialMock<SchemaMetaService>(new object[] { schemaMetaPropertyService, config });
 
             jsonPaths = @"{
                 'refs': {
@@ -177,11 +180,7 @@ namespace YuzuDelivery.Core.Test
         {
             var schemaMetaLocations = locations.Select(x => new DataLocation() { Path = x }).Cast<IDataLocation>().ToList();
 
-            Yuzu.Reset();
-            Yuzu.Initialize(new YuzuConfiguration()
-            {
-                SchemaMetaLocations = schemaMetaLocations
-            });
+            config.SchemaMetaLocations = schemaMetaLocations;
         }
 
         public void StubPathFile(string rootPath, string declaringTypeName, string filePath, bool exists = true)
@@ -224,11 +223,7 @@ namespace YuzuDelivery.Core.Test
             var viewmodels = new List<Type>();
             viewmodels.Add(type);
 
-            var config = MockRepository.GeneratePartialMock<YuzuConfiguration>();
             config.Stub(x => x.ViewModels).Return(viewmodels);
-
-            Yuzu.Reset();
-            Yuzu.Initialize(config);
         }
 
     }

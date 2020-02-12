@@ -19,6 +19,15 @@ namespace YuzuDelivery.Core.Test
 
         public List<Type> ViewModels;
 
+        public IYuzuConfiguration config;
+
+        [TestFixtureSetUp]
+        public void FixtureSetup()
+        {
+            YuzuConstants.Reset();
+            YuzuConstants.Initialize(new YuzuConstantsConfig());
+        }
+
         [SetUp]
         public void Setup()
         {
@@ -41,18 +50,15 @@ namespace YuzuDelivery.Core.Test
             ViewModels = new List<Type>();
             ViewModels.Add(blockType);
 
-            var config = MockRepository.GeneratePartialMock<YuzuConfiguration>();
+            config = MockRepository.GeneratePartialMock<YuzuConfiguration>();
             config.Stub(x => x.ViewModels).Return(ViewModels);
-
-            Yuzu.Reset();
-            Yuzu.Initialize(config);
         }
 
         [Test]
         public void GetComponent_when_type_is_component_the_just_return()
         {
 
-            var output = blockType.GetComponent();
+            var output = blockType.GetComponent(config);
 
             Assert.AreEqual(blockType, output);
         }
@@ -62,7 +68,7 @@ namespace YuzuDelivery.Core.Test
         {
             SetupPropertyInfo(blockType, subBlockType);
 
-            var output = subBlockType.GetComponent();
+            var output = subBlockType.GetComponent(config);
 
             Assert.AreEqual(blockType, output);
         }
@@ -72,7 +78,7 @@ namespace YuzuDelivery.Core.Test
         {
             SetupPropertyInfo(blockType, subListBlockType);
 
-            var output = subBlockType.GetComponent();
+            var output = subBlockType.GetComponent(config);
 
             Assert.AreEqual(blockType, output);
         }
@@ -83,7 +89,7 @@ namespace YuzuDelivery.Core.Test
             SetupPropertyInfo(blockType, parentBlockType);
             SetupPropertyInfo(parentBlockType, subBlockType);
 
-            var output = subBlockType.GetComponent();
+            var output = subBlockType.GetComponent(config);
 
             Assert.AreEqual(blockType, output);
         }
@@ -94,7 +100,7 @@ namespace YuzuDelivery.Core.Test
             SetupPropertyInfo(blockType, parentBlockType);
             SetupPropertyInfo(parentBlockType, subListBlockType);
 
-            var output = subBlockType.GetComponent();
+            var output = subBlockType.GetComponent(config);
 
             Assert.AreEqual(blockType, output);
         }
@@ -104,7 +110,7 @@ namespace YuzuDelivery.Core.Test
         {
             SetupPropertyInfo(blockType, subExternalBlockType);
 
-            var output = subBlockType.GetComponent();
+            var output = subBlockType.GetComponent(config);
 
             Assert.IsNull(output);
         }
