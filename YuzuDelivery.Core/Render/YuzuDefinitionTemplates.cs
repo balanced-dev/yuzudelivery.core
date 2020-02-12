@@ -15,10 +15,12 @@ namespace YuzuDelivery.Core
         private const string RenderSettingsDataNotFound = "Render settings data not set for template {0}";
 
         private IMapper mapper;
+        private readonly IYuzuConfiguration config;
 
-        public YuzuDefinitionTemplates(IMapper mapper)
+        public YuzuDefinitionTemplates(IMapper mapper, IYuzuConfiguration config)
         {
             this.mapper = mapper;
+            this.config = config;
         }
 
         public virtual string Render<E>(IRenderSettings settings, IDictionary<string, object> mappingItems = null)
@@ -45,8 +47,8 @@ namespace YuzuDelivery.Core
 
             string html = null;
 
-            if (!string.IsNullOrEmpty(settings.CacheName) && Yuzu.Configuration.GetRenderedHtmlCache != null)
-                html = Yuzu.Configuration.GetRenderedHtmlCache(settings);
+            if (!string.IsNullOrEmpty(settings.CacheName) && config.GetRenderedHtmlCache != null)
+                html = config.GetRenderedHtmlCache(settings);
 
             if (string.IsNullOrEmpty(html))
             {
@@ -55,8 +57,8 @@ namespace YuzuDelivery.Core
                html = RenderTemplate(settings, data);
                html = AddCurrentJsonToTemplate(settings, data, html);
 
-               if (!string.IsNullOrEmpty(settings.CacheName) && Yuzu.Configuration.SetRenderedHtmlCache != null)
-                    Yuzu.Configuration.SetRenderedHtmlCache(settings, html);
+               if (!string.IsNullOrEmpty(settings.CacheName) && config.SetRenderedHtmlCache != null)
+                    config.SetRenderedHtmlCache(settings, html);
             }
 
             return html;
@@ -72,10 +74,10 @@ namespace YuzuDelivery.Core
 
         public virtual string RenderTemplate(IRenderSettings settings, object data)
         {
-            var templates = Yuzu.Configuration.GetTemplatesCache();
+            var templates = config.GetTemplatesCache();
             if (templates == null)
             {
-                templates = Yuzu.Configuration.SetTemplatesCache();
+                templates = config.SetTemplatesCache();
             }
 
             if (!templates.ContainsKey(settings.Template))

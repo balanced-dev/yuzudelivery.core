@@ -27,10 +27,10 @@ namespace YuzuDelivery.Core
 
         public static string RemoveAllDefinitionPrefixes(this string str, bool removeForwardSlash = false)
         {
-            var prefix = Yuzu.Configuration.BlockRefPrefix;
+            var prefix = YuzuConstants.Configuration.BlockRefPrefix;
             if (removeForwardSlash)
             {
-                prefix = Yuzu.Configuration.BlockRefPrefix.RemoveFirstForwardSlash();
+                prefix = YuzuConstants.Configuration.BlockRefPrefix.RemoveFirstForwardSlash();
                 if (str.StartsWith(prefix))
                     return str.Substring(3);
             }
@@ -45,49 +45,49 @@ namespace YuzuDelivery.Core
 
         public static string RemoveAllVmPrefixes(this string str)
         {
-            return str.Replace(Yuzu.Configuration.BlockPrefix, "").Replace(Yuzu.Configuration.SubPrefix, "").Replace(Yuzu.Configuration.PagePrefix, "");
+            return str.Replace(YuzuConstants.Configuration.BlockPrefix, "").Replace(YuzuConstants.Configuration.SubPrefix, "").Replace(YuzuConstants.Configuration.PagePrefix, "");
         }
 
         public static string RemoveComponentVmPrefixes(this string str)
         {
-            return str.Replace(Yuzu.Configuration.BlockPrefix, "").Replace(Yuzu.Configuration.PagePrefix, "");
+            return str.Replace(YuzuConstants.Configuration.BlockPrefix, "").Replace(YuzuConstants.Configuration.PagePrefix, "");
         }
 
         public static bool IsPage(this string propertyTypeName)
         {
-            return propertyTypeName.StartsWith(Yuzu.Configuration.PagePrefix);
+            return propertyTypeName.StartsWith(YuzuConstants.Configuration.PagePrefix);
         }
 
         public static bool IsComponentVm(this string propertyTypeName, bool allowIgnored = false)
         {
             if (allowIgnored)
-                return (propertyTypeName.StartsWith(Yuzu.Configuration.BlockPrefix) || propertyTypeName.StartsWith(Yuzu.Configuration.PagePrefix));
+                return (propertyTypeName.StartsWith(YuzuConstants.Configuration.BlockPrefix) || propertyTypeName.StartsWith(YuzuConstants.Configuration.PagePrefix));
             else
-                return (propertyTypeName.StartsWith(Yuzu.Configuration.BlockPrefix) || propertyTypeName.StartsWith(Yuzu.Configuration.PagePrefix));
+                return (propertyTypeName.StartsWith(YuzuConstants.Configuration.BlockPrefix) || propertyTypeName.StartsWith(YuzuConstants.Configuration.PagePrefix));
         }
 
         public static bool IsBlockOrSubVm(this string propertyTypeName)
         {
-            return (propertyTypeName.StartsWith(Yuzu.Configuration.BlockPrefix) || propertyTypeName.StartsWith(Yuzu.Configuration.SubPrefix));
+            return (propertyTypeName.StartsWith(YuzuConstants.Configuration.BlockPrefix) || propertyTypeName.StartsWith(YuzuConstants.Configuration.SubPrefix));
         }
 
         public static bool IsSubVm(this string propertyTypeName)
         {
-            return (propertyTypeName.StartsWith(Yuzu.Configuration.SubPrefix));
+            return (propertyTypeName.StartsWith(YuzuConstants.Configuration.SubPrefix));
         }
 
         public static string BlockRefToVmTypeName(this string refName)
         {
-            return refName.Replace(Yuzu.Configuration.BlockRefPrefix, Yuzu.Configuration.BlockPrefix);
+            return refName.Replace(YuzuConstants.Configuration.BlockRefPrefix, YuzuConstants.Configuration.BlockPrefix);
         }
 
-        public static Type GetComponent(this Type type)
+        public static Type GetComponent(this Type type, IYuzuConfiguration config)
         {
             if (type.Name.IsComponentVm(true))
                 return type;
             else
             {
-                return Yuzu.Configuration.ViewModels.Where(x =>
+                return config.ViewModels.Where(x =>
                     x.GetProperties().Any(y => HasPropertyType(type, y)))
                     .FirstOrDefault();
             }

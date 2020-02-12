@@ -7,6 +7,12 @@ namespace YuzuDelivery.Core
 {
     public class SchemaMetaPropertyService : ISchemaMetaPropertyService
     {
+        private readonly IYuzuConfiguration config;
+
+        public SchemaMetaPropertyService(IYuzuConfiguration config)
+        {
+            this.config = config;
+        }
 
         public virtual (Type Type, string Path) Get(PropertyInfo property)
         {
@@ -20,7 +26,7 @@ namespace YuzuDelivery.Core
             }
             else
             {
-                componentType = property.DeclaringType.GetComponent();
+                componentType = property.DeclaringType.GetComponent(config);
                 List<string> paths = null;
                 FindSubVmPropertyPath(componentType, new List<PropertyInfo>(), property, ref paths);
 

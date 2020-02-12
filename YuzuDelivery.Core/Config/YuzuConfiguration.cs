@@ -11,16 +11,8 @@ namespace YuzuDelivery.Core
     {
         public YuzuConfiguration()
         {
-            BlockPrefix = "vmBlock_";
-            SubPrefix = "vmSub_";
-            PagePrefix = "vmPage_";
-            BlockRefPrefix = "/par";
-
             SchemaMetaLocations = new List<IDataLocation>();
             TemplateLocations = new List<ITemplateLocation>();
-            TemplateFileExtension = ".hbs";
-            ExcludeViewmodelsAtGeneration = new List<string>();
-            AddNamespacesAtGeneration = new List<string>();
         }
 
         public virtual IEnumerable<Type> ViewModels { get; private set; }
@@ -40,23 +32,14 @@ namespace YuzuDelivery.Core
 
         public IEnumerable<Type> CMSModels { get; set; }
 
-        public string BlockPrefix { get; set; }
-        public string SubPrefix { get; set; }
-        public string PagePrefix { get; set; }
-        public string BlockRefPrefix { get; set; }
-
         public List<ITemplateLocation> TemplateLocations { get; set; }
         public List<IDataLocation> SchemaMetaLocations { get; set; }
-        public string TemplateFileExtension { get; set; }
 
         public Func<Dictionary<string, Func<object, string>>> GetTemplatesCache { get; set; }
         public Func<Dictionary<string, Func<object, string>>> SetTemplatesCache { get; set; }
 
         public Func<IRenderSettings, string> GetRenderedHtmlCache { get; set; }
         public Action<IRenderSettings, string> SetRenderedHtmlCache { get; set; }
-
-        public List<string> ExcludeViewmodelsAtGeneration { get; set; }
-        public List<string> AddNamespacesAtGeneration { get; set; }
 
     }
 

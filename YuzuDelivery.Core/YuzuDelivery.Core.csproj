@@ -96,9 +96,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Api\ApiBasicFilter.cs" />
-    <Compile Include="Api\IAuthoriseApi.cs" />
     <Compile Include="Config\ConfigTypesAndPropertiesExtensions.cs" />
+    <Compile Include="Config\YuzuConfiguration.cs" />
+    <Compile Include="Constants\IYuzuConstantsConfig.cs" />
     <Compile Include="HbsHelpers\EnumResolver.cs" />
     <Compile Include="HbsHelpers\PictureSource.cs" />
     <Compile Include="HbsHelpers\Enum.cs" />
@@ -122,10 +122,10 @@
     <Compile Include="Setup\IYuzuDefinitionTemplateSetup.cs" />
     <Compile Include="Setup\YuzuDefinitionTemplateSetup.cs" />
     <Compile Include="Setup\TemplateLocation.cs" />
-    <Compile Include="Config\YuzuConfiguration.cs" />
+    <Compile Include="Constants\YuzuConstantsConfig.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="ViewmodelHelperExtensions.cs" />
-    <Compile Include="Yuzu.cs" />
+    <Compile Include="YuzuConstants.cs" />
     <Compile Include="Render\RenderSettings.cs" />
   </ItemGroup>
   <ItemGroup>

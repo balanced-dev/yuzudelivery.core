@@ -11,12 +11,6 @@ namespace YuzuDelivery.Core
 
         IEnumerable<Type> CMSModels { get; set; }
 
-        string BlockPrefix { get; set; }
-        string SubPrefix { get; set; }
-        string PagePrefix { get; set; }
-        string BlockRefPrefix { get; set; }
-
-        string TemplateFileExtension { get; set; }
         List<IDataLocation> SchemaMetaLocations { get; set; }
         List<ITemplateLocation> TemplateLocations { get; set; }
 
@@ -25,8 +19,5 @@ namespace YuzuDelivery.Core
 
         Func<Dictionary<string, Func<object, string>>> GetTemplatesCache { get; set; }
         Func<Dictionary<string, Func<object, string>>> SetTemplatesCache { get; set; }
-
-        List<string> ExcludeViewmodelsAtGeneration { get; set; }
-        List<string> AddNamespacesAtGeneration { get; set; }
     }
 }

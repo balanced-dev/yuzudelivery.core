@@ -11,20 +11,22 @@ namespace YuzuDelivery.Core
         private const string TemplateLocationsNotSet = "Yuzu definition template locations not set";
 
         public IHandlebarsProvider hbsProvider;
+        private readonly IYuzuConfiguration config;
 
-        public YuzuDefinitionTemplateSetup(IHandlebarsProvider hbsProvider)
+        public YuzuDefinitionTemplateSetup(IHandlebarsProvider hbsProvider, IYuzuConfiguration config)
         {
             this.hbsProvider = hbsProvider;
+            this.config = config;
         }
 
         public virtual Dictionary<string, Func<object, string>> RegisterAll()
         {
-            if (Yuzu.Configuration.TemplateLocations == null || !Yuzu.Configuration.TemplateLocations.Any())
+            if (config.TemplateLocations == null || !config.TemplateLocations.Any())
                 throw new ArgumentNullException(TemplateLocationsNotSet);
 
             var templates = new Dictionary<string, Func<object, string>>();
 
-            foreach (var location in Yuzu.Configuration.TemplateLocations)
+            foreach (var location in config.TemplateLocations)
             {
                 TestDirectoryExists(location);
                 var directory = GetDirectory(location);
@@ -45,7 +47,7 @@ namespace YuzuDelivery.Core
                     ProcessTemplates(d, ref templates, location);
                 }
 
-            foreach (var f in directory.GetFiles().Where(x => x.Extension == Yuzu.Configuration.TemplateFileExtension))
+            foreach (var f in directory.GetFiles().Where(x => x.Extension == YuzuConstants.Configuration.TemplateFileExtension))
             {
                 if (location.RegisterAllAsPartials)
                 {

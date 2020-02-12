@@ -10,10 +10,12 @@ namespace YuzuDelivery.Core
     public class SchemaMetaService : ISchemaMetaService
     {
         protected ISchemaMetaPropertyService schemaMetaPropertyService;
+        protected readonly IYuzuConfiguration config;
 
-        public SchemaMetaService(ISchemaMetaPropertyService schemaMetaPropertyService)
+        public SchemaMetaService(ISchemaMetaPropertyService schemaMetaPropertyService, IYuzuConfiguration config)
         {
             this.schemaMetaPropertyService = schemaMetaPropertyService;
+            this.config = config;
         }
 
         public virtual string GetOfType(PropertyInfo property, string area)
@@ -30,7 +32,7 @@ namespace YuzuDelivery.Core
 
         public virtual string[] Get(Type propertyType, string area, string path, string ofType)
         {
-            var pathData = GetPathFileData(propertyType.GetComponent());
+            var pathData = GetPathFileData(propertyType.GetComponent(config));
 
             if (pathData[ofType] != null && pathData[ofType][area] != null && pathData[ofType][area][path] != null)
             {
@@ -43,7 +45,7 @@ namespace YuzuDelivery.Core
 
         public virtual string[] Get(Type propertyType, string area, string path)
         {
-            var pathData = GetPathFileData(propertyType.GetComponent());
+            var pathData = GetPathFileData(propertyType.GetComponent(config));
 
             if (pathData[area] != null && pathData[area][path] != null)
             {
@@ -75,7 +77,7 @@ namespace YuzuDelivery.Core
             string pathFilename = string.Empty;
 
             //get paths file from frontend solution
-            foreach(var location in Yuzu.Configuration.SchemaMetaLocations) { 
+            foreach(var location in config.SchemaMetaLocations) { 
                 var filename = GetPathFileName(location.Path, typeName, isPage);
                 if (FileExists(filename))
                     pathFilename = filename;
@@ -91,7 +93,7 @@ namespace YuzuDelivery.Core
         {
             string filePatttern = IsPage ? "{0}/{1}.schema" : "{0}/{2}{1}.schema";
 
-            return string.Format(filePatttern, rootPath, declaringTypeName.RemoveAllVmPrefixes(), Yuzu.Configuration.BlockRefPrefix.RemoveFirstForwardSlash());
+            return string.Format(filePatttern, rootPath, declaringTypeName.RemoveAllVmPrefixes(), YuzuConstants.Configuration.BlockRefPrefix.RemoveFirstForwardSlash());
         }
 
         public virtual bool FileExists(string pathFilename)
