@@ -1,0 +1,13 @@
+{
+	"id": "/par1_JustRootNode",
+	"type": "object",
+    "properties": {
+        "discount": {
+            "type": "string"
+        },
+        "discountAmount": {
+            "type": "string"
+        }
+    },
+	"additionalProperties": false
+}

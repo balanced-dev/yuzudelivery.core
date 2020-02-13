@@ -1,0 +1,13 @@
+{
+  "id": "/par13_2_ExternalRef",
+  "type": "object",
+  "properties": {
+    "property1": {
+      "type": "string"
+    },
+    "property2": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,13 @@
+{
+    "id": "/par6_1_ExternalRefModule",
+    "type": "object",
+    "properties": {
+        "ref": {
+            "$ref": "./par6_2_ExternalRefModule.schema"
+        },
+        "module": {
+            "$ref": "./par6_3_ExternalRefModule.schema"
+        }
+    },
+    "additionalProperties": false
+}

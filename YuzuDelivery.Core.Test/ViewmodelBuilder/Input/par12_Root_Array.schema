@@ -1,0 +1,12 @@
+{
+  "id": "/par12_Root_Array",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "item": {
+        "anyOf": []
+      }
+    }
+  }
+}

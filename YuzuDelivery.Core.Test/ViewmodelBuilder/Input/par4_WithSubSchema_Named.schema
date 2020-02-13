@@ -1,0 +1,18 @@
+{
+    "id": "/par4_WithSubSchema_Named",
+    "type": "object",
+    "properties": {
+        "item": {
+            "type": "object",
+            "properties": {
+                "property1": {
+                    "type": "string"
+                },
+                "property2": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "additionalProperties": false
+}

@@ -1,0 +1,13 @@
+{
+    "id": "/par8_1_ExternalRefSubArray",
+    "type": "object",
+    "properties": {
+      "ref": {
+        "type": "array",
+        "items": {
+          "$ref": "./par8_2_ExternalRefSubArray.schema"
+        },
+      }
+    },
+    "additionalProperties": false
+}

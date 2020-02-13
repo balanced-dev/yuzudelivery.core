@@ -1,0 +1,12 @@
+{
+  "id": "/par10_AnyOf_Array",
+  "type": "object",
+  "properties": {
+    "items": {
+      "type": "array",
+      "items": {
+        "anyOf": []
+      }
+    }
+  }
+}

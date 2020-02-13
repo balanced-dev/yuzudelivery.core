@@ -1,0 +1,9 @@
+{
+  "id": "/par11_AnyOf_Object",
+  "type": "object",
+  "properties": {
+    "item": {
+      "anyOf": []
+    }
+  }
+}

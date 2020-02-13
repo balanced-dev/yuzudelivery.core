@@ -1,0 +1,10 @@
+{
+    "id": "/par5_1_ExternalRefSub",
+    "type": "object",
+    "properties": {
+        "ref": {
+            "$ref": "./par5_2_ExternalRefSub.schema"
+        }
+    },
+    "additionalProperties": false
+}

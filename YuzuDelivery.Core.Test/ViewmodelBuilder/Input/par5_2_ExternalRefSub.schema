@@ -1,0 +1,18 @@
+{
+    "id": "/par5_2_ExternalRefSub",
+    "type": "object",
+    "properties": {
+        "named": {
+            "type": "object",
+            "properties": {
+                "property1": {
+                    "type": "string"
+                },
+                "property2": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "additionalProperties": false
+}

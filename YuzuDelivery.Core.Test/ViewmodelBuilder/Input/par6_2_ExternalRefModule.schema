@@ -1,0 +1,21 @@
+{
+    "id": "/par6_2_ExternalRefModule",
+    "type": "object",
+    "properties": {
+        "named": {
+            "type": "object",
+            "properties": {
+                "property1": {
+                    "type": "string"
+                },
+                "property2": {
+                    "type": "string"
+                }
+            }
+        },
+        "module": {
+            "$ref": "./par6_3_ExternalRefModule.schema"
+        }
+    },
+    "additionalProperties": false
+}

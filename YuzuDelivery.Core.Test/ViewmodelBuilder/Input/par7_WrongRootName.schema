@@ -1,0 +1,13 @@
+{
+	"id": "/par7_WrongRootName_Wrong",
+	"type": "object",
+    "properties": {
+        "discount": {
+            "type": "string"
+        },
+        "discountAmount": {
+            "type": "string"
+        }
+    },
+	"additionalProperties": false
+}

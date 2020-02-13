@@ -55,10 +55,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SchemaMetaServiceTests.cs" />
-    <Compile Include="ViewmodelHelperExtensionsTests_GetComponent.cs" />
-    <Compile Include="YuzuDefinitionTemplateSetupTests.cs" />
-    <Compile Include="YuzuDefinitionTemplatesTests.cs" />
+    <Compile Include="Core\SchemaMetaServiceTests.cs" />
+    <Compile Include="Core\ViewmodelHelperExtensionsTests_GetComponent.cs" />
+    <Compile Include="Core\YuzuDefinitionTemplateSetupTests.cs" />
+    <Compile Include="Core\YuzuDefinitionTemplatesTests.cs" />
+    <Compile Include="ViewmodelBuilder\ViewModelServiceGenerationTests.cs" />
+    <Compile Include="ViewmodelBuilder\ViewModelServiceGetSchemaRefsTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\YuzuDelivery.Core\YuzuDelivery.Core.csproj">
@@ -69,6 +71,26 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+    <None Include="ViewmodelBuilder\Input\par10_AnyOf_Array.schema" />
+    <None Include="ViewmodelBuilder\Input\par11_AnyOf_Object.schema" />
+    <None Include="ViewmodelBuilder\Input\par12_Root_Array.schema" />
+    <None Include="ViewmodelBuilder\Input\par13_1_Root_Array_External_Ref.schema" />
+    <None Include="ViewmodelBuilder\Input\par13_2_Root_Array_External_Ref.schema" />
+    <None Include="ViewmodelBuilder\Input\par14_DirectEnum.schema" />
+    <None Include="ViewmodelBuilder\Input\par1_JustRootNode.schema" />
+    <None Include="ViewmodelBuilder\Input\par2_1_ExternalRef.schema" />
+    <None Include="ViewmodelBuilder\Input\par2_2_ExternalRef.schema" />
+    <None Include="ViewmodelBuilder\Input\par3_WithSubSchema_NamedArray.schema" />
+    <None Include="ViewmodelBuilder\Input\par4_WithSubSchema_Named.schema" />
+    <None Include="ViewmodelBuilder\Input\par5_1_ExternalRefSub.schema" />
+    <None Include="ViewmodelBuilder\Input\par5_2_ExternalRefSub.schema" />
+    <None Include="ViewmodelBuilder\Input\par6_1_ExternalRefModule.schema" />
+    <None Include="ViewmodelBuilder\Input\par6_2_ExternalRefModule.schema" />
+    <None Include="ViewmodelBuilder\Input\par6_3_ExternalRefModule.schema" />
+    <None Include="ViewmodelBuilder\Input\par7_WrongRootName.schema" />
+    <None Include="ViewmodelBuilder\Input\par8_1_ExternalRefSubArray.schema" />
+    <None Include="ViewmodelBuilder\Input\par8_2_ExternalRefSubArray.schema" />
+    <None Include="ViewmodelBuilder\Input\par9_EnumInSubObject.schema" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

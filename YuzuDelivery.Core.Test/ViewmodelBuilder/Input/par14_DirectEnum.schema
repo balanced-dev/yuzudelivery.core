@@ -1,0 +1,6 @@
+{
+  "id": "/par14_DirectEnum",
+  "type": "integer",
+  "enum": [ 12, 6 ],
+  "additionalProperties": false
+}

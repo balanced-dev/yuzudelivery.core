@@ -1,0 +1,12 @@
+{
+  "id": "/par13_1_Root_Array_External_Ref",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "ref": {
+        "$ref": "./par13_2_Root_Array_External_Ref.schema"
+      }
+    }
+  }
+}
