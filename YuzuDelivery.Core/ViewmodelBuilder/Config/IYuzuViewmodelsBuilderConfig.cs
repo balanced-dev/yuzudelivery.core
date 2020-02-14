@@ -15,4 +15,10 @@ namespace YuzuDelivery.Core.ViewModelBuilder
         List<string> AddNamespacesAtGeneration { get; set; }
         string GeneratedViewmodelsOutputFolder { get; set; }
     }
+
+    public interface IUpdateableVmBuilderConfig
+    {
+        List<string> ExcludeViewmodelsAtGeneration { get; set; }
+        List<string> AddNamespacesAtGeneration { get; set; }
+    }
 }

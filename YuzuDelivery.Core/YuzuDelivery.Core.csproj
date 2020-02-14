@@ -117,7 +117,7 @@
   <ItemGroup>
     <Compile Include="Config\ConfigTypesAndPropertiesExtensions.cs" />
     <Compile Include="Config\YuzuConfiguration.cs" />
-    <Compile Include="Constants\IYuzuConstantsConfig.cs" />
+    <Compile Include="ConstantsConfig\IYuzuConstantsConfig.cs" />
     <Compile Include="HbsHelpers\EnumResolver.cs" />
     <Compile Include="HbsHelpers\PictureSource.cs" />
     <Compile Include="HbsHelpers\Enum.cs" />
@@ -141,11 +141,10 @@
     <Compile Include="Setup\IYuzuDefinitionTemplateSetup.cs" />
     <Compile Include="Setup\YuzuDefinitionTemplateSetup.cs" />
     <Compile Include="Setup\TemplateLocation.cs" />
-    <Compile Include="Constants\YuzuConstantsConfig.cs" />
+    <Compile Include="ConstantsConfig\YuzuConstantsConfig.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="ViewmodelBuilder\BuildViewModelsService.cs" />
     <Compile Include="ViewmodelBuilder\Config\IYuzuViewmodelsBuilderConfig.cs" />
-    <Compile Include="ViewmodelBuilder\Config\IYuzuViewmodelsBuilderUpdateableConfig.cs" />
     <Compile Include="ViewmodelBuilder\Config\YuzuViewmodelsBuilderConfig.cs" />
     <Compile Include="ViewmodelBuilder\Helpers\SchemaSingleton.cs" />
     <Compile Include="ViewmodelBuilder\Helpers\StringExtensions.cs" />

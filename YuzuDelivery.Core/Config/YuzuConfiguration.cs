@@ -9,13 +9,20 @@ namespace YuzuDelivery.Core
 {
     public class YuzuConfiguration : IYuzuConfiguration
     {
-        public YuzuConfiguration()
+        public YuzuConfiguration(IEnumerable<IUpdateableConfig> extraConfigs)
         {
             SchemaMetaLocations = new List<IDataLocation>();
             TemplateLocations = new List<ITemplateLocation>();
+
+            MappingAssemblies = new List<Assembly>();
+
+            foreach(var i in extraConfigs)
+            {
+                MappingAssemblies = MappingAssemblies.Union(i.MappingAssemblies).ToList();
+            }
         }
 
-        public virtual IEnumerable<Type> ViewModels { get; private set; }
+        public List<Assembly> MappingAssemblies { get; set; }
         private Assembly[] viewModelAssemblies;
         public Assembly[] ViewModelAssemblies
         {
@@ -30,6 +37,7 @@ namespace YuzuDelivery.Core
             }
         }
 
+        public virtual IEnumerable<Type> ViewModels { get; private set; }
         public IEnumerable<Type> CMSModels { get; set; }
 
         public List<ITemplateLocation> TemplateLocations { get; set; }
@@ -53,6 +61,16 @@ namespace YuzuDelivery.Core
     {
         public string Name { get; set; }
         public string Path { get; set; }
+    }
+
+    public abstract class UpdateableConfig : IUpdateableConfig
+    {
+        public UpdateableConfig()
+        {
+            MappingAssemblies = new List<Assembly>();
+        }
+
+        public List<Assembly> MappingAssemblies { get; set; }
     }
 
 }

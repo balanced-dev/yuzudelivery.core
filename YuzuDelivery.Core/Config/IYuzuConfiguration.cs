@@ -6,9 +6,10 @@ namespace YuzuDelivery.Core
 {
     public interface IYuzuConfiguration
     {
-        IEnumerable<Type> ViewModels { get; }
         Assembly[] ViewModelAssemblies { get; set; }
+        List<Assembly> MappingAssemblies { get; set; }
 
+        IEnumerable<Type> ViewModels { get; }
         IEnumerable<Type> CMSModels { get; set; }
 
         List<IDataLocation> SchemaMetaLocations { get; set; }
@@ -19,5 +20,10 @@ namespace YuzuDelivery.Core
 
         Func<Dictionary<string, Func<object, string>>> GetTemplatesCache { get; set; }
         Func<Dictionary<string, Func<object, string>>> SetTemplatesCache { get; set; }
+    }
+
+    public interface IUpdateableConfig
+    {
+        List<Assembly> MappingAssemblies { get; set; }
     }
 }

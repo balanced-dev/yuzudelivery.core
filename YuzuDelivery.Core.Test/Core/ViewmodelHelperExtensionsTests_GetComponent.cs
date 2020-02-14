@@ -50,7 +50,7 @@ namespace YuzuDelivery.Core.Test
             ViewModels = new List<Type>();
             ViewModels.Add(blockType);
 
-            config = MockRepository.GeneratePartialMock<YuzuConfiguration>();
+            config = MockRepository.GeneratePartialMock<YuzuConfiguration>(new object[] { new List<IUpdateableConfig>() });
             config.Stub(x => x.ViewModels).Return(ViewModels);
         }
 
