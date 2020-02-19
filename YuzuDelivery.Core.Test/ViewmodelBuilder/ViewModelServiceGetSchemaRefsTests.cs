@@ -96,6 +96,13 @@ namespace YuzuDelivery.Core.ViewModelBuilder.Tests
             Assert.False(output.Contains("\"$ref\": \"./par_Ref.schema_Partial\""));
         }
 
+        [Test]
+        public void given_a_file_with_name_references_using_data()
+        {
+            var file = "\"$ref\" :\"/data2_2_ExternalRef\"";
+            var output = svc.Fix(file);
 
+            Assert.True(output.Contains("\"$ref\" :\"./data2_2_ExternalRef.schema\""));
+        }
     }
 }

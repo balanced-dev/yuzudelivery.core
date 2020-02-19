@@ -11,8 +11,8 @@ namespace YuzuDelivery.Core.ViewModelBuilder
 {
     public class ReferencesService
     {
-        public const string SchemaFileReferencePattern = @"""\$ref""\s?:\s?""\./par.*schema""";
-        public const string SchemaNameReferencePattern = @"""\$ref""\s?:\s?""\/par.*\""";
+        public const string SchemaFileReferencePattern = @"""\$ref""\s?:\s?""\./(par|data).*schema""";
+        public const string SchemaNameReferencePattern = @"""\$ref""\s?:\s?""\/(par|data).*\""";
 
         private string pagePath;
         private string blockPath;
@@ -55,7 +55,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder
                     .Replace("\"", "");
                 var replaceValue = string.Format(".{0}.schema\"", matchValue);
 
-                var fixedMatches = Regex.Matches(file, SchemaFileReferencePattern.Replace("./par.*schema", replaceValue));
+                var fixedMatches = Regex.Matches(file, SchemaFileReferencePattern.Replace("./(par|data).*schema", replaceValue));
                 if (fixedMatches.Count == 0)
                 {
                     var toReplace = string.Format("{0}\"", matchValue);
