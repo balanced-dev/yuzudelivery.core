@@ -73,7 +73,6 @@ namespace YuzuDelivery.Core
         public virtual JObject GetPathFileData(Type propertyType)
         {
             var typeName = propertyType.Name;
-            var isPage = typeName.IsPage();
             string pathFilename = string.Empty;
 
             //get paths file from frontend solution

@@ -152,7 +152,7 @@ namespace YuzuDelivery.Core.Test
             Assert.AreEqual(JObject.Parse(jsonPaths), output);
         }
 
-        [Test, ExpectedException(ExpectedMessage = "Paths file not found for vmBlock_Test")]
+        [Test, ExpectedException(ExpectedMessage = "Schema meta file not found for vmBlock_Test")]
         public void GetPathFileData_given_path_file_found_then_throw_exception()
         {
             var p = CreatePropertyInfo("ContentRows", "vmBlock_Test");
@@ -161,19 +161,12 @@ namespace YuzuDelivery.Core.Test
         }
 
         [Test]
-        public void GetPathFileName_given_root_path_and_type_then_show_path_without_vm_prefix()
+        public void GetPossiblePathFileName_return_possible_paths_with_par_prefix_and_without_prefix()
         {
-            var output = svc.GetPathFileName("c:/test", "vmPage_Test", true);
+            var output = svc.GetPossiblePathFileName("c:/test", "vmPage_Test");
 
-            Assert.AreEqual("c:/test/Test.schema", output);
-        }
-
-        [Test]
-        public void GetPathFileName_given_is_sub_block_then_add_par_prefix()
-        {
-            var output = svc.GetPathFileName("c:/test", "vmBlock_Test", false);
-
-            Assert.AreEqual("c:/test/parTest.schema", output);
+            Assert.AreEqual("c:/test/Test.schema", output[0]);
+            Assert.AreEqual("c:/test/parTest.schema", output[1]);
         }
 
         public void CreatePathDataLocations(string[] locations)
@@ -185,7 +178,7 @@ namespace YuzuDelivery.Core.Test
 
         public void StubPathFile(string rootPath, string declaringTypeName, string filePath, bool exists = true)
         {
-            svc.Stub(x => x.GetPathFileName(rootPath, declaringTypeName, false)).Return(filePath);
+            svc.Stub(x => x.GetPossiblePathFileName(rootPath, declaringTypeName)).Return(new string[] { filePath });
             svc.Stub(x => x.FileExists(filePath)).Return(exists);
             svc.Stub(x => x.FileRead(filePath)).Return(jsonPaths);
         }
