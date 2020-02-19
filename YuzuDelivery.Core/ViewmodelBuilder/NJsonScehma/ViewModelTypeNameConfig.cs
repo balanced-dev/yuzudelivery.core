@@ -24,7 +24,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder
             if (parentObjectName == typeNameHint)
                 objectName = typeNameHint.AddVmTypePrefix(SchemaName.ViewModelType);
             //external schema
-            else if (typeNameHint != null && typeNameHint.StartsWith("Par"))
+            else if (typeNameHint != null && (typeNameHint.StartsWith("Par") || typeNameHint.StartsWith("Data")))
             {
                 objectName = schema.Id.SchemaIdToName().AddVmTypePrefix(ViewModelType.block);
             }

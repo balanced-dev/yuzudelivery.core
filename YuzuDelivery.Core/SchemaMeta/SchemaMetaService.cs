@@ -78,22 +78,27 @@ namespace YuzuDelivery.Core
 
             //get paths file from frontend solution
             foreach(var location in config.SchemaMetaLocations) { 
-                var filename = GetPathFileName(location.Path, typeName, isPage);
-                if (FileExists(filename))
-                    pathFilename = filename;
+                var possibleFilenames = GetPossiblePathFileName(location.Path, typeName);
+                foreach (var filename in possibleFilenames)
+                {
+                    if (FileExists(filename))
+                        pathFilename = filename;
+                }
             };
 
             if (pathFilename != string.Empty)
                 return JsonConvert.DeserializeObject<JObject>(FileRead(pathFilename));
             else
-                throw new Exception(string.Format("Paths file not found for {0}", typeName));
+                throw new Exception(string.Format("Schema meta file not found for {0}", typeName));
         }
 
-        public virtual string GetPathFileName(string rootPath, string declaringTypeName, bool IsPage)
+        public virtual string[] GetPossiblePathFileName(string rootPath, string declaringTypeName)
         {
-            string filePatttern = IsPage ? "{0}/{1}.schema" : "{0}/{2}{1}.schema";
+            string[] patterns = new string[] { "{0}/{1}.schema", "{0}/{2}{1}.schema" };
 
-            return string.Format(filePatttern, rootPath, declaringTypeName.RemoveAllVmPrefixes(), YuzuConstants.Configuration.BlockRefPrefix.RemoveFirstForwardSlash());
+            return patterns.Select(pattern => {
+                return string.Format(pattern, rootPath, declaringTypeName.RemoveAllVmPrefixes(), YuzuConstants.Configuration.BlockRefPrefix.RemoveFirstForwardSlash());
+            }).ToArray();
         }
 
         public virtual bool FileExists(string pathFilename)

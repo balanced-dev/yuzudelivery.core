@@ -35,7 +35,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder
             if (string.IsNullOrEmpty(s))
                 throw new ArgumentException("String is null");
 
-            return s.Replace("./par", "");
+            return s.Replace("./par", "").Replace("./data", "");
         }
 
         public static string RemoveFileSuffix(this string s)
