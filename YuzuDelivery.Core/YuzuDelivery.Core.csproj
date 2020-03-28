@@ -115,6 +115,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutoMapper\MappingContextFactory.cs" />
+    <Compile Include="Mapper\AddedMapContext.cs" />
+    <Compile Include="Mapper\Interfaces\IMapper.cs" />
+    <Compile Include="AutoMapper\Mapper.cs" />
     <Compile Include="Config\ConfigTypesAndPropertiesExtensions.cs" />
     <Compile Include="Config\YuzuConfiguration.cs" />
     <Compile Include="ConstantsConfig\IYuzuConstantsConfig.cs" />
@@ -126,7 +130,14 @@
     <Compile Include="HbsHelpers\IfCond.cs" />
     <Compile Include="HbsHelpers\ModPartial.cs" />
     <Compile Include="HbsHelpers\toString.cs" />
+    <Compile Include="AutoMapper\Interfaces\IMappingContextFactory.cs" />
+    <Compile Include="Mapper\Interfaces\IYuzuBaseOverride.cs" />
+    <Compile Include="Mapper\Interfaces\IYuzuMappingResolver.cs" />
+    <Compile Include="Mapper\YuzuMappingConfig.cs" />
+    <Compile Include="Mapper\YuzuMappingContext.cs" />
+    <Compile Include="Mapper\YuzuMappingSettings.cs" />
     <Compile Include="Render\HtmlExtensions.cs" />
+    <Compile Include="Render\IMapperAddItem.cs" />
     <Compile Include="Render\IYuzuDefinitionTemplates.cs" />
     <Compile Include="Render\YuzuDefinitionTemplates.cs" />
     <Compile Include="Render\IRenderSettings.cs" />
@@ -164,5 +175,6 @@
     <None Include="packages.config" />
     <None Include="YuzuDelivery.Core.nuspec" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

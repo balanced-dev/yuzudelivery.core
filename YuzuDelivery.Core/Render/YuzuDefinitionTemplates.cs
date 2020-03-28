@@ -3,39 +3,47 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
-using AutoMapper;
 using System.Web;
+using System.Web.Mvc;
 
 namespace YuzuDelivery.Core
 {
+
     public class YuzuDefinitionTemplates : IYuzuDefinitionTemplates
     {
         private const string TemplatesNotFoundMessage = "Yuzu definition template {0} not found";
         private const string RenderSettingsNotFound = "Render settings data not set";
         private const string RenderSettingsDataNotFound = "Render settings data not set for template {0}";
 
-        private IMapper mapper;
+        private readonly IMapper mapper;
         private readonly IYuzuConfiguration config;
+        private readonly IMapperAddItem[] mapperAddItems;
 
-        public YuzuDefinitionTemplates(IMapper mapper, IYuzuConfiguration config)
+        public YuzuDefinitionTemplates(IMapper mapper, IYuzuConfiguration config, IMapperAddItem[] mapperAddItems)
         {
             this.mapper = mapper;
             this.config = config;
+            this.mapperAddItems = mapperAddItems;
         }
 
-        public virtual string Render<E>(IRenderSettings settings, IDictionary<string, object> mappingItems = null)
+        public virtual string Render<E>(IRenderSettings settings, HtmlHelper html = null, IDictionary<string, object> mappingItems = null)
         {
             if (settings.MapFrom != null)
             {
                 if (mappingItems == null)
                     mappingItems = new Dictionary<string, object>();
 
+                if(!mappingItems.ContainsKey("HtmlHelper") && html != null)
+                    mappingItems.Add("HtmlHelper", html);
+
+                foreach(var a in mapperAddItems)
+                {
+                    a.Add(mappingItems);
+                }
+
                 settings.Data = () => {
-                    return mapper.Map<E>(settings.MapFrom, opt => {
-                        foreach(var i in mappingItems) {
-                            opt.Items.Add(i.Key, i.Value);
-                        }
-                    }); };
+                    return mapper.Map<E>(settings.MapFrom, mappingItems);
+                };
             }
             return Render(settings);
         }
@@ -69,7 +77,7 @@ namespace YuzuDelivery.Core
             if (settings.Data != null)
                 return settings.Data();
             else
-                return string.Empty;
+                return new { };
         }
 
         public virtual string RenderTemplate(IRenderSettings settings, object data)
