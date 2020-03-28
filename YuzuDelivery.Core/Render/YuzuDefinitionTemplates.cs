@@ -5,6 +5,7 @@ using System.Text;
 using Newtonsoft.Json;
 using System.Web;
 using System.Web.Mvc;
+using YuzuDelivery.Core.ViewModelBuilder;
 
 namespace YuzuDelivery.Core
 {
@@ -26,9 +27,12 @@ namespace YuzuDelivery.Core
             this.mapperAddItems = mapperAddItems;
         }
 
-        public virtual string Render<E>(IRenderSettings settings, HtmlHelper html = null, IDictionary<string, object> mappingItems = null)
+        public virtual string Render<E>(object model, bool showJson, IRenderSettings settings = null, HtmlHelper html = null, IDictionary<string, object> mappingItems = null)
         {
-            if (settings.MapFrom != null)
+            if (settings == null)
+                settings = new RenderSettings() { ShowJson = showJson };
+
+            if (model != null)
             {
                 if (mappingItems == null)
                     mappingItems = new Dictionary<string, object>();
@@ -41,8 +45,11 @@ namespace YuzuDelivery.Core
                     a.Add(mappingItems);
                 }
 
+                if (string.IsNullOrEmpty(settings.Template))
+                    settings.Template = GetSuspectTemplateName(typeof(E));
+
                 settings.Data = () => {
-                    return mapper.Map<E>(settings.MapFrom, mappingItems);
+                    return mapper.Map<E>(model, mappingItems);
                 };
             }
             return Render(settings);
@@ -88,6 +95,8 @@ namespace YuzuDelivery.Core
                 templates = config.SetTemplatesCache();
             }
 
+
+
             if (!templates.ContainsKey(settings.Template))
                 throw new Exception(string.Format(TemplatesNotFoundMessage, settings.Template));
 
@@ -102,6 +111,15 @@ namespace YuzuDelivery.Core
                 return string.Format("{0}<pre data-app=\"JSONHelper\">{1}</pre>", html, HttpUtility.HtmlEncode(json));
             }
             return html;
+        }
+
+        public string GetSuspectTemplateName(Type model)
+        {
+            var suspectName = model.Name;
+            if (suspectName.IsPage())
+                return suspectName.RemoveAllVmPrefixes().FirstCharacterToLower();
+            else
+                return $"par{suspectName.RemoveAllVmPrefixes()}";
         }
     }
 }

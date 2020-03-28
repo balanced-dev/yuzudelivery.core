@@ -7,7 +7,6 @@ namespace YuzuDelivery.Core
         int CacheExpiry { get; set; }
         string CacheName { get; set; }
         Func<object> Data { get; set; }
-        object MapFrom { get; set; }
         bool ShowJson { get; set; }
         string Template { get; set; }
     }

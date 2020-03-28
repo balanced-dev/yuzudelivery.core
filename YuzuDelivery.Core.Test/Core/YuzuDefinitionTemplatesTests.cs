@@ -5,8 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Rhino.Mocks;
-using YuzuDelivery.Core;
 using AutoMapper;
+using Newtonsoft.Json;
+using System.Web.Mvc;
 
 namespace YuzuDelivery.Core.Test
 {
@@ -20,22 +21,35 @@ namespace YuzuDelivery.Core.Test
 
         private ExampleModel exampleModel;
         private IDictionary<string, object> inputMappingItems;
+        private IDictionary<string, object> usedMappingItems;
+
+        private vmPage_ExampleViewModel exampleViewModel;
 
         private object dataObject;
         private string html;
         private IYuzuConfiguration config;
 
+        List<IMapperAddItem> mapperAddItems;
+
         private Dictionary<string, Func<object, string>> templates;
         private string templateName;
         private Func<object, string> templateRenderer;
+
+        [TestFixtureSetUp]
+        public void SetupFixture()
+        {
+            YuzuConstants.Reset();
+            YuzuConstants.Initialize(new YuzuConstantsConfig());
+        }
 
         [SetUp]
         public void Setup()
         {
             mapper = MockRepository.GenerateStub<IMapper>();
             config = MockRepository.GenerateStub<IYuzuConfiguration>();
+            mapperAddItems = new List<IMapperAddItem>();
 
-            svc = MockRepository.GeneratePartialMock<YuzuDefinitionTemplates>(new object[] { mapper, config });
+            svc = MockRepository.GeneratePartialMock<YuzuDefinitionTemplates>(new object[] { mapper, config, mapperAddItems.ToArray() });
             settings = new RenderSettings();
 
             config.GetRenderedHtmlCache = null;
@@ -48,7 +62,14 @@ namespace YuzuDelivery.Core.Test
             config.GetTemplatesCache = () => { return templates; };
 
             exampleModel = new ExampleModel() { Text = "text" };
+            exampleViewModel = new vmPage_ExampleViewModel();
             inputMappingItems = new Dictionary<string, object>();
+
+            Func<object, IDictionary<string, object>, vmPage_ExampleViewModel> doFunction = (object source, IDictionary<string, object> items) => {
+                usedMappingItems = items; return exampleViewModel;
+            };
+
+            mapper.Stub(x => x.Map<vmPage_ExampleViewModel>(null, null)).IgnoreArguments().Do(doFunction);
 
             Mapper.Reset();
         }
@@ -58,36 +79,43 @@ namespace YuzuDelivery.Core.Test
         [Test]
         public void given_automapped_model_then_model_maps_to_viewModel()
         {
-
             StubRenderMethod();
 
-            settings.MapFrom = exampleModel;
+            mapper.Stub(x => x.Map<vmPage_ExampleViewModel>(null, null)).IgnoreArguments().Return(exampleViewModel);
 
-            var exampleViewModel = new ExampleViewModel();
-            mapper.Stub(x => x.Map<ExampleViewModel>(null, null)).IgnoreArguments().Return(exampleViewModel);
-
-            svc.Render<ExampleViewModel>(settings);
+            svc.Render<vmPage_ExampleViewModel>(exampleModel, false, settings);
 
             Assert.AreEqual(settings.Data(), exampleViewModel);
         }
 
-        [Test, Ignore("can't work out how to test this")]
+        [Test]
         public void given_automapped_model_and_mapping_items_then_model_maps_to_viewModel()
         {
-            var d = new ExampleViewModelSub();
+            StubRenderMethod();
 
-            mapper.Stub(x => x.Map<ExampleViewModelSub>(settings.MapFrom)).Return(d);
+            inputMappingItems.Add("test", "text");
+
+            svc.Render<vmPage_ExampleViewModel>(exampleModel, false, settings, null, inputMappingItems);
+
+            settings.Data();
+
+            Assert.AreEqual(inputMappingItems["test"], usedMappingItems["test"]);
+        }
+
+        [Test]
+        public void given_automapped_model_and_mapped_actions_then_apply()
+        { 
+            var mappedItem = MockRepository.GenerateStub<IMapperAddItem>();
+
+            mapperAddItems.Add(mappedItem);
+
+            svc = MockRepository.GeneratePartialMock<YuzuDefinitionTemplates>(new object[] { mapper, config, mapperAddItems.ToArray() });
 
             StubRenderMethod();
 
-            settings.MapFrom = exampleModel;
-            inputMappingItems.Add("test", "text");
+            svc.Render<vmPage_ExampleViewModel>(exampleModel, false, settings, null, inputMappingItems);
 
-            svc.Render<ExampleViewModel>(settings, inputMappingItems);
-
-            var output = settings.Data() as ExampleViewModel;
-
-            Assert.AreEqual(inputMappingItems["test"], output.Sub.OptionItem);
+            mappedItem.AssertWasCalled(x => x.Add(inputMappingItems));
         }
 
         public void StubRenderMethod()
@@ -184,11 +212,11 @@ namespace YuzuDelivery.Core.Test
         }
 
         [Test]
-        public void given_no_render_data_then_throw_exception()
+        public void given_no_render_data_then_return_empty_object()
         {
             var output = svc.CreateData(settings);
 
-            Assert.AreEqual(output, string.Empty);
+            Assert.AreEqual(JsonConvert.SerializeObject(output), "{}");
         }
 
         #endregion
@@ -252,6 +280,26 @@ namespace YuzuDelivery.Core.Test
 
         #endregion
 
+        #region automate template name
+
+        [Test]
+        public void give_page_viewmodel_the_return_page_template_name()
+        {
+            var output = svc.GetSuspectTemplateName(typeof(vmPage_ExampleViewModel));
+
+            Assert.AreEqual("exampleViewModel", output);
+        }
+
+        [Test]
+        public void give_page_viewmodel_the_return_partial_template_name()
+        {
+            var output = svc.GetSuspectTemplateName(typeof(vmBlock_ExampleViewModelSub));
+
+            Assert.AreEqual("parExampleViewModelSub", output);
+        }
+
+        #endregion
+
         #region add_json
 
         [Test]
@@ -307,24 +355,24 @@ namespace YuzuDelivery.Core.Test
         public string Text { get; set; }
     }
 
-    public class ExampleViewModel
+    public class vmPage_ExampleViewModel
     {
         public string Text { get; set; }
-        public ExampleViewModelSub Sub { get; set; }
+        public vmBlock_ExampleViewModelSub Sub { get; set; }
     }
 
-    public class ExampleViewModelSub
+    public class vmBlock_ExampleViewModelSub
     {
         public string OptionItem { get; set; }
     }
 
 
-    public class ExampleConverter : IValueConverter<string, ExampleViewModelSub>
+    public class ExampleConverter : IValueConverter<string, vmBlock_ExampleViewModelSub>
     {
 
-        public ExampleViewModelSub Convert(string sourceMember, ResolutionContext context)
+        public vmBlock_ExampleViewModelSub Convert(string sourceMember, ResolutionContext context)
         {
-            return new ExampleViewModelSub()
+            return new vmBlock_ExampleViewModelSub()
             {
                 OptionItem = context.Options.Items["test"].ToString()
             };
