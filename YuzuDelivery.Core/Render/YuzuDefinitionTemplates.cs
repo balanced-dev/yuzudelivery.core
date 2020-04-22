@@ -19,12 +19,14 @@ namespace YuzuDelivery.Core
         private readonly IMapper mapper;
         private readonly IYuzuConfiguration config;
         private readonly IMapperAddItem[] mapperAddItems;
+        private readonly IYuzuTypeFactoryRunner typeFactoryRunner;
 
-        public YuzuDefinitionTemplates(IMapper mapper, IYuzuConfiguration config, IMapperAddItem[] mapperAddItems)
+        public YuzuDefinitionTemplates(IMapper mapper, IYuzuConfiguration config, IMapperAddItem[] mapperAddItems, IYuzuTypeFactoryRunner typeFactoryRunner)
         {
             this.mapper = mapper;
             this.config = config;
             this.mapperAddItems = mapperAddItems;
+            this.typeFactoryRunner = typeFactoryRunner;
         }
 
         public virtual string Render<E>(object model, bool showJson, IRenderSettings settings = null, HtmlHelper html = null, IDictionary<string, object> mappingItems = null)
@@ -49,7 +51,11 @@ namespace YuzuDelivery.Core
                     settings.Template = GetSuspectTemplateName(typeof(E));
 
                 settings.Data = () => {
-                    return mapper.Map<E>(model, mappingItems);
+                    var output = typeFactoryRunner.Run<E>();
+                    if (output != null)
+                        return output;
+                    else
+                        return mapper.Map<E>(model, mappingItems);
                 };
             }
             return Render(settings);

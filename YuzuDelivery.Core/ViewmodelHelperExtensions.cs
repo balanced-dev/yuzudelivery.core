@@ -42,7 +42,6 @@ namespace YuzuDelivery.Core
             return str;
         }
 
-
         public static string RemoveAllVmPrefixes(this string str)
         {
             return str.Replace(YuzuConstants.Configuration.BlockPrefix, "").Replace(YuzuConstants.Configuration.SubPrefix, "").Replace(YuzuConstants.Configuration.PagePrefix, "");
@@ -58,17 +57,24 @@ namespace YuzuDelivery.Core
             return propertyTypeName.StartsWith(YuzuConstants.Configuration.PagePrefix);
         }
 
-        public static bool IsComponentVm(this string propertyTypeName, bool allowIgnored = false)
+        public static bool IsVm(this string propertyTypeName)
         {
-            if (allowIgnored)
-                return (propertyTypeName.StartsWith(YuzuConstants.Configuration.BlockPrefix) || propertyTypeName.StartsWith(YuzuConstants.Configuration.PagePrefix));
-            else
-                return (propertyTypeName.StartsWith(YuzuConstants.Configuration.BlockPrefix) || propertyTypeName.StartsWith(YuzuConstants.Configuration.PagePrefix));
+            return (propertyTypeName.StartsWith(YuzuConstants.Configuration.SubPrefix) || propertyTypeName.StartsWith(YuzuConstants.Configuration.BlockPrefix) || propertyTypeName.StartsWith(YuzuConstants.Configuration.PagePrefix));
+        }
+
+        public static bool IsComponentVm(this string propertyTypeName)
+        {
+            return (propertyTypeName.StartsWith(YuzuConstants.Configuration.BlockPrefix) || propertyTypeName.StartsWith(YuzuConstants.Configuration.PagePrefix));
         }
 
         public static bool IsBlockOrSubVm(this string propertyTypeName)
         {
             return (propertyTypeName.StartsWith(YuzuConstants.Configuration.BlockPrefix) || propertyTypeName.StartsWith(YuzuConstants.Configuration.SubPrefix));
+        }
+
+        public static bool IsBlock(this string propertyTypeName)
+        {
+            return (propertyTypeName.StartsWith(YuzuConstants.Configuration.BlockPrefix));
         }
 
         public static bool IsSubVm(this string propertyTypeName)
@@ -83,7 +89,7 @@ namespace YuzuDelivery.Core
 
         public static Type GetComponent(this Type type, IYuzuConfiguration config)
         {
-            if (type.Name.IsComponentVm(true))
+            if (type.Name.IsComponentVm())
                 return type;
             else
             {

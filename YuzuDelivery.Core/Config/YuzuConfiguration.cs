@@ -16,6 +16,10 @@ namespace YuzuDelivery.Core
 
             MappingAssemblies = new List<Assembly>();
 
+            InstalledManualMaps = new List<ManualMapInstalledType>();
+            ActiveManualMaps = new List<ManualMapActiveType>();
+            ViewmodelFactories = new Dictionary<Type, Func<IYuzuTypeFactory>>();
+
             foreach(var i in extraConfigs)
             {
                 MappingAssemblies = MappingAssemblies.Union(i.MappingAssemblies).ToList();
@@ -33,12 +37,16 @@ namespace YuzuDelivery.Core
             set
             {
                 viewModelAssemblies = value;
-                ViewModels = value.SelectMany(x => x.GetTypes().Where(y => y.Name.IsComponentVm()));
+                ViewModels = value.SelectMany(x => x.GetTypes().Where(y => y.Name.IsVm()));
             }
         }
 
         public virtual IEnumerable<Type> ViewModels { get; private set; }
         public IEnumerable<Type> CMSModels { get; set; }
+
+        public List<ManualMapInstalledType> InstalledManualMaps { get; private set; }
+        public List<ManualMapActiveType> ActiveManualMaps { get; private set; }
+        public Dictionary<Type, Func<IYuzuTypeFactory>> ViewmodelFactories { get; private set; }
 
         public List<ITemplateLocation> TemplateLocations { get; set; }
         public List<IDataLocation> SchemaMetaLocations { get; set; }
@@ -48,6 +56,22 @@ namespace YuzuDelivery.Core
 
         public Func<IRenderSettings, string> GetRenderedHtmlCache { get; set; }
         public Action<IRenderSettings, string> SetRenderedHtmlCache { get; set; }
+
+        public void AddActiveManualMap<Resolver, Dest>(string destMemberName = null)
+        {
+            ActiveManualMaps.Add(new ManualMapActiveType()
+            {
+                Resolver = typeof(Resolver),
+                Interface = typeof(Resolver).GetInterfaces().Where(x => !x.GetGenericArguments().Any()).FirstOrDefault(),
+                Dest = typeof(Dest),
+                DestMemberName = destMemberName
+            });
+        }
+
+        public bool HasActiveManualMap(string dest, string destMemberName = null)
+        {
+            return ActiveManualMaps.Any(x => x.Dest.Name == dest && x.DestMemberName == destMemberName);
+        }
 
     }
 
@@ -71,6 +95,24 @@ namespace YuzuDelivery.Core
         }
 
         public List<Assembly> MappingAssemblies { get; set; }
+    }
+
+    public class ManualMapInstalledType
+    {
+        public Type Interface { get; set; }
+        public Type Concrete { get; set; }
+        public Type SourceType { get; set; }
+        public Type SourceMemberType { get; set; }
+        public Type DestType { get; set; }
+        public Type DestMemberType { get; set; }
+    }
+
+    public class ManualMapActiveType
+    {
+        public Type Resolver { get; set; }
+        public Type Interface { get; set; }
+        public Type Dest { get; set; }
+        public string DestMemberName { get; set; }
     }
 
 }

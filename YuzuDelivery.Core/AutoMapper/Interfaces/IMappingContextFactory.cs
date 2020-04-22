@@ -7,7 +7,7 @@ namespace YuzuDelivery.Core
 {
     public interface IMappingContextFactory
     {
-        T From<T>(ResolutionContext context)
+        T From<T>(IDictionary<string, object> items)
             where T : YuzuMappingContext;
     }
 }

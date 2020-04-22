@@ -23,7 +23,7 @@ namespace YuzuDelivery.Core
             return Items.Any(x => x.Source == source && x.Dest == dest);
         }
 
-        public IMappingExpression<Source, Dest> Get<Source, Dest>(MapperConfigurationExpression cfg)
+        public IMappingExpression<Source, Dest> AddOrGet<Source, Dest>(MapperConfigurationExpression cfg)
         {
             var map =  Items
                 .Where(x => x.Source == typeof(Source) && x.Dest == typeof(Dest))

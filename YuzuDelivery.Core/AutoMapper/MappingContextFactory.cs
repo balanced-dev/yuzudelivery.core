@@ -9,24 +9,25 @@ namespace YuzuDelivery.Core
 {
     public class MappingContextFactory : IMappingContextFactory
     {
-        public virtual T From<T>(ResolutionContext context)
+
+        public virtual T From<T>(IDictionary<string, object> items)
             where T : YuzuMappingContext
         {
             var output = new YuzuMappingContext();
 
-            AddDefaults(output, context);
+            AddDefaults(output, items);
 
             return output as T;
         }
 
-        protected void AddDefaults(YuzuMappingContext output, ResolutionContext context)
+        protected void AddDefaults(YuzuMappingContext output, IDictionary<string, object> items)
         {
-            output.Items = context.Items;
+            output.Items = items;
             output.HttpContext = new HttpContextWrapper(HttpContext.Current);
 
-            if (context.Items.ContainsKey("HtmlHelper"))
+            if (items.ContainsKey("HtmlHelper"))
             {
-                output.Html = context.Items["HtmlHelper"] as HtmlHelper;
+                output.Html = items["HtmlHelper"] as HtmlHelper;
             }
         }
     }

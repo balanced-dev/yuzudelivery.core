@@ -12,6 +12,10 @@ namespace YuzuDelivery.Core
         IEnumerable<Type> ViewModels { get; }
         IEnumerable<Type> CMSModels { get; set; }
 
+        List<ManualMapInstalledType> InstalledManualMaps { get; }
+        List<ManualMapActiveType> ActiveManualMaps { get; }
+        Dictionary<Type, Func<IYuzuTypeFactory>> ViewmodelFactories { get; }
+
         List<IDataLocation> SchemaMetaLocations { get; set; }
         List<ITemplateLocation> TemplateLocations { get; set; }
 
@@ -20,6 +24,9 @@ namespace YuzuDelivery.Core
 
         Func<Dictionary<string, Func<object, string>>> GetTemplatesCache { get; set; }
         Func<Dictionary<string, Func<object, string>>> SetTemplatesCache { get; set; }
+
+        void AddActiveManualMap<Resolver, Dest>(string destPropertyName = null);
+        bool HasActiveManualMap(string dest, string destMemberName = null);
     }
 
     public interface IUpdateableConfig

@@ -133,6 +133,13 @@
     <Compile Include="AutoMapper\Interfaces\IMappingContextFactory.cs" />
     <Compile Include="Mapper\Interfaces\IYuzuBaseOverride.cs" />
     <Compile Include="Mapper\Interfaces\IYuzuMappingResolver.cs" />
+    <Compile Include="Mapper\Interfaces\IYuzuTypeFactoryRunner.cs" />
+    <Compile Include="Mapper\ResolverInterfaces\IYuzuFullPropertyResolver.cs" />
+    <Compile Include="Mapper\ResolverInterfaces\IYuzuPropertyAfterResolver.cs" />
+    <Compile Include="Mapper\ResolverInterfaces\IYuzuPropertyResolver.cs" />
+    <Compile Include="Mapper\ResolverInterfaces\IYuzuTypeAfterConvertor.cs" />
+    <Compile Include="Mapper\ResolverInterfaces\IYuzuTypeConvertor.cs" />
+    <Compile Include="Mapper\ResolverInterfaces\IYuzuTypeFactory.cs" />
     <Compile Include="Mapper\YuzuMappingConfig.cs" />
     <Compile Include="Mapper\YuzuMappingContext.cs" />
     <Compile Include="Mapper\YuzuMappingSettings.cs" />
