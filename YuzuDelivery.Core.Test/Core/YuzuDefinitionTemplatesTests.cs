@@ -18,6 +18,7 @@ namespace YuzuDelivery.Core.Test
 
         private YuzuDefinitionTemplates svc;
         private RenderSettings settings;
+        private IYuzuTypeFactoryRunner typeFactoryRunner;
 
         private ExampleModel exampleModel;
         private IDictionary<string, object> inputMappingItems;
@@ -47,9 +48,10 @@ namespace YuzuDelivery.Core.Test
         {
             mapper = MockRepository.GenerateStub<IMapper>();
             config = MockRepository.GenerateStub<IYuzuConfiguration>();
+            typeFactoryRunner = MockRepository.GenerateStub<IYuzuTypeFactoryRunner>();
             mapperAddItems = new List<IMapperAddItem>();
 
-            svc = MockRepository.GeneratePartialMock<YuzuDefinitionTemplates>(new object[] { mapper, config, mapperAddItems.ToArray() });
+            svc = MockRepository.GeneratePartialMock<YuzuDefinitionTemplates>(new object[] { mapper, config, mapperAddItems.ToArray(), typeFactoryRunner });
             settings = new RenderSettings();
 
             config.GetRenderedHtmlCache = null;
@@ -109,13 +111,26 @@ namespace YuzuDelivery.Core.Test
 
             mapperAddItems.Add(mappedItem);
 
-            svc = MockRepository.GeneratePartialMock<YuzuDefinitionTemplates>(new object[] { mapper, config, mapperAddItems.ToArray() });
+            svc = MockRepository.GeneratePartialMock<YuzuDefinitionTemplates>(new object[] { mapper, config, mapperAddItems.ToArray(), typeFactoryRunner });
 
             StubRenderMethod();
 
             svc.Render<vmPage_ExampleViewModel>(exampleModel, false, settings, null, inputMappingItems);
 
             mappedItem.AssertWasCalled(x => x.Add(inputMappingItems));
+        }
+
+        [Test]
+        public void given_typedfactory_model_then_use_it()
+        {
+            StubRenderMethod();
+
+            typeFactoryRunner.Stub(x => x.Run<vmPage_ExampleViewModel>()).Return(exampleViewModel);
+
+            svc.Render<vmPage_ExampleViewModel>(exampleModel, false, settings, null, inputMappingItems);
+
+            Assert.AreEqual(settings.Data(), exampleViewModel);
+            typeFactoryRunner.AssertWasCalled(x => x.Run<vmPage_ExampleViewModel>());
         }
 
         public void StubRenderMethod()
