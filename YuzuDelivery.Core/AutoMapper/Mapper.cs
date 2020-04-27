@@ -31,5 +31,15 @@ namespace YuzuDelivery.Core
                 }
             });
         }
+
+        public object Map(object source, Type sourceType, Type destinationType, IDictionary<string, object> items)
+        {
+            return mapper.Map(source, sourceType, destinationType, opt => {
+                foreach (var i in items)
+                {
+                    opt.Items.Add(i.Key, i.Value);
+                }
+            });
+        }
     }
 }
