@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace YuzuDelivery.Umbraco.Core
+namespace YuzuDelivery.Core
 {
     public interface IYuzuPropertyAfterResolver { }
 }
