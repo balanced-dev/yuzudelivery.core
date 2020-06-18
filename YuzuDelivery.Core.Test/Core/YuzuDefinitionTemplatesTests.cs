@@ -130,7 +130,7 @@ namespace YuzuDelivery.Core.Test
             svc.Render<vmPage_ExampleViewModel>(exampleModel, false, settings, null, inputMappingItems);
 
             Assert.AreEqual(settings.Data(), exampleViewModel);
-            typeFactoryRunner.AssertWasCalled(x => x.Run<vmPage_ExampleViewModel>());
+            typeFactoryRunner.AssertWasCalled(x => x.Run<vmPage_ExampleViewModel>(inputMappingItems));
         }
 
         public void StubRenderMethod()
