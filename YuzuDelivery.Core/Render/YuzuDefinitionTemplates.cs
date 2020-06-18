@@ -42,7 +42,7 @@ namespace YuzuDelivery.Core
                 if(!mappingItems.ContainsKey("HtmlHelper") && html != null)
                     mappingItems.Add("HtmlHelper", html);
 
-                foreach(var a in mapperAddItems)
+                foreach (var a in mapperAddItems)
                 {
                     a.Add(mappingItems);
                 }
@@ -51,7 +51,7 @@ namespace YuzuDelivery.Core
                     settings.Template = GetSuspectTemplateName(typeof(E));
 
                 settings.Data = () => {
-                    var output = typeFactoryRunner.Run<E>();
+                    var output = typeFactoryRunner.Run<E>(mappingItems);
                     if (output != null)
                         return output;
                     else
