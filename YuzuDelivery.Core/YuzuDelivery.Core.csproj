@@ -116,6 +116,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AutoMapper\MappingContextFactory.cs" />
+    <Compile Include="HbsHelpers\ToLowerCase.cs" />
     <Compile Include="Mapper\AddedMapContext.cs" />
     <Compile Include="Mapper\Interfaces\IMapper.cs" />
     <Compile Include="AutoMapper\Mapper.cs" />
