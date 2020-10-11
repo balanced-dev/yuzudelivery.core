@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Web.Mvc;
 
 namespace YuzuDelivery.Core
@@ -7,5 +8,6 @@ namespace YuzuDelivery.Core
     {
         string Render(IRenderSettings settings);
         string Render<E>(object model, bool showJson = false, IRenderSettings settings = null, HtmlHelper html = null, IDictionary<string, object> mappingItems = null);
+        string GetSuspectTemplateName(Type model);
     }
 }
