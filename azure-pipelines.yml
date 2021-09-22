@@ -22,7 +22,7 @@ variables:
     revision: ''
     separator: ''
 
-name: $(version)$(separator)$(Rev:.r)
+name: $(version)$(separator)$(revision)
 
 steps:
 - task: Assembly-Info-NetFramework@2
