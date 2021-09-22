@@ -4,8 +4,13 @@ using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 using System.Web;
-using System.Web.Mvc;
 using YuzuDelivery.Core.ViewModelBuilder;
+#if NETCOREAPP
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Http;
+#else
+using System.Web.Mvc;
+#endif
 
 namespace YuzuDelivery.Core
 {
@@ -29,7 +34,11 @@ namespace YuzuDelivery.Core
             this.typeFactoryRunner = typeFactoryRunner;
         }
 
-        public virtual string Render<E>(object model, bool showJson, IRenderSettings settings = null, HtmlHelper html = null, IDictionary<string, object> mappingItems = null)
+#if NETCOREAPP
+        public string Render<E>(object model, bool showJson = false, IRenderSettings settings = null, IHtmlHelper html = null, IDictionary<string, object> mappingItems = null)
+#else
+        public string Render<E>(object model, bool showJson = false, IRenderSettings settings = null, HtmlHelper html = null, IDictionary<string, object> mappingItems = null)
+#endif
         {
             if (settings == null)
                 settings = new RenderSettings() { ShowJson = showJson };

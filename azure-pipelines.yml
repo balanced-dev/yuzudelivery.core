@@ -13,9 +13,15 @@ variables:
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
-  version: '1.0'
+  version: '1.0.49'
+  ${{ if ne(variables['Build.SourceBranchName'], 'master') }}:
+    revision: $[ counter('.', 0) ]
+    separator: '.'
+  ${{ if eq( variables['Build.SourceBranchName'], 'master') }}:
+    revision: ''
+    separator: ''
 
-name: $(version)$(Rev:.r)
+name: $(version)$(separator)$(Rev:.r)
 
 steps:
 - task: Assembly-Info-NetFramework@2
@@ -23,7 +29,6 @@ steps:
     Path: '$(Build.SourcesDirectory)'
     FileNames: |
       **\AssemblyInfo.cs
-
       **\AssemblyInfo.vb
     InsertAttributes: false
     FileEncoding: 'auto'

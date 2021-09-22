@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using Rhino.Mocks;
+using Moq;
 using YuzuDelivery.Core;
 using YuzuDelivery.Core.ViewModelBuilder;
 
@@ -10,28 +10,31 @@ namespace YuzuDelivery.Core.ViewModelBuilder.Tests
 
     public class ViewModelBuilderServiceTests
     {
+        public Mock<BuildViewModelsService> svcMock;
         public BuildViewModelsService svc;
         public ReferencesService references;
 
         [SetUp]
         public void Setup()
         {
-            var rootDir = Environment.CurrentDirectory.Replace("\\bin\\Debug", "").Replace("\\bin\\Release", "");
+            var rootDir = AppDomain.CurrentDomain.BaseDirectory.Replace("\\bin\\Debug\\net472", "").Replace("\\bin\\Release\\net472", "");
             var blockPath = string.Format("{0}\\ViewmodelBuilder\\Input", rootDir);
 
             var generate = new GenerateViewmodelService();
             var post = new List<IViewmodelPostProcessor>();
 
-            var config = MockRepository.GenerateStub<IYuzuConfiguration>();
+            var configMock = new Moq.Mock<IYuzuConfiguration>().SetupAllProperties();
+            var config = configMock.Object;
             config.TemplateLocations = new List<ITemplateLocation>();
             config.TemplateLocations.Add(new TemplateLocation() { Name = "Pages", Schema = "some" });
             config.TemplateLocations.Add(new TemplateLocation() { Name = "Partials", Schema = blockPath });
 
-            var importConfig = MockRepository.GenerateStub<IYuzuViewmodelsBuilderConfig>();
+            var importConfig = new Moq.Mock<IYuzuViewmodelsBuilderConfig>().SetupAllProperties().Object;
             importConfig.ExcludeViewmodelsAtGeneration = new List<string>();
 
-            svc = MockRepository.GeneratePartialMock<BuildViewModelsService>(new object[] { generate, post, config, importConfig });
-            svc.Stub(x => x.WriteOutputFile(null, null)).IgnoreArguments();
+            svcMock = new Moq.Mock<BuildViewModelsService>(MockBehavior.Strict, generate, post, config, importConfig) { CallBase = true };
+            svcMock.Setup(x => x.WriteOutputFile(It.IsAny<string>(), It.IsAny<string>()));
+            svc = svcMock.Object;
         }
 
         [Test]

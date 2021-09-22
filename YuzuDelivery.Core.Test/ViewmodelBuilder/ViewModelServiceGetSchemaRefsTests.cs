@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using Rhino.Mocks;
+using Moq;
 using YuzuDelivery.Core;
 using YuzuDelivery.Core.ViewModelBuilder;
 
@@ -21,12 +21,13 @@ namespace YuzuDelivery.Core.ViewModelBuilder.Tests
         [SetUp]
         public void Setup()
         {
-            var config = MockRepository.GenerateStub<IYuzuConfiguration>();
+            var configMock = new Moq.Mock<IYuzuConfiguration>().SetupAllProperties();
+            var config = configMock.Object;
             config.TemplateLocations = new List<ITemplateLocation>();
             config.TemplateLocations.Add(new TemplateLocation() { Name = "Pages", Schema = "some" });
             config.TemplateLocations.Add(new TemplateLocation() { Name = "Partials", Schema = "some" });
 
-            svc = MockRepository.GeneratePartialMock<ReferencesService>(new object[] { config });
+            svc = new Moq.Mock<ReferencesService>(MockBehavior.Loose, config) { CallBase = true }.Object;
             references = new List<string>();
             excludedTypes = new List<string>();
         }
