@@ -16,6 +16,7 @@
 	</dependencies>
   </metadata>
   <files>
-     <file src="bin\Release\YuzuDelivery.Core.dll" target="lib\net472" />
+     <file src="bin\Release\net472\YuzuDelivery.Core.dll" target="lib\net472" />
+     <file src="bin\Release\net5.0\YuzuDelivery.Core.dll" target="lib\net5.0" />
   </files>
 </package>
