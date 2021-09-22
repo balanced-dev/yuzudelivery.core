@@ -5,6 +5,7 @@
 
 trigger:
 - master
+- v9
 
 pool:
   vmImage: 'windows-latest'
