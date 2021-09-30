@@ -23,10 +23,10 @@ namespace YuzuDelivery.Core
 
         private readonly IMapper mapper;
         private readonly IYuzuConfiguration config;
-        private readonly IMapperAddItem[] mapperAddItems;
+        private readonly IEnumerable<IMapperAddItem> mapperAddItems;
         private readonly IYuzuTypeFactoryRunner typeFactoryRunner;
 
-        public YuzuDefinitionTemplates(IMapper mapper, IYuzuConfiguration config, IMapperAddItem[] mapperAddItems, IYuzuTypeFactoryRunner typeFactoryRunner)
+        public YuzuDefinitionTemplates(IMapper mapper, IYuzuConfiguration config, IEnumerable<IMapperAddItem> mapperAddItems, IYuzuTypeFactoryRunner typeFactoryRunner)
         {
             this.mapper = mapper;
             this.config = config;
