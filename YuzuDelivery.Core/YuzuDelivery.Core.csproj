@@ -6,14 +6,13 @@
   <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
     <Reference Include="System.Web" />
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.7" />
-    <PackageReference Include="Inflector" Version="1.0.0.0" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net5.0'">
     <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.2.0" />
-    <PackageReference Include="Inflector.NetStandard" Version="1.2.2" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Inflector.NetStandard" Version="1.2.2" />
     <PackageReference Include="AutoMapper" Version="8.1.1" />
     <PackageReference Include="Handlebars.Net" Version="1.10.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
