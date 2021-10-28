@@ -17,6 +17,8 @@ namespace YuzuDelivery.Core.ViewModelBuilder.Tests
         [SetUp]
         public void Setup()
         {
+            Inflector.Inflector.SetDefaultCultureFunc = () => System.Threading.Thread.CurrentThread.CurrentUICulture;
+
             var rootDir = AppDomain.CurrentDomain.BaseDirectory.Replace("\\bin\\Debug\\net472", "").Replace("\\bin\\Release\\net472", "");
             var blockPath = string.Format("{0}\\ViewmodelBuilder\\Input", rootDir);
 
