@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Dynamic;
 using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel;
+using HandlebarsDotNet.Compiler;
 
 namespace YuzuDelivery.Core
 {
@@ -86,16 +86,18 @@ namespace YuzuDelivery.Core
                 properties.Remove("_modifiers");
             }
 
-            properties.TryAdd("_modifiers", modifiers);
-
-            if (parameters[^1] is not HashParameterDictionary hashParameterDictionary)
-                return properties;
-
-            foreach (var (key, value) in hashParameterDictionary)
+            if (!properties.ContainsKey("_modifiers"))
             {
-                properties.Add(key, value);
+                properties.Add("_modifiers", modifiers);
             }
-
+            
+            if (!(parameters[parameters.Length - 1] is HashParameterDictionary hashParameterDictionary))
+                return properties;
+            
+            foreach ( var parameter in hashParameterDictionary)
+            {
+                properties.Add(parameter.Key, parameter.Value);
+            }
             return properties;
         }
     }

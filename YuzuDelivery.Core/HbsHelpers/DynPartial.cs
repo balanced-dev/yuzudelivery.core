@@ -1,20 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using HandlebarsDotNet;
+using HandlebarsDotNet.Compiler;
 
 namespace YuzuDelivery.Core
 {
     public class DynPartial
     {
-
-        public class DynPartial
-    {
-      
         public DynPartial()
         {
-            HandlebarsDotNet.Handlebars.RegisterHelper("dynPartial", (writer , context, parameters) =>
+            HandlebarsDotNet.Handlebars.RegisterHelper("dynPartial", (writer, context, parameters) =>
             {
                 var _ref = string.Empty;
                 if (parameters[0] != null)
@@ -27,10 +22,12 @@ namespace YuzuDelivery.Core
                     {
                         vmType = vmType.GetElementType();
                     }
+
                     if (vmType.IsGenericType)
                     {
                         vmType = vmType.GetGenericArguments().FirstOrDefault();
                     }
+
                     _ref = vmType.Name.Replace("vmBlock_", "par");
                 }
 
@@ -45,29 +42,26 @@ namespace YuzuDelivery.Core
                 {
                     //not sure what is faster
                     // linq:
-                    var properties = parameters[1].GetType().GetProperties().ToDictionary(property => StringExtensions.FirstCharacterToLower(property.Name),
-                      property => property.GetValue(parameters[1]));
-                    
+                    var properties = parameters[1].GetType().GetProperties().ToDictionary(
+                        property => StringExtensions.FirstCharacterToLower(property.Name),
+                        property => property.GetValue(parameters[1]));
+
                     //jsonSerialize/deserialize:
                     //var json = JsonConvert.SerializeObject(parameters[1]);
                     //var properties = JsonConvert.DeserializeObject<Dictionary<string, object>>(json); 
-                    
+
                     foreach (var property in hashParameterDictionary)
                     {
                         properties.Add(property.Key, property.Value);
                     }
-                    
+
                     r(writer, properties);
                 }
                 else
                 {
                     r(writer, parameters[1]);
                 }
-
             });
         }
-    }
-
-
     }
 }
