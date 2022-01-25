@@ -8,7 +8,6 @@ namespace YuzuDelivery.Core
 {
     public class ModPartial
     {
-
         /*
         var partial = Handlebars.partials[path];
                 if (typeof partial !== 'function') {
@@ -34,10 +33,12 @@ namespace YuzuDelivery.Core
                         {
                             vmType = vmType.GetElementType();
                         }
+
                         if (vmType.IsGenericType)
                         {
                             vmType = vmType.GetGenericArguments().FirstOrDefault();
                         }
+
                         _ref = vmType.Name.Replace("vmBlock_", "par");
                     }
 
@@ -47,37 +48,60 @@ namespace YuzuDelivery.Core
 
                     if (r != null)
                     {
-                        var modifiers = parameters.Where((source, index) => index > 1).Select(x => x != null ? x.ToString() : string.Empty).ToList();
-
-                        if (parameters[1] is ExpandoObject)
+                        if (_ref == "parMasonryLoadMore")
                         {
-                            dynamic outputContext = parameters[1];
-                            outputContext._modifiers = parameters[2];
-                            r(writer, outputContext);
+                            var test = "";
                         }
-                        else if (parameters[1].GetType().GetProperties().Any(x => x.Name.ToLower() == "_modifiers"))
-                        {
-                            var modifier = parameters[1].GetType().GetProperties().Where(x => x.Name.ToLower() == "_modifiers").FirstOrDefault();
-                            modifier.SetValue(parameters[1], modifiers);
-                            r(writer, parameters[1]);
-                        }
-                        else
-                        {
-                            var contentWithModifiers = parameters[1].AddProperty("_modifiers", modifiers);
-                            r(writer, contentWithModifiers);
-                        }
+                        r(writer, GetDataModel(parameters));
                     }
                     else
-                        throw new Exception(string.Format("Handlebars modifier partial cannot find partial {0}", parameters[0]));
+                        throw new Exception(string.Format("Handlebars modifier partial cannot find partial {0}",
+                            parameters[0]));
                 }
                 else
-                    throw new Exception("Handlebars modifier partial should have 3 parameters; parial name, content and modifier");
+                    throw new Exception(
+                        "Handlebars modifier partial should have 3 parameters; parial name, content and modifier");
             });
         }
 
+        private static Dictionary<string, object> GetDataModel(object[] parameters)
+        {
+            var modifiers = parameters.Where((source, index) => index > 1)
+                .Where(x => x != null && x.GetType() != typeof(HashParameterDictionary))
+                .Select(x => x.ToString()).ToList();
 
+
+            //not sure what is faster
+            // linq:
+            var properties = parameters[1].GetType().GetProperties().ToDictionary(
+                property => StringExtensions.FirstCharacterToLower(property.Name),
+                property => property.GetValue(parameters[1]));
+
+            //jsonSerialize/deserialize:
+            //var json = JsonConvert.SerializeObject(parameters[1]);
+            //var properties = JsonConvert.DeserializeObject<Dictionary<string, object>>(json); 
+
+            if (properties.Any(property => property.Key == "_modifiers" && property.Value == null))
+            {
+                properties.Remove("_modifiers");
+            }
+
+            properties.TryAdd("_modifiers", modifiers);
+
+            if (parameters[^1] is not HashParameterDictionary hashParameterDictionary)
+                return properties;
+
+            foreach (var (key, value) in hashParameterDictionary)
+            {
+                properties.Add(key, value);
+            }
+
+            return properties;
+        }
     }
 
+
+    [Obsolete("no longer in use?")]
     public static class ObjectExtensions
     {
         public static IDictionary<string, object> AddProperty(this object obj, string name, object value)
@@ -96,6 +120,7 @@ namespace YuzuDelivery.Core
             {
                 result.Add(property.Name, property.GetValue(obj));
             }
+
             return result;
         }
     }
