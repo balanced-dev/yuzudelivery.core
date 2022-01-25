@@ -9,9 +9,12 @@ namespace YuzuDelivery.Core
     public class DynPartial
     {
 
+        public class DynPartial
+    {
+      
         public DynPartial()
         {
-            HandlebarsDotNet.Handlebars.RegisterHelper("dynPartial", (writer, context, parameters) =>
+            HandlebarsDotNet.Handlebars.RegisterHelper("dynPartial", (writer , context, parameters) =>
             {
                 var _ref = string.Empty;
                 if (parameters[0] != null)
@@ -38,9 +41,32 @@ namespace YuzuDelivery.Core
                 if (r == null)
                     throw new Exception(string.Format("dynPartial error : Partial not found for ref {0}", _ref));
 
-                r(writer, parameters[1]);
+                if (parameters.Length > 2 && parameters[2] is HashParameterDictionary hashParameterDictionary)
+                {
+                    //not sure what is faster
+                    // linq:
+                    var properties = parameters[1].GetType().GetProperties().ToDictionary(property => StringExtensions.FirstCharacterToLower(property.Name),
+                      property => property.GetValue(parameters[1]));
+                    
+                    //jsonSerialize/deserialize:
+                    //var json = JsonConvert.SerializeObject(parameters[1]);
+                    //var properties = JsonConvert.DeserializeObject<Dictionary<string, object>>(json); 
+                    
+                    foreach (var property in hashParameterDictionary)
+                    {
+                        properties.Add(property.Key, property.Value);
+                    }
+                    
+                    r(writer, properties);
+                }
+                else
+                {
+                    r(writer, parameters[1]);
+                }
+
             });
         }
+    }
 
 
     }
