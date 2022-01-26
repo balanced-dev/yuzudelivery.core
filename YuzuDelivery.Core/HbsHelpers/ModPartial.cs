@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel;
 using HandlebarsDotNet.Compiler;
+using Newtonsoft.Json;
 
 namespace YuzuDelivery.Core
 {
@@ -52,7 +53,8 @@ namespace YuzuDelivery.Core
                         {
                             var test = "";
                         }
-                        r(writer, GetDataModel(parameters));
+
+                        r(writer, GetDataModel(parameters) ?? parameters[1]);
                     }
                     else
                         throw new Exception(string.Format("Handlebars modifier partial cannot find partial {0}",
@@ -63,19 +65,30 @@ namespace YuzuDelivery.Core
                         "Handlebars modifier partial should have 3 parameters; parial name, content and modifier");
             });
         }
+        private static bool IsSimple(Type type)
+        {
+            return type.IsPrimitive
+                   || type == typeof(string);
+        }
 
         private static Dictionary<string, object> GetDataModel(object[] parameters)
         {
+            var paramType = parameters[1].GetType();
+            //we can't support modifiers and hashParameters on base types
+            if (IsSimple(paramType))
+            {
+                return null;
+            }
+            
             var modifiers = parameters.Where((source, index) => index > 1)
                 .Where(x => x != null && x.GetType() != typeof(HashParameterDictionary))
                 .Select(x => x.ToString()).ToList();
-
-
+            
             //not sure what is faster
             // linq:
             var properties = parameters[1].GetType().GetProperties().ToDictionary(
-                property => StringExtensions.FirstCharacterToLower(property.Name),
-                property => property.GetValue(parameters[1]));
+              property => StringExtensions.FirstCharacterToLower(property.Name),
+              property => property.GetValue(parameters[1]));
 
             //jsonSerialize/deserialize:
             //var json = JsonConvert.SerializeObject(parameters[1]);
@@ -90,14 +103,15 @@ namespace YuzuDelivery.Core
             {
                 properties.Add("_modifiers", modifiers);
             }
-            
+
             if (!(parameters[parameters.Length - 1] is HashParameterDictionary hashParameterDictionary))
                 return properties;
-            
-            foreach ( var parameter in hashParameterDictionary)
+
+            foreach (var parameter in hashParameterDictionary)
             {
                 properties.Add(parameter.Key, parameter.Value);
             }
+
             return properties;
         }
     }
