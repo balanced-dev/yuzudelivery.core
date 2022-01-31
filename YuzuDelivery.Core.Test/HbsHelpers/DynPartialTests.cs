@@ -28,9 +28,9 @@ namespace YuzuDelivery.Core.Test.HbsHelpers
         }
 
         [Test]
-        public void given_empty_path_and_context()
+        public void given__ref_and_context()
         {
-            var source = "{{{dynPartial '' foo}}}";
+            var source = "{{{dynPartial _ref foo}}}";
             var partialSource = "test {{bar}}";
             var template = Handlebars.Compile(source);
 
@@ -47,9 +47,9 @@ namespace YuzuDelivery.Core.Test.HbsHelpers
         }
 
         [Test]
-        public void given_empty_path_context_and_parameter()
+        public void given__ref_context_and_parameter()
         {
-            var source = "{{{dynPartial '' foo param='test'}}}";
+            var source = "{{{dynPartial _ref foo param='test'}}}";
             var partialSource = "test {{bar}} {{param}}";
             var template = Handlebars.Compile(source);
 
@@ -68,7 +68,7 @@ namespace YuzuDelivery.Core.Test.HbsHelpers
         [Test]
         public void given_empty_path_and_context_is_array()
         {
-            var source = "{{{dynPartial '' foo}}}";
+            var source = "{{{dynPartial _ref foo}}}";
             var partialSource = "test {{#each this}}{{this.bar}}{{/each}}";
             var template = Handlebars.Compile(source);
 
@@ -84,6 +84,24 @@ namespace YuzuDelivery.Core.Test.HbsHelpers
             Assert.AreEqual("test bar", output);
         }
 
+        [Test]
+        public void given_partial_form_ref_and_context_is_generic_list()
+        {
+            var source = "{{{dynPartial _ref foo}}}";
+            var partialSource = "test {{#each this}}{{this.bar}}{{/each}}";
+            var template = Handlebars.Compile(source);
+
+            using (var reader = new StringReader(partialSource))
+            {
+                var partialTemplate = Handlebars.Compile(reader);
+                Handlebars.RegisterTemplate("parPartialName", partialTemplate);
+            }
+
+            var data = new { foo = new List<vmBlock_PartialName>() { new vmBlock_PartialName() } };
+
+            var output = template(data);
+            Assert.AreEqual("test bar", output);
+        }
 
         [Test]
         public void given_path_and_context_where_context_is_an_object()
