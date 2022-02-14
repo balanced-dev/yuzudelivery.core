@@ -18,7 +18,7 @@ namespace YuzuDelivery.Core.Helpers
             var paramType = parameters[1].GetType();
             var properties = new Dictionary<string, object>();
             //we can't support modifiers and hashParameters on generic types
-            if (paramType.IsSimple() || paramType.IsArray)
+            if (paramType.IsSimple() || paramType.IsArray || paramType.IsGenericType)
             {
                 return null;
             }

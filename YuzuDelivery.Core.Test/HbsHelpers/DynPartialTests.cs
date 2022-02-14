@@ -115,7 +115,7 @@ namespace YuzuDelivery.Core.Test.HbsHelpers
         [TestCase(12)]
         [TestCase(12.0)]
         [TestCase('f')]
-        public void given_path_and_context_where_context_is_generic_type(object input)
+        public void given_path_and_context_where_context_is_base_type(object input)
         {
             var source = "{{{dynPartial 'partialName' foo}}}";
             var partialSource = "test {{this}}";
