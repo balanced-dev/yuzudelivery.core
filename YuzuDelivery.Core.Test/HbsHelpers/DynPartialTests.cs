@@ -135,6 +135,26 @@ namespace YuzuDelivery.Core.Test.HbsHelpers
             var output = template(data);
             Assert.AreEqual($"test {input}", output);
         }
+        
+        [Test]
+        public void given_empty_path_context_where_context_is_generic_type()
+        {
+            var source = "{{{dynPartial 'parPartialName' foo}}}";
+            var partialSource = "test {{this.[0].bar}}";
+            var template = Handlebars.Compile(source);
+
+            using (var reader = new StringReader(partialSource))
+            {
+                var partialTemplate = Handlebars.Compile(reader);
+                Handlebars.RegisterTemplate("parPartialName", partialTemplate);
+            }
+
+            var data = new { foo = new List<vmBlock_PartialName>() {new vmBlock_PartialName() } };
+
+            var output = template(data);
+            Assert.AreEqual("test bar", output);
+        }
+
 
         [Test]
         public void given_path_context_and_parameter()
