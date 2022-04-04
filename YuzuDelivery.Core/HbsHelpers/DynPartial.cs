@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using HandlebarsDotNet;
+using HandlebarsDotNet.Compiler;
+using Newtonsoft.Json;
+using YuzuDelivery.Core.Helpers;
 
 namespace YuzuDelivery.Core
 {
     public class DynPartial
     {
-
         public DynPartial()
         {
             HandlebarsDotNet.Handlebars.RegisterHelper("dynPartial", (writer, context, parameters) =>
@@ -24,10 +25,12 @@ namespace YuzuDelivery.Core
                     {
                         vmType = vmType.GetElementType();
                     }
+
                     if (vmType.IsGenericType)
                     {
                         vmType = vmType.GetGenericArguments().FirstOrDefault();
                     }
+
                     _ref = vmType.Name.Replace("vmBlock_", "par");
                 }
 
@@ -38,10 +41,15 @@ namespace YuzuDelivery.Core
                 if (r == null)
                     throw new Exception(string.Format("dynPartial error : Partial not found for ref {0}", _ref));
 
-                r(writer, parameters[1]);
+                if (parameters.Length > 1)
+                {
+                    r(writer, PartialHelpers.GetDataModel(parameters, context) ?? parameters[1]);
+                }
+                else
+                {
+                    r(writer, context);
+                }
             });
         }
-
-
     }
 }

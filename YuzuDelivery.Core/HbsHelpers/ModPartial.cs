@@ -1,14 +1,15 @@
 ﻿using System;
-using System.Dynamic;
 using System.Linq;
 using System.Collections.Generic;
 using System.ComponentModel;
+using HandlebarsDotNet.Compiler;
+using Newtonsoft.Json;
+using YuzuDelivery.Core.Helpers;
 
 namespace YuzuDelivery.Core
 {
     public class ModPartial
     {
-
         /*
         var partial = Handlebars.partials[path];
                 if (typeof partial !== 'function') {
@@ -34,10 +35,12 @@ namespace YuzuDelivery.Core
                         {
                             vmType = vmType.GetElementType();
                         }
+
                         if (vmType.IsGenericType)
                         {
                             vmType = vmType.GetGenericArguments().FirstOrDefault();
                         }
+
                         _ref = vmType.Name.Replace("vmBlock_", "par");
                     }
 
@@ -47,37 +50,28 @@ namespace YuzuDelivery.Core
 
                     if (r != null)
                     {
-                        var modifiers = parameters.Where((source, index) => index > 1).Select(x => x != null ? x.ToString() : string.Empty).ToList();
+                        if (_ref == "parMasonryLoadMore")
+                        {
+                            var test = "";
+                        }
 
-                        if (parameters[1] is ExpandoObject)
-                        {
-                            dynamic outputContext = parameters[1];
-                            outputContext._modifiers = parameters[2];
-                            r(writer, outputContext);
-                        }
-                        else if (parameters[1].GetType().GetProperties().Any(x => x.Name.ToLower() == "_modifiers"))
-                        {
-                            var modifier = parameters[1].GetType().GetProperties().Where(x => x.Name.ToLower() == "_modifiers").FirstOrDefault();
-                            modifier.SetValue(parameters[1], modifiers);
-                            r(writer, parameters[1]);
-                        }
-                        else
-                        {
-                            var contentWithModifiers = parameters[1].AddProperty("_modifiers", modifiers);
-                            r(writer, contentWithModifiers);
-                        }
+                        r(writer, PartialHelpers.GetDataModel(parameters) ?? parameters[1]);
                     }
                     else
-                        throw new Exception(string.Format("Handlebars modifier partial cannot find partial {0}", parameters[0]));
+                        throw new Exception(string.Format("Handlebars modifier partial cannot find partial {0}",
+                            parameters[0]));
                 }
                 else
-                    throw new Exception("Handlebars modifier partial should have 3 parameters; parial name, content and modifier");
+                    throw new Exception(
+                        "Handlebars modifier partial should have 3 parameters; parial name, content and modifier");
             });
         }
 
-
+        
     }
 
+
+    [Obsolete("no longer in use?")]
     public static class ObjectExtensions
     {
         public static IDictionary<string, object> AddProperty(this object obj, string name, object value)
@@ -96,6 +90,7 @@ namespace YuzuDelivery.Core
             {
                 result.Add(property.Name, property.GetValue(obj));
             }
+
             return result;
         }
     }
