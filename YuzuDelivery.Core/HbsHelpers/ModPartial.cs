@@ -50,11 +50,6 @@ namespace YuzuDelivery.Core
 
                     if (r != null)
                     {
-                        if (_ref == "parMasonryLoadMore")
-                        {
-                            var test = "";
-                        }
-
                         r(writer, PartialHelpers.GetDataModel(parameters) ?? parameters[1]);
                     }
                     else
@@ -63,7 +58,7 @@ namespace YuzuDelivery.Core
                 }
                 else
                     throw new Exception(
-                        "Handlebars modifier partial should have 3 parameters; parial name, content and modifier");
+                        "Handlebars modifier partial should have 3 parameters; partial name, content and modifier");
             });
         }
 
