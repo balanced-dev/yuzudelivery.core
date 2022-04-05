@@ -38,7 +38,7 @@ namespace YuzuDelivery.Core
                     var userSettings = new Dictionary<string, object>(parameters[2] as Dictionary<string, object>);
 
                     // Allows overriding of any settings and/or addition of extra settings to be used by the image processor
-                    settings = Extend(settings, userSettings);
+                    settings = Sanitize(Extend(settings, userSettings));
 
                     // Create webP first        
                     if (settings["createWebP"].ToBool())
@@ -60,6 +60,19 @@ namespace YuzuDelivery.Core
 
                 writer.WriteSafeString(sourceTagsHTML);
             });
+        }
+        /// <summary>
+        /// Sanitizes settings dictionary-values by removing whitespace characters
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns>
+        /// Sanitized settings dictionary
+        /// </returns>
+        private static Dictionary<string, object> Sanitize(Dictionary<string, object> obj)
+        {
+            foreach (string key in obj.Keys)
+                obj[key] = obj[key].ToString()?.Trim();
+            return obj;
         }
 
         public Dictionary<string, object> Extend(Dictionary<string, object> obj, Dictionary<string, object> src)
