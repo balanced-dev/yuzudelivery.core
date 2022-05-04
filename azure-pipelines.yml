@@ -14,7 +14,7 @@ variables:
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
-  version: '2.0.3'
+  version: '2.0.4'
   ${{ if ne(variables['Build.SourceBranchName'], 'master') }}:
     revision: $[ counter('.', 0) ]
     separator: '.'
