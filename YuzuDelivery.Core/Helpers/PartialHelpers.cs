@@ -24,23 +24,6 @@ namespace YuzuDelivery.Core.Helpers
                 return null;
             }
             
-            var modifiers = parameters.Where((source, index) => index > 1)
-                .Where(x => x != null && x.GetType().IsSimple())
-                .Select(x => x.ToString()).ToList();
-            
-            if (modifiers.Any())
-            {
-                if (properties.Any(property => property.Key == "_modifiers" && property.Value == null))
-                {
-                    properties.Remove("_modifiers");
-                }
-
-                if (!properties.ContainsKey("_modifiers"))
-                {
-                    properties.Add("_modifiers", modifiers);
-                }
-            }
-            
             if (paramType != typeof(HashParameterDictionary))
             {
                 //not sure what is faster
@@ -59,6 +42,22 @@ namespace YuzuDelivery.Core.Helpers
                 properties = ((object)context).GetType().GetProperties().ToDictionary(
                     property => StringExtensions.FirstCharacterToLower(property.Name),
                     property => property.GetValue(context));
+            }
+            
+            var modifiers = parameters.Where((source, index) => index > 1)
+                .Where(x => x != null && x.GetType().IsSimple())
+                .Select(x => x.ToString()).ToList();
+            if (modifiers.Any())
+            {
+                if (properties.Any(property => property.Key == "_modifiers" && property.Value == null))
+                {
+                    properties.Remove("_modifiers");
+                }
+
+                if (!properties.ContainsKey("_modifiers"))
+                {
+                    properties.Add("_modifiers", modifiers);
+                }
             }
             
             if (!(parameters[parameters.Length - 1] is HashParameterDictionary hashParameterDictionary))

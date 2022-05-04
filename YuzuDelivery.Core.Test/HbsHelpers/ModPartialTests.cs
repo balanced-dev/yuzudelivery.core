@@ -16,6 +16,8 @@ namespace YuzuDelivery.Core.Test.HbsHelpers
             helper = new YuzuDelivery.Core.ModPartial();
         }
         
+        
+        
                 [Test]
         public void given_empty_path_and_context()
         {
@@ -97,6 +99,32 @@ namespace YuzuDelivery.Core.Test.HbsHelpers
             var output = template(data);
             Assert.AreEqual("test foo bar", output);
         }
+        
+        [Test]
+        public void given_path_and_context_where_context_is_an_object_and_modifiers()
+        {
+            var source = "{{{modPartial 'partialName' foo 'modifier'}}}";
+            var partialSource = "test {{bar}} {{#each _modifiers}}{{this}}{{/each}}";
+            var template = Handlebars.Compile(source);
+            
+            using(var reader = new StringReader(partialSource))
+            {
+                var partialTemplate = Handlebars.Compile(reader);
+                Handlebars.RegisterTemplate("partialName", partialTemplate);
+            }
+            
+            var data = new
+            {
+                foo = new
+                {
+                    bar = "foo bar"
+                }
+            };
+
+            var output = template(data);
+            Assert.AreEqual("test foo bar modifier", output);
+        }
+        
 
         [Test]
         public void given_path_context_and_parameter()
@@ -121,6 +149,31 @@ namespace YuzuDelivery.Core.Test.HbsHelpers
 
             var output = template(data);
             Assert.AreEqual("test foo bar test", output);
+        }
+        
+        [Test]
+        public void given_path_context_modifier_and_parameter()
+        {
+            var source = "{{{modPartial 'partialName' foo 'modifier' param='test'}}}";
+            var partialSource = "test {{bar}} {{param}} {{#each _modifiers}}{{this}}{{/each}}";
+            var template = Handlebars.Compile(source);
+            
+            using(var reader = new StringReader(partialSource))
+            {
+                var partialTemplate = Handlebars.Compile(reader);
+                Handlebars.RegisterTemplate("partialName", partialTemplate);
+            }
+            
+            var data = new
+            {
+                foo = new
+                {
+                    bar = "foo bar"
+                }
+            };
+
+            var output = template(data);
+            Assert.AreEqual("test foo bar test modifier", output);
         }
         
         [Test]
