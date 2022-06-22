@@ -20,7 +20,7 @@ namespace YuzuDelivery.Core
                     var param1 = string.Empty;
                     var param2 = string.Empty;
 
-                    try { param0 = EnumResolver.Convert(parameters[0]).ToString(); } catch { }
+                    try { param0 = EnumResolver.Convert(parameters[0])?.ToString(); } catch { }
                     try { param1 = parameters[1].ToString(); } catch { }
                     try { param2 = EnumResolver.Convert(parameters[2])?.ToString(); } catch { }
 
@@ -76,8 +76,8 @@ namespace YuzuDelivery.Core
             }
             else
             {
-                var v1AsString = v1.ToString();
-                var v2AsString = v2.ToString();
+                var v1AsString = v1?.ToString();
+                var v2AsString = v2?.ToString();
 
                 switch (operators)
                 {
