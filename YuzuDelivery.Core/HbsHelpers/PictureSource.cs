@@ -70,7 +70,7 @@ namespace YuzuDelivery.Core
         /// </returns>
         private static Dictionary<string, object> Sanitize(Dictionary<string, object> obj)
         {
-            foreach (string key in obj.Keys)
+            foreach (string key in obj.Keys.ToList())
                 obj[key] = obj[key].ToString()?.Trim();
             return obj;
         }
