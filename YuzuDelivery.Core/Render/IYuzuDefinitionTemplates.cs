@@ -17,6 +17,7 @@ namespace YuzuDelivery.Core
 #else
         string Render<E>(object model, bool showJson = false, IRenderSettings settings = null, HtmlHelper html = null, IDictionary<string, object> mappingItems = null);
 #endif
-        string GetSuspectTemplateName(Type model);
+
+        string GetSuspectTemplateNameFromVm(Type vmType);
     }
 }

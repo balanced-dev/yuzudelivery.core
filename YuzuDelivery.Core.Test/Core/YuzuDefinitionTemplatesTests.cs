@@ -303,7 +303,7 @@ namespace YuzuDelivery.Core.Test
         [Test]
         public void give_page_viewmodel_the_return_page_template_name()
         {
-            var output = svc.Object.GetSuspectTemplateName(typeof(vmPage_ExampleViewModel));
+            var output = svc.Object.GetSuspectTemplateNameFromVm(typeof(vmPage_ExampleViewModel));
 
             Assert.AreEqual("exampleViewModel", output);
         }
@@ -311,7 +311,7 @@ namespace YuzuDelivery.Core.Test
         [Test]
         public void give_page_viewmodel_the_return_partial_template_name()
         {
-            var output = svc.Object.GetSuspectTemplateName(typeof(vmBlock_ExampleViewModelSub));
+            var output = svc.Object.GetSuspectTemplateNameFromVm(typeof(vmBlock_ExampleViewModelSub));
 
             Assert.AreEqual("parExampleViewModelSub", output);
         }

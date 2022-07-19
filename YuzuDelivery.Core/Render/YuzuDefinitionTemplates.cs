@@ -57,7 +57,7 @@ namespace YuzuDelivery.Core
                 }
 
                 if (string.IsNullOrEmpty(settings.Template))
-                    settings.Template = GetSuspectTemplateName(typeof(E));
+                    settings.Template = GetSuspectTemplateNameFromVm(typeof(E));
 
                 settings.Data = () => {
                     var output = typeFactoryRunner.Run<E>(mappingItems);
@@ -128,13 +128,18 @@ namespace YuzuDelivery.Core
             return html;
         }
 
-        public string GetSuspectTemplateName(Type model)
+        public string GetSuspectTemplateNameFromVm(Type vmType)
         {
-            var suspectName = model.Name;
-            if (suspectName.IsPage())
-                return suspectName.RemoveAllVmPrefixes().FirstCharacterToLower();
+            var suspectName = vmType.Name.RemoveAllVmPrefixes();
+
+            //allow getting template name from base viewmodels
+            if (vmType.BaseType != null && vmType.BaseType.Name.StartsWith("vm"))
+                suspectName = vmType.BaseType.Name.RemoveAllVmPrefixes();
+
+            if (vmType.Name.IsPage())
+                return suspectName.FirstCharacterToLower();
             else
-                return $"par{suspectName.RemoveAllVmPrefixes()}";
+                return $"par{suspectName}";
         }
     }
 }
