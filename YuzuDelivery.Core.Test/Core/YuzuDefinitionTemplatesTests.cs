@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using Moq;
 using AutoMapper;
 using Newtonsoft.Json;
 #if NETCOREAPP
@@ -19,11 +18,11 @@ namespace YuzuDelivery.Core.Test
     [TestFixture]
     public class YuzuDefinitionTemplatesTests
     {
-        private Mock<IMapper> mapper;
+        private IMapper mapper;
 
-        private Mock<YuzuDefinitionTemplates> svc;
+        private YuzuDefinitionTemplates svc;
         private RenderSettings settings;
-        private Mock<IYuzuTypeFactoryRunner> typeFactoryRunner;
+        private IYuzuTypeFactoryRunner typeFactoryRunner;
 
         private ExampleModel exampleModel;
         private IDictionary<string, object> inputMappingItems;
@@ -33,7 +32,7 @@ namespace YuzuDelivery.Core.Test
 
         private object dataObject;
         private string html;
-        private Mock<IYuzuConfiguration> config;
+        private IYuzuConfiguration config;
 
         List<IMapperAddItem> mapperAddItems;
 
@@ -51,22 +50,22 @@ namespace YuzuDelivery.Core.Test
         [SetUp]
         public void Setup()
         {
-            mapper = new Moq.Mock<IMapper>();
-            config = new Moq.Mock<IYuzuConfiguration>().SetupAllProperties();
-            typeFactoryRunner = new Moq.Mock<IYuzuTypeFactoryRunner>();
+            mapper = Substitute.For<IMapper>();
+            config = Substitute.For<IYuzuConfiguration>();
+            typeFactoryRunner = Substitute.For<IYuzuTypeFactoryRunner>();
             mapperAddItems = new List<IMapperAddItem>();
 
-            svc = new Moq.Mock<YuzuDefinitionTemplates>(MockBehavior.Loose, mapper.Object, config.Object, mapperAddItems.ToArray(), typeFactoryRunner.Object) { CallBase = true };
+            svc = Substitute.ForPartsOf<YuzuDefinitionTemplates>(mapper, config, mapperAddItems.ToArray(), typeFactoryRunner);
             settings = new RenderSettings();
 
-            config.Object.GetRenderedHtmlCache = null;
-            config.Object.SetRenderedHtmlCache = null;
+            config.GetRenderedHtmlCache = null;
+            config.SetRenderedHtmlCache = null;
 
             templates = new Dictionary<string, Func<object, string>>();
 
             templateName = "template";
             templateRenderer = (object data) => { return html; };
-            config.Object.GetTemplatesCache = () => { return templates; };
+            config.GetTemplatesCache = () => { return templates; };
 
             exampleModel = new ExampleModel() { Text = "text" };
             exampleViewModel = new vmPage_ExampleViewModel();
@@ -76,7 +75,7 @@ namespace YuzuDelivery.Core.Test
                 usedMappingItems = items; return exampleViewModel;
             };
 
-            mapper.Setup(x => x.Map<vmPage_ExampleViewModel>(It.IsAny<object>(), It.IsAny<IDictionary<string, object>>())).Returns(doFunction);
+            mapper.WhenForAnyArgs(x => x.Map<vmPage_ExampleViewModel>(null, null)).Do(x => doFunction(x.Arg<object>(), x.Arg<IDictionary<string, object>>()));
 
             Mapper.Reset();
         }
@@ -88,9 +87,9 @@ namespace YuzuDelivery.Core.Test
         {
             StubRenderMethod();
 
-            mapper.Setup(x => x.Map<vmPage_ExampleViewModel>(It.IsAny<object>(), It.IsAny<IDictionary<string, object>>())).Returns(exampleViewModel);
+            mapper.Map<vmPage_ExampleViewModel>(Arg.Any<object>(), Arg.Any<IDictionary<string, object>>()).Returns(exampleViewModel);
 
-            svc.Object.Render<vmPage_ExampleViewModel>(exampleModel, false, settings);
+            svc.Render<vmPage_ExampleViewModel>(exampleModel, false, settings);
 
             Assert.AreEqual(settings.Data(), exampleViewModel);
         }
@@ -102,7 +101,7 @@ namespace YuzuDelivery.Core.Test
 
             inputMappingItems.Add("test", "text");
 
-            svc.Object.Render<vmPage_ExampleViewModel>(exampleModel, false, settings, null, inputMappingItems);
+            svc.Render<vmPage_ExampleViewModel>(exampleModel, false, settings, null, inputMappingItems);
 
             settings.Data();
 
@@ -112,17 +111,17 @@ namespace YuzuDelivery.Core.Test
         [Test]
         public void given_automapped_model_and_mapped_actions_then_apply()
         { 
-            var mappedItem = new Moq.Mock<IMapperAddItem>();
+            var mappedItem = Substitute.For<IMapperAddItem>();
 
-            mapperAddItems.Add(mappedItem.Object);
+            mapperAddItems.Add(mappedItem);
 
-            svc = new Moq.Mock<YuzuDefinitionTemplates>(MockBehavior.Loose, mapper.Object, config.Object, mapperAddItems.ToArray(), typeFactoryRunner.Object) { CallBase = true };
+            svc = Substitute.For<YuzuDefinitionTemplates>(mapper, config, mapperAddItems.ToArray(), typeFactoryRunner);
 
             StubRenderMethod();
 
-            svc.Object.Render<vmPage_ExampleViewModel>(exampleModel, false, settings, null, inputMappingItems);
+            svc.Render<vmPage_ExampleViewModel>(exampleModel, false, settings, null, inputMappingItems);
 
-            mappedItem.Verify(x => x.Add(inputMappingItems));
+            mappedItem.Received().Add(inputMappingItems);
         }
 
         [Test]
@@ -130,17 +129,17 @@ namespace YuzuDelivery.Core.Test
         {
             StubRenderMethod();
 
-            typeFactoryRunner.Setup(x => x.Run<vmPage_ExampleViewModel>(null)).Returns(exampleViewModel);
+            typeFactoryRunner.Run<vmPage_ExampleViewModel>(inputMappingItems).Returns(exampleViewModel);
 
-            svc.Object.Render<vmPage_ExampleViewModel>(exampleModel, false, settings, null, inputMappingItems);
+            svc.Render<vmPage_ExampleViewModel>(exampleModel, false, settings, null, inputMappingItems);
 
             Assert.AreEqual(settings.Data(), exampleViewModel);
-            typeFactoryRunner.Verify(x => x.Run<vmPage_ExampleViewModel>(inputMappingItems));
+            typeFactoryRunner.Received().Run<vmPage_ExampleViewModel>(inputMappingItems);
         }
 
         public void StubRenderMethod()
         {
-            svc.Setup(x => x.Render(settings)).Returns((string) null);
+            svc.Configure().Render(settings).Returns((string) null);
         }
 
         #endregion
@@ -150,7 +149,7 @@ namespace YuzuDelivery.Core.Test
         [Test]
         public void given_render_settings_null_then_throw_exception()
         {
-            Assert.Throws<ArgumentNullException>(() => svc.Object.Render(null));
+            Assert.Throws<ArgumentNullException>(() => svc.Render(null));
         }
 
         [Test]
@@ -158,11 +157,11 @@ namespace YuzuDelivery.Core.Test
         {
             RemoveAllMethodsFromRender();
 
-            svc.Object.Render(settings);
+            svc.Render(settings);
 
-            svc.Verify(x => x.CreateData(settings));
-            svc.Verify(x => x.RenderTemplate(settings, dataObject));
-            svc.Verify(x => x.AddCurrentJsonToTemplate(settings, dataObject, html));
+            svc.Received().CreateData(settings);
+            svc.Received().RenderTemplate(settings, dataObject);
+            svc.Received().AddCurrentJsonToTemplate(settings, dataObject, html);
         }
 
         [Test]
@@ -172,20 +171,20 @@ namespace YuzuDelivery.Core.Test
 
             settings.CacheName = "cacheName";
 
-            var output = svc.Object.Render(settings);
+            var output = svc.Render(settings);
 
-            svc.Verify(x => x.RenderTemplate(settings, dataObject));
+            svc.Received().RenderTemplate(settings, dataObject);
         }
 
         [Test]
         public void given_cache_name_and_cache_exists_then_used_cached_version_and_dont_run_render()
         {
-            config.Object.GetRenderedHtmlCache = (IRenderSettings settings) => { return html; };
+            config.GetRenderedHtmlCache = (IRenderSettings settings) => { return html; };
 
             html = "html";
             settings.CacheName = "cacheName";
 
-            var output = svc.Object.Render(settings);
+            var output = svc.Render(settings);
 
             Assert.AreEqual(html, output);
         }
@@ -196,23 +195,23 @@ namespace YuzuDelivery.Core.Test
             var output = string.Empty;
             html = "html";
 
-            config.Object.GetRenderedHtmlCache = (IRenderSettings settings) => { return null; };
-            config.Object.SetRenderedHtmlCache = (IRenderSettings settings, string html) => { output = html; };
+            config.GetRenderedHtmlCache = (IRenderSettings settings) => { return null; };
+            config.SetRenderedHtmlCache = (IRenderSettings settings, string html) => { output = html; };
 
             RemoveAllMethodsFromRender();
 
             settings.CacheName = "cacheName";
 
-            svc.Object.Render(settings);
+            svc.Render(settings);
 
             Assert.AreEqual(html, output);
         }
 
         public void RemoveAllMethodsFromRender()
         {
-            svc.Setup(x => x.CreateData(settings)).Returns(dataObject);
-            svc.Setup(x => x.RenderTemplate(settings, dataObject)).Returns(html);
-            svc.Setup(x => x.AddCurrentJsonToTemplate(settings, dataObject, html)).Returns(html);
+            svc.Configure().CreateData(settings).Returns(dataObject);
+            svc.Configure().RenderTemplate(settings, dataObject).Returns(html);
+            svc.Configure().AddCurrentJsonToTemplate(settings, dataObject, html).Returns(html);
         }
 
         #endregion
@@ -226,7 +225,7 @@ namespace YuzuDelivery.Core.Test
 
             settings.Data = () => { return data; };
 
-            var output = svc.Object.CreateData(settings);
+            var output = svc.CreateData(settings);
 
             Assert.AreEqual(data, output);
         }
@@ -234,7 +233,7 @@ namespace YuzuDelivery.Core.Test
         [Test]
         public void given_no_render_data_then_return_empty_object()
         {
-            var output = svc.Object.CreateData(settings);
+            var output = svc.CreateData(settings);
 
             Assert.AreEqual(JsonConvert.SerializeObject(output), "{}");
         }
@@ -251,7 +250,7 @@ namespace YuzuDelivery.Core.Test
 
             AddTemplatesToTemplates();
 
-            var output = svc.Object.RenderTemplate(settings, dataObject);
+            var output = svc.RenderTemplate(settings, dataObject);
 
             Assert.AreEqual(html, output);
         }
@@ -263,7 +262,7 @@ namespace YuzuDelivery.Core.Test
 
             AddTemplatesToTemplates();
 
-            var output = svc.Object.RenderTemplate(settings, null);
+            var output = svc.RenderTemplate(settings, null);
 
             Assert.AreEqual(html, output);
         }
@@ -271,7 +270,7 @@ namespace YuzuDelivery.Core.Test
         [Test]
         public void given_templates_when_template_not_present_then_throw_exception()
         {
-            Assert.Throws<ArgumentNullException>(() => svc.Object.RenderTemplate(settings, dataObject));
+            Assert.Throws<ArgumentNullException>(() => svc.RenderTemplate(settings, dataObject));
         }
 
         [Test]
@@ -281,10 +280,10 @@ namespace YuzuDelivery.Core.Test
 
             AddTemplatesToTemplates();
 
-            config.Object.GetTemplatesCache = () => { return null; };
-            config.Object.SetTemplatesCache = () => { output = true; return templates; };
+            config.GetTemplatesCache = () => { return null; };
+            config.SetTemplatesCache = () => { output = true; return templates; };
 
-            svc.Object.RenderTemplate(settings, dataObject);
+            svc.RenderTemplate(settings, dataObject);
 
             Assert.IsTrue(output);
         }
@@ -303,7 +302,7 @@ namespace YuzuDelivery.Core.Test
         [Test]
         public void give_page_viewmodel_the_return_page_template_name()
         {
-            var output = svc.Object.GetSuspectTemplateNameFromVm(typeof(vmPage_ExampleViewModel));
+            var output = svc.GetSuspectTemplateNameFromVm(typeof(vmPage_ExampleViewModel));
 
             Assert.AreEqual("exampleViewModel", output);
         }
@@ -311,7 +310,7 @@ namespace YuzuDelivery.Core.Test
         [Test]
         public void give_page_viewmodel_the_return_partial_template_name()
         {
-            var output = svc.Object.GetSuspectTemplateNameFromVm(typeof(vmBlock_ExampleViewModelSub));
+            var output = svc.GetSuspectTemplateNameFromVm(typeof(vmBlock_ExampleViewModelSub));
 
             Assert.AreEqual("parExampleViewModelSub", output);
         }
@@ -327,7 +326,7 @@ namespace YuzuDelivery.Core.Test
             dataObject = new { name = "test" };
             settings.ShowJson = true;
 
-            var output = svc.Object.AddCurrentJsonToTemplate(settings, dataObject, html);
+            var output = svc.AddCurrentJsonToTemplate(settings, dataObject, html);
 
             Assert.IsTrue(output.StartsWith(html));
             Assert.IsTrue(output.Contains("name"));
@@ -340,7 +339,7 @@ namespace YuzuDelivery.Core.Test
             html = "<h1>header</h1>";
             settings.ShowJson = true;
 
-            var output = svc.Object.AddCurrentJsonToTemplate(settings, null, html);
+            var output = svc.AddCurrentJsonToTemplate(settings, null, html);
 
             Assert.AreEqual(html, output);
         }
@@ -351,7 +350,7 @@ namespace YuzuDelivery.Core.Test
             html = "<h1>header</h1>";
             settings.ShowJson = true;
 
-            var output = svc.Object.AddCurrentJsonToTemplate(settings, string.Empty, html);
+            var output = svc.AddCurrentJsonToTemplate(settings, string.Empty, html);
 
             Assert.AreEqual(html, output);
         }
@@ -359,7 +358,7 @@ namespace YuzuDelivery.Core.Test
         [Test]
         public void given_setting_doesnt_add_json_then_html_unchanged()
         {
-            var output = svc.Object.AddCurrentJsonToTemplate(settings, dataObject, html);
+            var output = svc.AddCurrentJsonToTemplate(settings, dataObject, html);
 
             Assert.AreEqual(html, output);
         }

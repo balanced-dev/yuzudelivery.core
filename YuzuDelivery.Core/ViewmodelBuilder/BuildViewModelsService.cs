@@ -13,7 +13,6 @@ namespace YuzuDelivery.Core.ViewModelBuilder
         private readonly GenerateViewmodelService generateViewmodelService;
         private readonly IEnumerable<IViewmodelPostProcessor> postProcessors;
         private readonly IYuzuViewmodelsBuilderConfig builderConfig;
-        private readonly IYuzuConfiguration config;
 
         private string pagePath;
         private string blockPath;

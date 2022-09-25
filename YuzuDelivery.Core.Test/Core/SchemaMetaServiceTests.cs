@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using Moq;
 using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -14,10 +13,10 @@ namespace YuzuDelivery.Core.Test
 {
     public class SchemaMetaServiceTests
     {
-        public Mock<ISchemaMetaPropertyService> schemaMetaPropertyService;
+        public ISchemaMetaPropertyService schemaMetaPropertyService;
 
-        public Mock<SchemaMetaService> svc;
-        public Mock<IYuzuConfiguration> config;
+        public SchemaMetaService svc;
+        public IYuzuConfiguration config;
 
         public string jsonPaths;
         public string jsonOfTypeParent;
@@ -33,11 +32,11 @@ namespace YuzuDelivery.Core.Test
         [SetUp]
         public void Setup()
         {
-            schemaMetaPropertyService = new Moq.Mock<ISchemaMetaPropertyService>();
-            config = new Moq.Mock<IYuzuConfiguration>();
-            config.Object.SchemaMetaLocations = new List<IDataLocation>();
+            schemaMetaPropertyService = Substitute.For<ISchemaMetaPropertyService>();
+            config = Substitute.For<IYuzuConfiguration>();
+            config.SchemaMetaLocations = new List<IDataLocation>();
 
-            svc = new Moq.Mock<SchemaMetaService>(MockBehavior.Loose, schemaMetaPropertyService.Object, config.Object) { CallBase = true };
+            svc = Substitute.ForPartsOf<SchemaMetaService>(schemaMetaPropertyService, config);
 
             jsonPaths = @"{
                 'refs': {
@@ -75,10 +74,10 @@ namespace YuzuDelivery.Core.Test
             var p = typeof(vmBlock_Test).GetProperty("ContentRows");
             var pathsJson = JObject.Parse(jsonPaths);
 
-            schemaMetaPropertyService.Setup(x => x.Get(p)).Returns((p.DeclaringType, "/contentRows"));
-            svc.Setup(x => x.GetPathFileData(p.DeclaringType)).Returns(pathsJson);
+            schemaMetaPropertyService.Get(p).Returns((p.DeclaringType, "/contentRows"));
+            svc.Configure().GetPathFileData(p.DeclaringType).Returns(pathsJson);
 
-            var output = svc.Object.Get(p, "refs");
+            var output = svc.Get(p, "refs");
 
             Assert.AreEqual("vmBlock_Test", output[0]);
             Assert.AreEqual("vmBlock_Test2", output[1]);
@@ -90,9 +89,9 @@ namespace YuzuDelivery.Core.Test
             var p = typeof(vmBlock_Test).GetProperty("ContentGrid");
             var pathsJson = JObject.Parse(jsonOfTypeParent);
 
-            svc.Setup(x => x.GetPathFileData(p.DeclaringType)).Returns(pathsJson);
+            svc.Configure().GetPathFileData(p.DeclaringType).Returns(pathsJson);
 
-            var output = svc.Object.Get(p.DeclaringType, "refs", "/content");
+            var output = svc.Get(p.DeclaringType, "refs", "/content");
 
             Assert.AreEqual("vmBlock_DataGridRows^parGrid", output[0]);
         }
@@ -103,9 +102,9 @@ namespace YuzuDelivery.Core.Test
             var p = typeof(vmBlock_Test).GetProperty("ContentGrid");
             var pathsJson = JObject.Parse(jsonOfTypeChild);
 
-            svc.Setup(x => x.GetPathFileData(p.DeclaringType)).Returns(pathsJson);
+            svc.Configure().GetPathFileData(p.DeclaringType).Returns(pathsJson);
 
-            var output = svc.Object.Get(p.DeclaringType, "refs", "/rows/columns/items", "parGrid");
+            var output = svc.Get(p.DeclaringType, "refs", "/rows/columns/items", "parGrid");
 
             Assert.AreEqual("vmBlock_Rte", output[0]);
             Assert.AreEqual("vmBlock_Image", output[1]);
@@ -119,9 +118,9 @@ namespace YuzuDelivery.Core.Test
             var pathsJson = JObject.Parse(jsonOfTypeChild);
 
             StubConfigViewmodels(blockType);
-            svc.Setup(x => x.GetPathFileData(blockType)).Returns(pathsJson);
+            svc.Configure().GetPathFileData(blockType).Returns(pathsJson);
 
-            var output = svc.Object.Get(p.PropertyType, "refs", "/rows/columns/items", "parGrid");
+            var output = svc.Get(p.PropertyType, "refs", "/rows/columns/items", "parGrid");
 
             Assert.AreEqual("vmBlock_Rte", output[0]);
             Assert.AreEqual("vmBlock_Image", output[1]);
@@ -134,7 +133,7 @@ namespace YuzuDelivery.Core.Test
             CreatePathDataLocations(new string[] { "c:/test" });
             StubPathFile("c:/test", "vmBlock_Test", "path");
 
-            var output = svc.Object.GetPathFileData(p.DeclaringType);
+            var output = svc.GetPathFileData(p.DeclaringType);
 
             Assert.AreEqual(JObject.Parse(jsonPaths), output);
         }
@@ -147,7 +146,7 @@ namespace YuzuDelivery.Core.Test
             StubPathFile("c:/test", "vmBlock_Test", "not-here", false);
             StubPathFile("c:/test2", "vmBlock_Test", "path");
 
-            var output = svc.Object.GetPathFileData(p.DeclaringType);
+            var output = svc.GetPathFileData(p.DeclaringType);
 
             Assert.AreEqual(JObject.Parse(jsonPaths), output);
         }
@@ -156,9 +155,9 @@ namespace YuzuDelivery.Core.Test
         public void GetPathFileData_given_path_file_found_then_throw_exception()
         {
             var p = typeof(vmBlock_Test).GetProperty("ContentRows");
-            config.Setup(x => x.SchemaMetaLocations).Returns(new List<IDataLocation>());
+            config.SchemaMetaLocations.Returns(new List<IDataLocation>());
 
-            var ex = Assert.Throws<Exception>(() => svc.Object.GetPathFileData(p.DeclaringType));
+            var ex = Assert.Throws<Exception>(() => svc.GetPathFileData(p.DeclaringType));
 
             Assert.That(ex.Message == "Schema meta file not found for vmBlock_Test");
         }
@@ -166,7 +165,7 @@ namespace YuzuDelivery.Core.Test
         [Test]
         public void GetPossiblePathFileName_return_possible_paths_with_par_prefix_and_without_prefix()
         {
-            var output = svc.Object.GetPossiblePathFileName("c:/test", "vmPage_Test");
+            var output = svc.GetPossiblePathFileName("c:/test", "vmPage_Test");
 
             Assert.AreEqual("c:/test/Test.schema", output[0]);
             Assert.AreEqual("c:/test/parTest.schema", output[1]);
@@ -176,14 +175,14 @@ namespace YuzuDelivery.Core.Test
         {
             var schemaMetaLocations = locations.Select(x => new DataLocation() { Path = x }).Cast<IDataLocation>().ToList();
 
-            config.Setup(x => x.SchemaMetaLocations).Returns(schemaMetaLocations);
+            config.SchemaMetaLocations.Returns(schemaMetaLocations);
         }
 
         public void StubPathFile(string rootPath, string declaringTypeName, string filePath, bool exists = true)
         {
-            svc.Setup(x => x.GetPossiblePathFileName(rootPath, declaringTypeName)).Returns(new string[] { filePath });
-            svc.Setup(x => x.FileExists(filePath)).Returns(exists);
-            svc.Setup(x => x.FileRead(filePath)).Returns(jsonPaths);
+            svc.Configure().GetPossiblePathFileName(rootPath, declaringTypeName).Returns(new string[] { filePath });
+            svc.Configure().FileExists(filePath).Returns(exists);
+            svc.Configure().FileRead(filePath).Returns(jsonPaths);
         }
 
         public void StubConfigViewmodels(Type type)
@@ -191,7 +190,7 @@ namespace YuzuDelivery.Core.Test
             var viewmodels = new List<Type>();
             viewmodels.Add(type);
 
-            config.Setup(x => x.ViewModels).Returns(viewmodels);
+            config.ViewModels.Returns(viewmodels);
         }
 
         public class vmBlock_Test

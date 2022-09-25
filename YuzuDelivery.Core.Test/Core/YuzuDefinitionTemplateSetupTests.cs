@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using Moq;
 using YuzuDelivery.Core;
 using System.IO;
 
@@ -13,17 +12,17 @@ namespace YuzuDelivery.Core.Test
     [TestFixture, Ignore("Properties not supported by Moq")]
     public class YuzuDefinitionTemplateSetupTests
     {
-        private Mock<YuzuDefinitionTemplateSetup> svc;
+        private YuzuDefinitionTemplateSetup svc;
 
-        private Mock<IHandlebarsProvider> hbs;
-        private Mock<IYuzuConstantsConfig> constantsConfig;
-        private Mock<IYuzuConfiguration> config;
+        private IHandlebarsProvider hbs;
+        private IYuzuConstantsConfig constantsConfig;
+        private IYuzuConfiguration config;
 
         private List<ITemplateLocation> templateLocations;
         private Dictionary<string, Func<object, string>> templates;
 
-        private Mock<DirectoryInfo> directory;
-        private Mock<DirectoryInfo> subdirectory;
+        private DirectoryInfo directory;
+        private DirectoryInfo subdirectory;
 
         private List<FileInfo> files;
         private string fileName = "testFile";
@@ -33,31 +32,31 @@ namespace YuzuDelivery.Core.Test
         [OneTimeSetUp]
         public void FixtureSetup()
         {
-            constantsConfig = new Moq.Mock<IYuzuConstantsConfig>();
+            constantsConfig = Substitute.For<IYuzuConstantsConfig>();
             YuzuConstants.Reset();
-            YuzuConstants.Initialize(constantsConfig.Object);
+            YuzuConstants.Initialize(constantsConfig);
         }
 
         [SetUp]
         public void Setup()
         {
-            hbs = new Moq.Mock<IHandlebarsProvider>();
-            config = new Moq.Mock<IYuzuConfiguration>();
+            hbs = Substitute.For<IHandlebarsProvider>();
+            config = Substitute.For<IYuzuConfiguration>();
 
             templates = new Dictionary<string, Func<object, string>>();
             templateLocations = new List<ITemplateLocation>();
 
-            directory = new Moq.Mock<DirectoryInfo>();
-            subdirectory = new Moq.Mock<DirectoryInfo>();
+            directory = Substitute.For<DirectoryInfo>();
+            subdirectory = Substitute.For<DirectoryInfo>();
 
             files = new List<FileInfo>();
 
-            directory.Setup(x => x.GetDirectories()).Returns(new DirectoryInfo[] { subdirectory.Object });
+            directory.GetDirectories().Returns(new DirectoryInfo[] { subdirectory });
 
-            config.Object.TemplateLocations = templateLocations;
-            constantsConfig.Object.TemplateFileExtension = fileExtension;
+            config.TemplateLocations = templateLocations;
+            constantsConfig.TemplateFileExtension = fileExtension;
 
-            svc = new Moq.Mock<YuzuDefinitionTemplateSetup>(MockBehavior.Loose, hbs, config) { CallBase = true };
+            svc = Substitute.ForPartsOf<YuzuDefinitionTemplateSetup>(hbs, config);
         }
 
         #region register_all
@@ -65,16 +64,16 @@ namespace YuzuDelivery.Core.Test
         [Test]
         public void given_template_locations_not_set_then_throw_excpetion()
         {
-            config.Object.TemplateLocations = null;
-            svc.Object.RegisterAll();
+            config.TemplateLocations = null;
+            svc.RegisterAll();
 
-            Assert.Throws<Exception>(() => svc.Object.RegisterAll());
+            Assert.Throws<Exception>(() => svc.RegisterAll());
         }
 
         [Test]
         public void given_template_locations_not_present_then_throw_excpetion()
         {
-            Assert.Throws<Exception>(() => svc.Object.RegisterAll());
+            Assert.Throws<Exception>(() => svc.RegisterAll());
         }
 
         [Test]
@@ -82,9 +81,9 @@ namespace YuzuDelivery.Core.Test
         {
             var location = StubLocationForRegister();
 
-            svc.Object.RegisterAll();
+            svc.RegisterAll();
 
-            svc.Verify(x => x.ProcessTemplates(directory.Object, ref templates, location));
+            svc.Received().ProcessTemplates(directory, ref templates, location);
         }
 
         [Test]
@@ -93,10 +92,10 @@ namespace YuzuDelivery.Core.Test
             var location = StubLocationForRegister();
             var location2 = StubLocationForRegister();
 
-            svc.Object.RegisterAll();
+            svc.RegisterAll();
 
-            svc.Verify(x => x.ProcessTemplates(directory.Object, ref templates, location));
-            svc.Verify(x => x.ProcessTemplates(directory.Object, ref templates, location2));
+            svc.Received().ProcessTemplates(directory, ref templates, location);
+            svc.Received().ProcessTemplates(directory, ref templates, location2);
         }
 
         [Test]
@@ -104,9 +103,9 @@ namespace YuzuDelivery.Core.Test
         {
             var location = StubLocationForRegister(false);
 
-            svc.Object.RegisterAll();
+            svc.RegisterAll();
 
-            svc.Verify(x => x.ProcessTemplates(directory.Object, ref templates, location));
+            svc.Received().ProcessTemplates(directory, ref templates, location);
         }
 
         public ITemplateLocation StubLocationForRegister(bool hasDirectory = true)
@@ -114,13 +113,13 @@ namespace YuzuDelivery.Core.Test
             var location = new TemplateLocation();
             templateLocations.Add(location);
 
-            svc.Setup(x => x.TestDirectoryExists(location));
-            svc.Setup(x => x.ProcessTemplates(directory.Object, ref templates, location));
+            svc.TestDirectoryExists(location);
+            svc.ProcessTemplates(directory, ref templates, location);
 
             if (hasDirectory)
-                svc.Setup(x => x.GetDirectory(location)).Returns(directory.Object);
+                svc.GetDirectory(location).Returns(directory);
             else
-                svc.Setup(x => x.GetDirectory(location)).Returns((DirectoryInfo) null);
+                svc.GetDirectory(location).Returns((DirectoryInfo) null);
 
             return location;
         }
@@ -137,11 +136,11 @@ namespace YuzuDelivery.Core.Test
 
             StubDirectoryFiles();
 
-            svc.Setup(x => x.AddCompiledTemplates(file, ref templates));
+            svc.AddCompiledTemplates(file, ref templates);
 
-            svc.Object.ProcessTemplates(directory.Object, ref templates, location);
+            svc.ProcessTemplates(directory, ref templates, location);
 
-            svc.Verify(x => x.AddCompiledTemplates(file, ref templates));
+            svc.Received().AddCompiledTemplates(file, ref templates);
         }
 
         [Test]
@@ -153,13 +152,13 @@ namespace YuzuDelivery.Core.Test
 
             StubDirectoryFiles();
 
-            svc.Setup(x => x.AddCompiledTemplates(file, ref templates));
-            svc.Setup(x => x.AddCompiledTemplates(file2, ref templates));
+            svc.AddCompiledTemplates(file, ref templates);
+            svc.AddCompiledTemplates(file2, ref templates);
 
-            svc.Object.ProcessTemplates(directory.Object, ref templates, location);
+            svc.ProcessTemplates(directory, ref templates, location);
 
-            svc.Verify(x => x.AddCompiledTemplates(file, ref templates));
-            svc.Verify(x => x.AddCompiledTemplates(file2, ref templates));
+            svc.Received().AddCompiledTemplates(file, ref templates);
+            svc.Received().AddCompiledTemplates(file2, ref templates);
         }
 
         [Test]
@@ -170,9 +169,9 @@ namespace YuzuDelivery.Core.Test
 
             StubDirectoryFiles();
 
-            svc.Object.ProcessTemplates(directory.Object, ref templates, location);
+            svc.ProcessTemplates(directory, ref templates, location);
 
-            svc.Verify(x => x.AddCompiledTemplates(file, ref templates));
+            svc.Received().AddCompiledTemplates(file, ref templates);
         }
 
         [Test]
@@ -183,12 +182,12 @@ namespace YuzuDelivery.Core.Test
 
             StubDirectoryFiles();
 
-            svc.Setup(x => x.AddCompiledTemplates(file, ref templates));
-            svc.Setup(x => x.RegisterPartial(file));
+            svc.AddCompiledTemplates(file, ref templates);
+            svc.RegisterPartial(file);
 
-            svc.Object.ProcessTemplates(directory.Object, ref templates, location);
+            svc.ProcessTemplates(directory, ref templates, location);
 
-            svc.Verify(x => x.RegisterPartial(file));
+            svc.Received().RegisterPartial(file);
         }
 
         [Test]
@@ -199,22 +198,22 @@ namespace YuzuDelivery.Core.Test
 
             StubDirectoryFiles();
 
-            svc.Setup(x => x.AddCompiledTemplates(file, ref templates));
-            svc.Setup(x => x.ProcessTemplates(subdirectory.Object, ref templates, location));
+            svc.AddCompiledTemplates(file, ref templates);
+            svc.ProcessTemplates(subdirectory, ref templates, location);
 
-            svc.Object.ProcessTemplates(directory.Object, ref templates, location);
+            svc.ProcessTemplates(directory, ref templates, location);
 
-            svc.Verify(x => x.ProcessTemplates(subdirectory.Object, ref templates, location));
+            svc.Received().ProcessTemplates(subdirectory, ref templates, location);
         }
 
         public FileInfo StubFile(string ext = ".hbs")
         {
-            var file = new Moq.Mock<FileInfo>();
-            file.Setup(x => x.Extension).Returns(ext);
-            file.Setup(x => x.Name).Returns(string.Format("{0}{1}", fileName, ext));
-            files.Add(file.Object);
+            var file = Substitute.For<FileInfo>();
+            file.Extension.Returns(ext);
+            file.Name.Returns(string.Format("{0}{1}", fileName, ext));
+            files.Add(file);
 
-            return file.Object;
+            return file;
         }
 
         public ITemplateLocation StubLocationForProcess(bool searchSubDirectories = false, bool registerAllAsPartials = false)
@@ -227,7 +226,7 @@ namespace YuzuDelivery.Core.Test
 
         public void StubDirectoryFiles()
         {
-            directory.Setup(x => x.GetFiles()).Returns(files.ToArray());
+            directory.GetFiles().Returns(files.ToArray());
         }
 
         #endregion
@@ -242,12 +241,12 @@ namespace YuzuDelivery.Core.Test
 
             Action<TextWriter, object> compiled = (TextWriter txt, object obj) => { };
 
-            svc.Setup(x => x.GetFileText(file)).Returns(fileContent);
-            hbs.Setup(x => x.Compile(It.IsAny<TextReader>())).Returns(compiled);
+            svc.GetFileText(file).Returns(fileContent);
+            hbs.Compile(Arg.Any<TextReader>()).Returns(compiled);
 
-            svc.Object.RegisterPartial(file);
+            svc.RegisterPartial(file);
 
-            hbs.Verify(x => x.RegisterTemplate(fileName, compiled));
+            hbs.Received().RegisterTemplate(fileName, compiled);
         }
 
         [Test]
@@ -257,10 +256,10 @@ namespace YuzuDelivery.Core.Test
 
             Func<object, string> compiled = (object obj) => { return null; };
 
-            svc.Setup(x => x.GetFileText(file)).Returns(fileContent);
-            hbs.Setup(x => x.Compile(fileContent)).Returns(compiled);
+            svc.GetFileText(file).Returns(fileContent);
+            hbs.Compile(fileContent).Returns(compiled);
 
-            svc.Object.AddCompiledTemplates(file, ref templates);
+            svc.AddCompiledTemplates(file, ref templates);
 
             Assert.IsTrue(templates.ContainsKey(fileName));
             Assert.AreEqual(templates[fileName], compiled);

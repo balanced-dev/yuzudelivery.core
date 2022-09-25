@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using Moq;
 using YuzuDelivery.Core;
 using YuzuDelivery.Core.ViewModelBuilder;
 
@@ -21,13 +20,13 @@ namespace YuzuDelivery.Core.ViewModelBuilder.Tests
         [SetUp]
         public void Setup()
         {
-            var configMock = new Moq.Mock<IYuzuConfiguration>().SetupAllProperties();
-            var config = configMock.Object;
+            var configMock = Substitute.For<IYuzuConfiguration>();
+            var config = configMock;
             config.TemplateLocations = new List<ITemplateLocation>();
             config.TemplateLocations.Add(new TemplateLocation() { Name = "Pages", Schema = "some" });
             config.TemplateLocations.Add(new TemplateLocation() { Name = "Partials", Schema = "some" });
 
-            svc = new Moq.Mock<ReferencesService>(MockBehavior.Loose, config) { CallBase = true }.Object;
+            svc = Substitute.For<ReferencesService>(config);
             references = new List<string>();
             excludedTypes = new List<string>();
         }

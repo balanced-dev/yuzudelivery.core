@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using Moq;
 using YuzuDelivery.Core;
 using YuzuDelivery.Core.ViewModelBuilder;
 
@@ -10,7 +9,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder.Tests
 
     public class ViewModelBuilderServiceTests
     {
-        public Mock<BuildViewModelsService> svcMock;
+        public BuildViewModelsService svcMock;
         public BuildViewModelsService svc;
         public ReferencesService references;
 
@@ -19,24 +18,24 @@ namespace YuzuDelivery.Core.ViewModelBuilder.Tests
         {
             Inflector.Inflector.SetDefaultCultureFunc = () => System.Threading.Thread.CurrentThread.CurrentUICulture;
 
-            var rootDir = AppDomain.CurrentDomain.BaseDirectory.Replace("\\bin\\Debug\\net472", "").Replace("\\bin\\Release\\net472", "");
+            var rootDir = AppDomain.CurrentDomain.BaseDirectory.Replace("\\bin\\Debug\\net6.0", "").Replace("\\bin\\Release\\net6.0", "");
             var blockPath = string.Format("{0}\\ViewmodelBuilder\\Input", rootDir);
 
             var generate = new GenerateViewmodelService();
             var post = new List<IViewmodelPostProcessor>();
 
-            var configMock = new Moq.Mock<IYuzuConfiguration>().SetupAllProperties();
-            var config = configMock.Object;
+            var configMock = Substitute.For<IYuzuConfiguration>();
+            var config = configMock;
             config.TemplateLocations = new List<ITemplateLocation>();
             config.TemplateLocations.Add(new TemplateLocation() { Name = "Pages", Schema = "some" });
             config.TemplateLocations.Add(new TemplateLocation() { Name = "Partials", Schema = blockPath });
 
-            var importConfig = new Moq.Mock<IYuzuViewmodelsBuilderConfig>().SetupAllProperties().Object;
+            var importConfig = Substitute.For<IYuzuViewmodelsBuilderConfig>();
             importConfig.ExcludeViewmodelsAtGeneration = new List<string>();
 
-            svcMock = new Moq.Mock<BuildViewModelsService>(MockBehavior.Strict, generate, post, config, importConfig) { CallBase = true };
-            svcMock.Setup(x => x.WriteOutputFile(It.IsAny<string>(), It.IsAny<string>()));
-            svc = svcMock.Object;
+            svcMock = Substitute.For<BuildViewModelsService>(generate, post, config, importConfig);
+            svcMock.Configure().WriteOutputFile(Arg.Any<string>(), Arg.Any<string>());
+            svc = svcMock;
         }
 
         [Test]

@@ -4,22 +4,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using Moq;
 using System.Reflection;
 
 namespace YuzuDelivery.Core.Test
 {
     public class VmHelperExtensionsTests_GetComponent
     {
-        public Mock<Type> blockType;
-        public Mock<Type> subBlockType;
-        public Mock<Type> subListBlockType;
-        public Mock<Type> parentBlockType;
-        public Mock<Type> subExternalBlockType;
+        public Type blockType;
+        public Type subBlockType;
+        public Type subListBlockType;
+        public Type parentBlockType;
+        public Type subExternalBlockType;
 
         public List<Type> ViewModels;
 
-        public Mock<YuzuConfiguration> config;
+        public YuzuConfiguration config;
 
         [OneTimeSetUp]
         public void FixtureSetup()
@@ -31,36 +30,36 @@ namespace YuzuDelivery.Core.Test
         [SetUp]
         public void Setup()
         {
-            blockType = new Moq.Mock<Type>();
-            blockType.Setup(x => x.Name).Returns("vmBlock_Name");
+            blockType = Substitute.For<Type>();
+            blockType.Name.Returns("vmBlock_Name");
 
-            subBlockType = new Moq.Mock<Type>();
-            subBlockType.Setup(x => x.Name).Returns("vmSub_Test");
+            subBlockType = Substitute.For<Type>();
+            subBlockType.Name.Returns("vmSub_Test");
 
-            /*subListBlockType = MockRepository.GenerateStub<Type>();
-            subListBlockType.Stub(x => x.IsGenericType).Return(true);
-            subListBlockType.Stub(x => x.GenericTypeArguments).Return(new Type[] { subBlockType });
+            subListBlockType = Substitute.For<Type>();
+            subListBlockType.IsGenericType.Returns(true);
+            subListBlockType.GenericTypeArguments.Returns(new Type[] { subBlockType });
 
-            parentBlockType = MockRepository.GenerateStub<Type>();
-            parentBlockType.Stub(x => x.Name).Return("vmSub_Parent");
+            parentBlockType = Substitute.For<Type>();
+            parentBlockType.Name.Returns("vmSub_Parent");
 
-            subExternalBlockType = MockRepository.GenerateStub<Type>();
-            subExternalBlockType.Stub(x => x.Name).Return("vmBlock_External");*/
+            subExternalBlockType = Substitute.For<Type>();
+            subExternalBlockType.Name.Returns("vmBlock_External");
 
             ViewModels = new List<Type>();
-            ViewModels.Add(blockType.Object);
+            ViewModels.Add(blockType);
 
-            config = new Moq.Mock<YuzuConfiguration>(MockBehavior.Loose, new List<IUpdateableConfig>()) { CallBase = true };
-            config.Setup(x => x.ViewModels).Returns(ViewModels);
+            config = Substitute.ForPartsOf<YuzuConfiguration>(new List<IUpdateableConfig>());
+            config.ViewModels.Returns(ViewModels);
         }
 
         [Test]
         public void GetComponent_when_type_is_component_the_just_return()
         {
 
-            var output = blockType.Object.GetComponent(config.Object);
+            var output = blockType.GetComponent(config);
 
-            Assert.AreEqual(blockType.Object, output);
+            Assert.AreEqual(blockType, output);
         }
 
         [Test, Ignore("Moq doesn't support properties")]
@@ -68,12 +67,12 @@ namespace YuzuDelivery.Core.Test
         {
             SetupPropertyInfo(blockType, subBlockType);
 
-            var output = subBlockType.Object.GetComponent(config.Object);
+            var output = subBlockType.GetComponent(config);
 
-            Assert.AreEqual(blockType.Object, output);
+            Assert.AreEqual(blockType, output);
         }
 
-        /*[Test]
+        [Test]
         public void GetComponent_when_sub_is_child_list_of_objects_then_return_parent()
         {
             SetupPropertyInfo(blockType, subListBlockType);
@@ -113,26 +112,16 @@ namespace YuzuDelivery.Core.Test
             var output = subBlockType.GetComponent(config);
 
             Assert.IsNull(output);
-        }*/
+        }
 
-        /*public PropertyInfo SetupPropertyInfo(Type parent, Type child)
+        public PropertyInfo SetupPropertyInfo(Type parent, Type child)
         {
-            var propertyInfo = MockRepository.GenerateStub<PropertyInfo>();
-            propertyInfo.Stub(x => x.PropertyType).Return(child);
+            var propertyInfo = Substitute.For<PropertyInfo>();
+            propertyInfo.PropertyType.Returns(child);
 
-            parent.Stub(x => x.GetProperties()).Return(new PropertyInfo[] { propertyInfo });
+            parent.GetProperties().Returns(new PropertyInfo[] { propertyInfo });
 
             return propertyInfo;
-        }*/
-
-        public PropertyInfo SetupPropertyInfo(Mock<Type> parent, Mock<Type> child)
-        {
-            var propertyInfo = new Moq.Mock<PropertyInfo>();
-            propertyInfo.Setup(x => x.PropertyType).Returns(child.Object);
-
-            parent.Setup(x => x.GetProperties()).Returns(new PropertyInfo[] { propertyInfo.Object });
-
-            return propertyInfo.Object;
         }
 
     }
