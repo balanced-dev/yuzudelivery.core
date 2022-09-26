@@ -10,76 +10,11 @@ trigger:
 pool:
   vmImage: 'windows-latest'
 
-variables:
-  solution: '**/*.sln'
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
-  version: '3.0.0-alpha'
-  ${{ if ne(variables['Build.SourceBranchName'], 'master') }}:
-    revision: $[ counter('.', 0) ]
-    separator: '.'
-  ${{ if eq( variables['Build.SourceBranchName'], 'master') }}:
-    revision: ''
-    separator: ''
-
-name: $(version)$(separator)$(revision)
-
 steps:
-- task: Assembly-Info-NetFramework@2
+- task: CmdLine@2
   inputs:
-    Path: '$(Build.SourcesDirectory)'
-    FileNames: |
-      **\AssemblyInfo.cs
-      **\AssemblyInfo.vb
-    InsertAttributes: false
-    FileEncoding: 'auto'
-    WriteBOM: false
-    VersionNumber: '$(Build.BuildNumber)'
-    FileVersionNumber: '$(Build.BuildNumber)'
-    InformationalVersion: '$(Build.BuildNumber)'
-    LogLevel: 'verbose'
-    FailOnWarning: false
-    DisableTelemetry: false
-    
-- task: NuGetToolInstaller@1
-
-- task: NuGetCommand@2
-  inputs:
-    restoreSolution: '$(solution)'
-
-- task: VSBuild@1
-  inputs:
-    solution: '$(solution)'
-    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactStagingDirectory)"'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-
-- task: VSTest@2
-  inputs:
-    testSelector: 'testAssemblies'
-    testAssemblyVer2: |
-      **\*test*.dll
-      !**\*TestAdapter.dll
-      !**\obj\**
-    searchFolder: '$(System.DefaultWorkingDirectory)'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-
-- task: NuGetCommand@2
-  inputs:
-    command: 'pack'
-    packagesToPack: 'YuzuDelivery.Core/YuzuDelivery.Core.nuspec'
-    versioningScheme: 'byBuildNumber'
-  
-- task: NuGetCommand@2
-  inputs:
-    command: 'push'
-    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
-    nuGetFeedType: 'internal'
-    publishVstsFeed: 'bfaa6bc6-9775-4d15-bf70-5bba69811803/0d5a2d7b-5eaa-444f-9208-7e7089885a00'
+    script: './build.cmd'
 
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'drop'
-    publishLocation: 'Container'
+    pathToPublish: './output'     

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>YuzuDelivery.Core</id>
+    <version>1.0.0</version>
+    <authors>Phil Whittaker</authors>
+    <description>Yuzu - core CMS independent setup</description>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <iconUrl>https://balanced.dev/media/1102/yuzu-package-icon.png</iconUrl>
+    <copyright>Copyright 2018-2022 HiFi Ltd</copyright>
+    <tags>umbraco cms</tags>
+	<dependencies>
+    <dependency id="Automapper" version="8.1.1" />
+		<dependency id="Handlebars.Net" version="1.10.1" />
+	</dependencies>
+  </metadata>
+  <files>
+     <file src="src\YuzuDelivery.Core\bin\Release\net6.0\YuzuDelivery.Core.dll" target="lib\net6.0" />
+  </files>
+</package>

@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\YuzuDelivery.Core\YuzuDelivery.Core.csproj" />
+    <ProjectReference Include="..\..\src\YuzuDelivery.Core\YuzuDelivery.Core.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

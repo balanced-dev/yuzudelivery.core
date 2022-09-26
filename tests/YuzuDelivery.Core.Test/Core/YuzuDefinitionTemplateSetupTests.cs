@@ -9,7 +9,7 @@ using System.IO;
 
 namespace YuzuDelivery.Core.Test
 {
-    [TestFixture, Ignore("Properties not supported by Moq")]
+    [TestFixture, Ignore("Directory Info is a sealed class and not mackable")]
     public class YuzuDefinitionTemplateSetupTests
     {
         private YuzuDefinitionTemplateSetup svc;
