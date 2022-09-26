@@ -5,7 +5,7 @@
 
 trigger:
 - master
-- v9
+- feature/net6-nsubstitute
 
 pool:
   vmImage: 'windows-latest'
@@ -14,7 +14,7 @@ variables:
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
-  version: '2.0.8'
+  version: '3.0.0-alpha'
   ${{ if ne(variables['Build.SourceBranchName'], 'master') }}:
     revision: $[ counter('.', 0) ]
     separator: '.'
