@@ -15,6 +15,13 @@ steps:
   inputs:
     script: './build.cmd'
 
+- task: NuGetCommand@2
+  inputs:
+    command: 'push'
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg'
+    nuGetFeedType: 'internal'
+    publishVstsFeed: 'bfaa6bc6-9775-4d15-bf70-5bba69811803/0d5a2d7b-5eaa-444f-9208-7e7089885a00'
+
 - task: PublishBuildArtifacts@1
   inputs:
     pathToPublish: './output'     
