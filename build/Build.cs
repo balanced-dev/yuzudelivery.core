@@ -1,6 +1,8 @@
 using System;
+using System.IO;
 using Nuke.Common;
 using Nuke.Common.CI;
+using Nuke.Common.CI.AzurePipelines;
 using Nuke.Common.Git;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
@@ -26,8 +28,6 @@ class Build : NukeBuild
     [NerdbankGitVersioning]
     readonly NerdbankGitVersioning NerdbankVersioning;
 
-    readonly DateTime BuildDate;
-
 
     AbsolutePath SourceDirectory => RootDirectory / "src";
     AbsolutePath TestsDirectory => RootDirectory / "tests";
@@ -35,13 +35,7 @@ class Build : NukeBuild
     AbsolutePath PackagesDirectory => OutputDirectory / "packages";
     AbsolutePath TestResultsDirectory => OutputDirectory / "test_results";
 
-    public Build()
-    {
-        BuildDate = DateTime.Now;
-    }
-
-
-    public static int Main () => Execute<Build>(x => x.Report);
+    public static int Main () => Execute<Build>(x => x.Clean, x => x.Pack, x => x.Report);
 
     Target Clean => _ => _
         .Before(Restore)
@@ -75,14 +69,31 @@ class Build : NukeBuild
         {
             var testProjects = Solution.GetProjects("*.Tests");
 
-            DotNetTest(s => s
-                .SetConfiguration(Configuration)
-                .SetResultsDirectory(TestResultsDirectory)
-                .EnableNoBuild()
-                .CombineWith(testProjects, (_, project) => _
-                    .SetProjectFile(project)
-                    .SetLoggers($"trx;LogFileName={project.Name}_{BuildDate:ddMMyy_hhmmss}.trx")));
+            try
+            {
+                DotNetTest(s => s
+                    .SetConfiguration(Configuration)
+                    .SetResultsDirectory(TestResultsDirectory)
+                    .EnableNoBuild()
+                    .CombineWith(testProjects, (_, project) => _
+                       .SetProjectFile(project)
+                       .SetLoggers($"trx;LogFileName={project.Name}.trx")),
+                    completeOnFailure: true);
+            }
+            finally
+            {
+                ReportTestResults();
+            }
         });
+
+    void ReportTestResults()
+    {
+        TestResultsDirectory.GlobFiles("*.trx").ForEach(x =>
+            AzurePipelines.Instance?.PublishTestResults(
+                type: AzurePipelinesTestResultsType.VSTest,
+                title: $"{Path.GetFileNameWithoutExtension(x)}",
+                files: new string[] { x }));
+    }
 
     Target Pack => _ => _
         .DependsOn(Test)
@@ -94,11 +105,10 @@ class Build : NukeBuild
         });
 
     Target Report => _ => _
-        .DependsOn(Pack)
+        .After(Pack)
         .Executes(() =>
         {
             Log.Information("NuGetPackageVersion:          {Value}", NerdbankVersioning.NuGetPackageVersion);
             Log.Information("AssemblyInformationalVersion: {Value}", NerdbankVersioning.AssemblyInformationalVersion);
         });
-
 }

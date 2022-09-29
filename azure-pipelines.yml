@@ -13,15 +13,6 @@ steps:
   inputs:
     script: './build.cmd'
 
-- task: PublishTestResults@2
-  displayName: Publish test results
-  condition: always()
-  inputs:
-    testResultsFormat: VSTest
-    testResultsFiles: '*.trx'
-    searchFolder: '$(Build.SourcesDirectory)/output/test_results'
-    failTaskOnFailedTests: true
-
 - task: PublishBuildArtifacts@1
   displayName: Publish packages artifact
   inputs:

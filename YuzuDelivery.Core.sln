@@ -9,6 +9,21 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "build\_build.cspr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YuzuDelivery.Core.Tests", "tests\YuzuDelivery.Core.Tests\YuzuDelivery.Core.Tests.csproj", "{5CFE0868-BDF7-40AD-AA92-E2A10A4C172B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "00 - Solution Items", "00 - Solution Items", "{8A134944-12F6-47B6-B8CE-77024B43B942}"
+	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		azure-pipelines.yml = azure-pipelines.yml
+		Directory.Build.props = Directory.Build.props
+		license.txt = license.txt
+		readme.md = readme.md
+		version.json = version.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01 - Libs", "01 - Libs", "{09982E74-99A6-4DAE-BCCE-F7BA2F7E7F28}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02 - Tests", "02 - Tests", "{6BC7771A-5A10-4C89-BA38-E09B4084D466}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,5 +46,9 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {202A96E3-85D3-45C1-A5F2-F55CA3699134}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{60211D1B-D002-4E3C-8602-4867DC636CE8} = {09982E74-99A6-4DAE-BCCE-F7BA2F7E7F28}
+		{5CFE0868-BDF7-40AD-AA92-E2A10A4C172B} = {6BC7771A-5A10-4C89-BA38-E09B4084D466}
 	EndGlobalSection
 EndGlobal
