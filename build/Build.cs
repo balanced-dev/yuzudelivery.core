@@ -20,13 +20,7 @@ using static Nuke.Common.Tools.DotNet.DotNetTasks;
 [ShutdownDotNetAfterServerBuild]
 class Build : NukeBuild
 {
-    /// Support plugins are available for:
-    ///   - JetBrains ReSharper        https://nuke.build/resharper
-    ///   - JetBrains Rider            https://nuke.build/rider
-    ///   - Microsoft VisualStudio     https://nuke.build/visualstudio
-    ///   - Microsoft VSCode           https://nuke.build/vscode
 
-    public static int Main () => Execute<Build>(x => x.Report);
 
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
@@ -37,9 +31,22 @@ class Build : NukeBuild
     [NerdbankGitVersioning]
     readonly NerdbankGitVersioning NerdbankVersioning;
 
+    readonly DateTime BuildDate;
+
+
     AbsolutePath SourceDirectory => RootDirectory / "src";
     AbsolutePath TestsDirectory => RootDirectory / "tests";
     AbsolutePath OutputDirectory => RootDirectory / "output";
+    AbsolutePath PackagesDirectory => OutputDirectory / "packages";
+    AbsolutePath TestResultsDirectory => OutputDirectory / "test_results";
+
+    public Build()
+    {
+        BuildDate = DateTime.Now;
+    }
+
+
+    public static int Main () => Execute<Build>(x => x.Report);
 
     Target Clean => _ => _
         .Before(Restore)
@@ -71,10 +78,15 @@ class Build : NukeBuild
         .DependsOn(Compile)
         .Executes(() =>
         {
+            var testProjects = Solution.GetProjects("*.Tests");
+
             DotNetTest(s => s
-                .SetProjectFile(Solution)
                 .SetConfiguration(Configuration)
-                .EnableNoBuild());
+                .SetResultsDirectory(TestResultsDirectory)
+                .EnableNoBuild()
+                .CombineWith(testProjects, (_, project) => _
+                    .SetProjectFile(project)
+                    .SetLoggers($"trx;LogFileName={project.Name}_{BuildDate:ddMMyy_hhmmss}.trx")));
         });
 
     Target Pack => _ => _
@@ -82,7 +94,7 @@ class Build : NukeBuild
         .Executes(() =>
         {
             DotNetPack(s => s
-                .SetOutputDirectory(OutputDirectory)
+                .SetOutputDirectory(PackagesDirectory)
                 .SetConfiguration(Configuration));
         });
 
