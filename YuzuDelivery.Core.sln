@@ -5,9 +5,9 @@ VisualStudioVersion = 16.0.31624.102
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YuzuDelivery.Core", "src/YuzuDelivery.Core\YuzuDelivery.Core.csproj", "{60211D1B-D002-4E3C-8602-4867DC636CE8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YuzuDelivery.Core.Test", "tests/YuzuDelivery.Core.Test\YuzuDelivery.Core.Test.csproj", "{02B12909-8023-457F-9D63-88733C4F8618}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "build\_build.csproj", "{FAE682FE-D00A-4C64-9871-5A6DADB80F04}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YuzuDelivery.Core.Tests", "tests\YuzuDelivery.Core.Tests\YuzuDelivery.Core.Tests.csproj", "{5CFE0868-BDF7-40AD-AA92-E2A10A4C172B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,10 +21,10 @@ Global
 		{60211D1B-D002-4E3C-8602-4867DC636CE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{60211D1B-D002-4E3C-8602-4867DC636CE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{60211D1B-D002-4E3C-8602-4867DC636CE8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{02B12909-8023-457F-9D63-88733C4F8618}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{02B12909-8023-457F-9D63-88733C4F8618}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{02B12909-8023-457F-9D63-88733C4F8618}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{02B12909-8023-457F-9D63-88733C4F8618}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5CFE0868-BDF7-40AD-AA92-E2A10A4C172B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5CFE0868-BDF7-40AD-AA92-E2A10A4C172B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5CFE0868-BDF7-40AD-AA92-E2A10A4C172B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5CFE0868-BDF7-40AD-AA92-E2A10A4C172B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
