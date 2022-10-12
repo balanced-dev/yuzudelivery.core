@@ -9,9 +9,10 @@ namespace YuzuDelivery.Umbraco.Core
 {
     public class CoreSettings
     {
-        internal const string StaticPages = "/yuzu/_templates/src/pages";
-        internal const string StaticPartials = "/yuzu/_templates/src/blocks";
-        internal const string StaticSchemaMeta = "/yuzu/_templates/paths";
+        private const string StaticPages = "/Yuzu/_templates/src/pages";
+        private const string StaticPartials = "/Yuzu/_templates/src/blocks";
+        private const string StaticSchemaMeta = "/Yuzu/_templates/paths";
+        private const string StaticConfigPath = "/Yuzu//YuzuConfig.json";
 
         [DefaultValue(StaticPages)]
         public string Pages { get; set; } = StaticPages;
@@ -21,5 +22,8 @@ namespace YuzuDelivery.Umbraco.Core
 
         [DefaultValue(StaticSchemaMeta)]
         public string SchemaMeta { get; set; } = StaticSchemaMeta;
+
+        [DefaultValue(StaticConfigPath)]
+        public string ConfigPath { get; set; } = StaticConfigPath;
     }
 }
