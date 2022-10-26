@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using NUnit.Framework;
 using YuzuDelivery.Core;
 using YuzuDelivery.Core.ViewModelBuilder;
@@ -18,8 +19,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder.Tests
         {
             Inflector.Inflector.SetDefaultCultureFunc = () => System.Threading.Thread.CurrentThread.CurrentUICulture;
 
-            var rootDir = AppDomain.CurrentDomain.BaseDirectory.Replace("\\bin\\Debug\\net6.0", "").Replace("\\bin\\Release\\net6.0", "");
-            var blockPath = string.Format("{0}\\ViewmodelBuilder\\Input", rootDir);
+            var blockPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ViewmodelBuilder", "Input");
 
             var generate = new GenerateViewmodelService();
             var post = new List<IViewmodelPostProcessor>();
