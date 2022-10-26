@@ -1,10 +1,23 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0</TargetFrameworks>
+    <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <Configurations>Debug;Release;Internal</Configurations>
+    <Platforms>AnyCPU</Platforms>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Internal'">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
-	<PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.2.0" />
     <PackageReference Include="Inflector.NetStandard" Version="1.2.2" />
     <PackageReference Include="AutoMapper" Version="8.1.1" />
     <PackageReference Include="Handlebars.Net" Version="1.10.1" />
