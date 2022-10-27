@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.IO;
 using NJsonSchema;
 using NJsonSchema.CodeGeneration.CSharp;
+using YuzuDelivery.Core.ViewmodelBuilder.NJsonSchema.CodeGeneration;
 
 namespace YuzuDelivery.Core.ViewModelBuilder
 {
@@ -34,8 +35,10 @@ namespace YuzuDelivery.Core.ViewModelBuilder
                 ClassStyle = CSharpClassStyle.Poco,
                 TypeNameGenerator = new ViewModelTypeNameGenerator(),
                 PropertyNameGenerator = new ViewModelPropertyNameGenerator(),
-                ExcludedTypeNames = excludedTypes.ToArray()
+                ExcludedTypeNames = excludedTypes.ToArray(),
             };
+
+            csharpSetting.TemplateFactory = new YuzuTemplateFactory(csharpSetting);
 
             SchemaName.RootSchema = outputFilename;
             SchemaName.ViewModelType = viewModelType;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using FluentAssertions;
 using NUnit.Framework;
 using YuzuDelivery.Core;
 using YuzuDelivery.Core.ViewModelBuilder;
@@ -174,5 +175,12 @@ namespace YuzuDelivery.Core.ViewModelBuilder.Tests
             Assert.IsTrue(file.Content.Contains("public enum vmBlock_14_DirectEnum"));
         }
 
+        [Test]
+        public void RunOneBlock_WithYuzuBaseClassKeywordPresentInSchema_ProducesSubClass()
+        {
+            var file = svc.RunOneBlock(ViewModelType.block, "15_yuzuBaseClass");
+
+            file.Content.Should().Contain("class vmBlock_15_yuzuBaseClass : TestYuzuBlock");
+        }
     }
 }
