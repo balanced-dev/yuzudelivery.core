@@ -19,8 +19,11 @@ namespace YuzuDelivery.Core.ViewModelBuilder
 
         public string OutputPath { get; set; }
 
-        public BuildViewModelsService(GenerateViewmodelService generateViewmodelService, IEnumerable<IViewmodelPostProcessor> postProcessors, 
-            IYuzuConfiguration config, IYuzuViewmodelsBuilderConfig builderConfig)
+        public BuildViewModelsService(
+            GenerateViewmodelService generateViewmodelService,
+            IEnumerable<IViewmodelPostProcessor> postProcessors,
+            IYuzuConfiguration config,
+            IYuzuViewmodelsBuilderConfig builderConfig)
         {
             this.generateViewmodelService = generateViewmodelService;
             this.postProcessors = postProcessors;
@@ -51,7 +54,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder
 
                 try
                 {
-                    file = generateViewmodelService.Create(i.FullName, i.Name.CleanFileExtension().RemoveFileSuffix(), viewModelType, builderConfig.ExcludeViewmodelsAtGeneration, blockPath, builderConfig.GeneratedViewmodelsNamespace);
+                    file = generateViewmodelService.Create(i.FullName, i.Name.CleanFileExtension().RemoveFileSuffix(), viewModelType, blockPath, builderConfig);
                 }
                 catch (Exception ex)
                 {
@@ -78,7 +81,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder
 
         public (string Name, string Content) RunOneBlock(ViewModelType viewModelType, string schemaName)
         {
-            return generateViewmodelService.Create(string.Format(@"{0}par{1}.schema", GetDirectoryForType(viewModelType), schemaName), schemaName, viewModelType, builderConfig.ExcludeViewmodelsAtGeneration, blockPath, builderConfig.GeneratedViewmodelsNamespace);
+            return generateViewmodelService.Create(string.Format(@"{0}par{1}.schema", GetDirectoryForType(viewModelType), schemaName), schemaName, viewModelType,  blockPath, builderConfig);
         }
 
         public virtual void WriteOutputFile(string outputFilename, string content)

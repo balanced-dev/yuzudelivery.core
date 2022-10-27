@@ -1,34 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
+using Microsoft.Extensions.Logging;
 using NJsonSchema;
 using NJsonSchema.CodeGeneration.CSharp;
 using YuzuDelivery.Core.ViewmodelBuilder.NJsonSchema.CodeGeneration;
+using YuzuDelivery.Core.ViewmodelBuilder.NJsonSchema.CodeGeneration.Models;
 
 namespace YuzuDelivery.Core.ViewModelBuilder
 {
     public class GenerateViewmodelService
     {
-        public (string Name, string Content) Create(string schemaFilename, string outputFilename, ViewModelType viewModelType, List<string> excludedViewModels, string blockPath, string namespaceValue)
+        private readonly ILoggerFactory _loggerFactory;
+
+        public GenerateViewmodelService(ILoggerFactory loggerFactory)
+        {
+            _loggerFactory = loggerFactory;
+        }
+
+        public (string Name, string Content) Create(string schemaFilename, string outputFilename, ViewModelType viewModelType,  string blockPath, IYuzuViewmodelsBuilderConfig config)
         {
             var file = ReadFile(schemaFilename);
             string fileOut = string.Empty;
 
             var excludedTypes = GetExcludedTypesFromFiles(outputFilename, blockPath);
             excludedTypes.Add("DoNotApply");
-            excludedTypes = excludedTypes.Union(excludedViewModels).ToList();
+            excludedTypes = excludedTypes.Union(config.ExcludeViewmodelsAtGeneration).ToList();
 
             var schema = JsonSchema.FromJsonAsync(file, blockPath).Result;
 
             if (outputFilename != schema.Id.SchemaIdToName())
                 throw new Exception(string.Format("Filename and schema id must match, {0} doesn't equal {1} and schema id must start with a /", outputFilename, schema.Id.SchemaIdToName()));
 
-            var csharpSetting = new CSharpGeneratorSettings
+            var csharpSetting = new YuzuCSharpGeneratorSettings()
             {
-                Namespace = namespaceValue,
+                Namespace = config.GeneratedViewmodelsNamespace,
                 ArrayType = "System.Collections.Generic.List",
                 ArrayBaseType = "System.Collections.Generic.List",
                 ArrayInstanceType = "System.Collections.Generic.List",
@@ -36,6 +43,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder
                 TypeNameGenerator = new ViewModelTypeNameGenerator(),
                 PropertyNameGenerator = new ViewModelPropertyNameGenerator(),
                 ExcludedTypeNames = excludedTypes.ToArray(),
+                AdditionalNamespaces = config.AddNamespacesAtGeneration
             };
 
             csharpSetting.TemplateFactory = new YuzuTemplateFactory(csharpSetting);
@@ -43,7 +51,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder
             SchemaName.RootSchema = outputFilename;
             SchemaName.ViewModelType = viewModelType;
 
-            var generator = new CSharpGenerator(schema, csharpSetting);
+            var generator = new YuzuCSharpGenerator(_loggerFactory.CreateLogger<YuzuCSharpGenerator>(), schema, csharpSetting);
             fileOut = generator.GenerateFile(outputFilename);
 
             var actualFilename = outputFilename.AddVmTypePrefix(viewModelType);

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using FluentAssertions;
+using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
 using YuzuDelivery.Core;
 using YuzuDelivery.Core.ViewModelBuilder;
@@ -22,7 +24,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder.Tests
 
             var blockPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ViewmodelBuilder", "Input");
 
-            var generate = new GenerateViewmodelService();
+            var generate = new GenerateViewmodelService(NullLoggerFactory.Instance);
             var post = new List<IViewmodelPostProcessor>();
 
             var configMock = Substitute.For<IYuzuConfiguration>();
@@ -33,6 +35,12 @@ namespace YuzuDelivery.Core.ViewModelBuilder.Tests
 
             var importConfig = Substitute.For<IYuzuViewmodelsBuilderConfig>();
             importConfig.ExcludeViewmodelsAtGeneration = new List<string>();
+            importConfig.GeneratedViewmodelsNamespace = "Yuzu.Test.ViewModels";
+            importConfig.AddNamespacesAtGeneration = new List<string>
+            {
+                "Yuzu.Test.Extra.Namespace",
+                "using Foo.Bar;"
+            };
 
             svcMock = Substitute.For<BuildViewModelsService>(generate, post, config, importConfig);
             svcMock.Configure().WriteOutputFile(Arg.Any<string>(), Arg.Any<string>());
@@ -182,5 +190,15 @@ namespace YuzuDelivery.Core.ViewModelBuilder.Tests
 
             file.Content.Should().Contain("class vmBlock_15_yuzuBaseClass : TestYuzuBlock");
         }
+
+        [Test]
+        public void RunOneBlock_WithAdditionalNamespacesInConfig_IncludesUsingDirectives()
+        {
+            var file = svc.RunOneBlock(ViewModelType.block, "15_yuzuBaseClass");
+
+            file.Content.Should().Contain("using Yuzu.Test.Extra.Namespace;");
+            file.Content.Should().MatchRegex(new Regex(@"^using Foo\.Bar;$", RegexOptions.Multiline)); // handles the legacy setup
+        }
+
     }
 }
