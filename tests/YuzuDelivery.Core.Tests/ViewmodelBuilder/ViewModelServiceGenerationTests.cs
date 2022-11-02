@@ -197,7 +197,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder.Tests
             var file = svc.RunOneBlock(ViewModelType.block, "15_yuzuBaseClass");
 
             file.Content.Should().Contain("using Yuzu.Test.Extra.Namespace;");
-            file.Content.Should().MatchRegex(new Regex(@"^using Foo\.Bar;$", RegexOptions.Multiline)); // handles the legacy setup
+            file.Content.Should().MatchRegex(new Regex(@"^using Foo\.Bar;\s+?$", RegexOptions.Multiline)); // handles the legacy setup
         }
 
     }

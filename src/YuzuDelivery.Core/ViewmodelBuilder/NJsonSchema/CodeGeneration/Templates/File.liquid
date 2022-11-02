@@ -6,13 +6,13 @@
 {%- if GenerateNullableReferenceTypes -%}
 #nullable enable
 {%- endif %}
+
 {%- for ns in AdditionalNamespaces -%}
 using {{ ns }};
 {%- endfor -%}
 
-namespace {{ Namespace }}
-{
+namespace {{ Namespace }};
+
 #pragma warning disable // Disable all warnings
 
 {{ TypesCode | tab }}
-}

@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.Extensions.Logging;
-using NJsonSchema;
 using NJsonSchema.CodeGeneration;
 using NJsonSchema.CodeGeneration.CSharp;
 using YuzuDelivery.Core.ViewmodelBuilder.NJsonSchema.CodeGeneration.Models;
@@ -19,10 +20,6 @@ public class YuzuCSharpGenerator : CSharpGenerator
         _logger = logger;
     }
 
-    // public YuzuCSharpGenerator(object rootObject, CSharpGeneratorSettings settings, CSharpTypeResolver resolver)
-    //     : base(rootObject, settings, resolver)
-    // { }
-
     protected override string GenerateFile(IEnumerable<CodeArtifact> artifactCollection)
     {
         var model = new YuzuFileTemplateModel()
@@ -33,7 +30,10 @@ public class YuzuCSharpGenerator : CSharpGenerator
         };
 
         var template = Settings.TemplateFactory.CreateTemplate("CSharp", "File", model);
-        return ConversionUtilities.TrimWhiteSpaces(template.Render());
+        var output = template.Render();
+
+        var ast = CSharpSyntaxTree.ParseText(output);
+        return ast.GetRoot().NormalizeWhitespace().ToFullString();
     }
 
     private IEnumerable<string> GetAdditionalNamespaces()
