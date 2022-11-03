@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Fluid;
 
 namespace YuzuDelivery.Core.ViewModelBuilder
 {
@@ -14,11 +15,15 @@ namespace YuzuDelivery.Core.ViewModelBuilder
         List<string> ExcludeViewmodelsAtGeneration { get; set; }
         List<string> AddNamespacesAtGeneration { get; set; }
         string GeneratedViewmodelsOutputFolder { get; set; }
+        public Dictionary<string, string> ClassLevelAttributeTemplates { get; set; }
+        public List<KeyValuePair<string,FilterDelegate>> CustomFilters { get; set; }
     }
 
     public interface IUpdateableVmBuilderConfig
     {
         List<string> ExcludeViewmodelsAtGeneration { get; set; }
         List<string> AddNamespacesAtGeneration { get; set; }
+        public Dictionary<string, string> ClassLevelAttributeTemplates { get; set; }
+        public List<KeyValuePair<string,FilterDelegate>> CustomFilters { get; set; }
     }
 }

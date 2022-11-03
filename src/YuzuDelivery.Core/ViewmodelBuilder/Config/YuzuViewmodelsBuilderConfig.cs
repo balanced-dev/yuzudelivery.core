@@ -1,45 +1,48 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Fluid;
 
 namespace YuzuDelivery.Core.ViewModelBuilder
 {
     public class YuzuViewmodelsBuilderConfig : IYuzuViewmodelsBuilderConfig, IUpdateableVmBuilderConfig
     {
+        public YuzuViewmodelsBuilderConfig()
+            : this(Enumerable.Empty<IUpdateableVmBuilderConfig>())
+        { }
+
         public YuzuViewmodelsBuilderConfig(IEnumerable<IUpdateableVmBuilderConfig> extraConfig)
         {
             GeneratedViewmodelsNamespace = "YuzuDelivery.ViewModels";
-            AddNamespacesAtGeneration = new List<string>();
-            ExcludeViewmodelsAtGeneration = new List<string>();
 
             foreach (var c in extraConfig)
             {
                 AddNamespacesAtGeneration = AddNamespacesAtGeneration.Union(c.AddNamespacesAtGeneration).ToList();
                 ExcludeViewmodelsAtGeneration = ExcludeViewmodelsAtGeneration.Union(c.ExcludeViewmodelsAtGeneration).ToList();
+                CustomFilters = CustomFilters.Union(c.CustomFilters).ToList();
+
+                foreach (var kvp in c.ClassLevelAttributeTemplates)
+                {
+                    ClassLevelAttributeTemplates[kvp.Key] = kvp.Value;
+                }
             }
         }
-       
+
         public bool EnableViewmodelsBuilder { get; set; }
         public string GeneratedViewmodelsNamespace { get; set; }
         public string GeneratedViewmodelsOutputFolder { get; set; }
 
-        public List<string> AddNamespacesAtGeneration { get; set; }
-        public List<string> ExcludeViewmodelsAtGeneration { get; set; }
-
+        public List<string> AddNamespacesAtGeneration { get; set; } = new();
+        public List<string> ExcludeViewmodelsAtGeneration { get; set; } = new();
+        public Dictionary<string, string> ClassLevelAttributeTemplates { get; set; } = new();
+        public List<KeyValuePair<string, FilterDelegate>> CustomFilters { get; set; } = new();
     }
 
     public abstract class UpdateableVmBuilderConfig : IUpdateableVmBuilderConfig
     {
-        public UpdateableVmBuilderConfig()
-        {
-            AddNamespacesAtGeneration = new List<string>();
-            ExcludeViewmodelsAtGeneration = new List<string>();
-        }
-
-        public List<string> AddNamespacesAtGeneration { get; set; }
-        public List<string> ExcludeViewmodelsAtGeneration { get; set; }
+        public List<string> AddNamespacesAtGeneration { get; set; } = new();
+        public List<string> ExcludeViewmodelsAtGeneration { get; set; } = new();
+        public Dictionary<string, string> ClassLevelAttributeTemplates { get; set; } = new();
+        public List<KeyValuePair<string, FilterDelegate>> CustomFilters { get; set; } = new();
     }
 
 }

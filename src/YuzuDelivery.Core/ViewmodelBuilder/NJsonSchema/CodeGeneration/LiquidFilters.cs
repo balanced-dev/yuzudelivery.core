@@ -1,7 +1,9 @@
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Fluid;
 using Fluid.Values;
 using NJsonSchema;
+using YuzuDelivery.Core.ViewModelBuilder;
 
 namespace YuzuDelivery.Core.ViewmodelBuilder.NJsonSchema.CodeGeneration;
 
@@ -34,5 +36,20 @@ internal static class LiquidFilters
     {
         var converted = "\"" + ConversionUtilities.ConvertToStringLiteral(input.ToStringValue()) + "\"";
         return new ValueTask<FluidValue>(new StringValue(converted, encode: false));
+    }
+
+    public static ValueTask<FluidValue> StripVmTypePrefix(FluidValue input, FilterArguments arguments,
+        TemplateContext context)
+    {
+        var result = input.ToStringValue().RemoveVmTypePrefix();
+        return new ValueTask<FluidValue>(new StringValue(result, encode: false));
+    }
+
+    public static ValueTask<FluidValue> StripUsingDirective(FluidValue input, FilterArguments arguments, TemplateContext context)
+    {
+        var match = Regex.Match(input.ToStringValue(), @"using\s+(.+);");
+        return match.Success
+            ? new ValueTask<FluidValue>(new StringValue(match.Groups[1].Value, encode: false))
+            : input;
     }
 }

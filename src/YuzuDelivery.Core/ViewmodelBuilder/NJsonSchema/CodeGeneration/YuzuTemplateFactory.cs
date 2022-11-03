@@ -11,20 +11,20 @@ using Fluid.Ast;
 using NJsonSchema.CodeGeneration;
 using NJsonSchema.CodeGeneration.CSharp;
 using Parlot.Fluent;
-using YuzuDelivery.Core.ViewmodelBuilder.NJsonSchema.CodeGeneration.Models;
+using YuzuDelivery.Core.ViewModelBuilder;
 
 namespace YuzuDelivery.Core.ViewmodelBuilder.NJsonSchema.CodeGeneration;
 
 public class YuzuTemplateFactory : ITemplateFactory
 {
-    private readonly YuzuCSharpGeneratorSettings _settings;
+    private readonly IYuzuViewmodelsBuilderConfig _config;
     private readonly TemplateOptions _templateOptions;
     private readonly Assembly[] _templateAssemblies;
     private readonly FluidParser _fluidParser;
 
-    public YuzuTemplateFactory(YuzuCSharpGeneratorSettings settings)
+    public YuzuTemplateFactory(IYuzuViewmodelsBuilderConfig config)
     {
-        _settings = settings;
+        _config = config;
         _templateOptions = new TemplateOptions();
 
         _templateOptions = new TemplateOptions
@@ -38,6 +38,13 @@ public class YuzuTemplateFactory : ITemplateFactory
         _templateOptions.Filters.AddFilter("lowercamelcase", LiquidFilters.CamelCase);
         _templateOptions.Filters.AddFilter("uppercamelcase", LiquidFilters.PascalCase);
         _templateOptions.Filters.AddFilter("literal", LiquidFilters.Literal);
+        _templateOptions.Filters.AddFilter("strip_vm_prefix", LiquidFilters.StripVmTypePrefix);
+        _templateOptions.Filters.AddFilter("strip_using_directive", LiquidFilters.StripUsingDirective);
+
+        foreach (var filter in config.CustomFilters)
+        {
+            _templateOptions.Filters.AddFilter(filter.Key, filter.Value);
+        }
 
         _templateAssemblies = new[]
         {
@@ -52,11 +59,29 @@ public class YuzuTemplateFactory : ITemplateFactory
     {
         var fluidTemplate = GetFluidTemplate(language, templateName);
 
-        return new YuzuCodeTemplate(fluidTemplate, language, templateName, _templateOptions, _settings, model);
+        return new YuzuCodeTemplate(fluidTemplate, language, templateName, _templateOptions, _config, model);
     }
+
+    private bool TryGetSettingsTemplate(string templateName, out string template)
+    {
+        if (_config.ClassLevelAttributeTemplates.ContainsKey(templateName))
+        {
+            template = _config.ClassLevelAttributeTemplates[templateName];
+            return true;
+        }
+
+        template = null;
+        return false;
+    }
+
 
     private string GetTemplateString(string language, string templateName)
     {
+        if (TryGetSettingsTemplate(templateName, out var settingTemplate))
+        {
+            return settingTemplate;
+        }
+
         foreach (var templateAssembly in _templateAssemblies)
         {
             var resourceName = templateAssembly
@@ -94,17 +119,17 @@ public class YuzuTemplateFactory : ITemplateFactory
         private readonly string _language;
         private readonly string _templateName;
         private readonly TemplateOptions _templateOptions;
-        private readonly CodeGeneratorSettingsBase _settings;
+        private readonly IYuzuViewmodelsBuilderConfig _yuzuConfig;
         private readonly object _model;
 
         public YuzuCodeTemplate(IFluidTemplate template, string language, string templateName,
-            TemplateOptions templateOptions, CodeGeneratorSettingsBase settings, object model)
+            TemplateOptions templateOptions, IYuzuViewmodelsBuilderConfig yuzuConfig, object model)
         {
             _template = template;
             _language = language;
             _templateName = templateName;
             _templateOptions = templateOptions;
-            _settings = settings;
+            _yuzuConfig = yuzuConfig;
             _model = model;
         }
 
@@ -129,9 +154,16 @@ public class YuzuTemplateFactory : ITemplateFactory
                         {
                             [YuzuFluidParser.LanguageKey] = _language,
                             [YuzuFluidParser.TemplateKey] = _templateName,
-                            [YuzuFluidParser.SettingsKey] = _settings,
                         }
                     };
+
+                    var version = typeof(YuzuTemplateFactory).Assembly
+                                          .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+                                          .InformationalVersion
+                                  ?? string.Empty;
+
+                    templateContext.SetValue("Yuzu", _yuzuConfig);
+                    templateContext.SetValue("ToolchainVersion", version);
                 }
 
                 return _template.Render(templateContext);
@@ -151,7 +183,6 @@ public class YuzuTemplateFactory : ITemplateFactory
         private readonly ITemplateFactory _templateFactory;
         internal const string LanguageKey = "__language";
         internal const string TemplateKey = "__template";
-        internal const string SettingsKey = "__settings";
 
         public YuzuFluidParser(ITemplateFactory templateFactory)
         {

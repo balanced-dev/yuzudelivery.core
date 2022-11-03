@@ -1,0 +1,4 @@
+{% for attr in Yuzu.ClassLevelAttributeTemplates %}
+    {% capture templateName %}{{ attr[0] }}{% endcapture %}
+    {% template templateName %}
+{% endfor %}

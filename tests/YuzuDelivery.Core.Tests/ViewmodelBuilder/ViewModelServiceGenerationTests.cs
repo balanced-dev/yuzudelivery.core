@@ -2,20 +2,19 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.Extensions.Logging.Abstractions;
-using NUnit.Framework;
-using YuzuDelivery.Core;
+using Fluid;
+using Fluid.Values;
 using YuzuDelivery.Core.ViewModelBuilder;
 
-namespace YuzuDelivery.Core.ViewModelBuilder.Tests
+namespace YuzuDelivery.Core.Test.ViewmodelBuilder
 {
-
     public class ViewModelBuilderServiceTests
     {
-        public BuildViewModelsService svcMock;
-        public BuildViewModelsService svc;
-        public ReferencesService references;
+        BuildViewModelsService Sut { get; set; }
+
+        IYuzuViewmodelsBuilderConfig BuilderConfig { get; set; }
 
         [SetUp]
         public void Setup()
@@ -24,33 +23,26 @@ namespace YuzuDelivery.Core.ViewModelBuilder.Tests
 
             var blockPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ViewmodelBuilder", "Input");
 
-            var generate = new GenerateViewmodelService(NullLoggerFactory.Instance);
+            var generate = new GenerateViewmodelService();
             var post = new List<IViewmodelPostProcessor>();
 
-            var configMock = Substitute.For<IYuzuConfiguration>();
-            var config = configMock;
-            config.TemplateLocations = new List<ITemplateLocation>();
-            config.TemplateLocations.Add(new TemplateLocation() { Name = "Pages", Schema = "some" });
-            config.TemplateLocations.Add(new TemplateLocation() { Name = "Partials", Schema = blockPath });
-
-            var importConfig = Substitute.For<IYuzuViewmodelsBuilderConfig>();
-            importConfig.ExcludeViewmodelsAtGeneration = new List<string>();
-            importConfig.GeneratedViewmodelsNamespace = "Yuzu.Test.ViewModels";
-            importConfig.AddNamespacesAtGeneration = new List<string>
+            var config = Substitute.For<IYuzuConfiguration>();
+            config.TemplateLocations = new List<ITemplateLocation>
             {
-                "Yuzu.Test.Extra.Namespace",
-                "using Foo.Bar;"
+                new TemplateLocation {Name = "Pages", Schema = "some"},
+                new TemplateLocation {Name = "Partials", Schema = blockPath}
             };
 
-            svcMock = Substitute.For<BuildViewModelsService>(generate, post, config, importConfig);
-            svcMock.Configure().WriteOutputFile(Arg.Any<string>(), Arg.Any<string>());
-            svc = svcMock;
+            BuilderConfig = new YuzuViewmodelsBuilderConfig();
+
+            Sut = Substitute.For<BuildViewModelsService>(generate, post, config, BuilderConfig);
+            Sut.Configure().WriteOutputFile(Arg.Any<string>(), Arg.Any<string>());
         }
 
         [Test]
         public void given_single_schema_with_simple_properties_then_class_name_is_prefixed_with_vm()
         {
-            var file = svc.RunOneBlock(ViewModelType.block, "1_JustRootNode");
+            var file = Sut.RunOneBlock(ViewModelType.block, "1_JustRootNode");
 
             Assert.IsTrue(file.Content.Contains("public partial class vmBlock_1_JustRootNode"));
         }
@@ -58,7 +50,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder.Tests
         [Test]
         public void given_single_schema_with_simple_properties_then_property_names_are_capitalised()
         {
-            var file = svc.RunOneBlock(ViewModelType.block, "1_JustRootNode");
+            var file = Sut.RunOneBlock(ViewModelType.block, "1_JustRootNode");
 
             Assert.IsTrue(file.Content.Contains("public string Discount"));
             Assert.IsTrue(file.Content.Contains("public string DiscountAmount"));
@@ -67,7 +59,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder.Tests
         [Test]
         public void given_schema_with_an_external_ref_then_external_property_type_is_set_but_child_schema_is_not_generated()
         {
-            var file = svc.RunOneBlock(ViewModelType.block,  "2_1_ExternalRef");
+            var file = Sut.RunOneBlock(ViewModelType.block,  "2_1_ExternalRef");
 
             Assert.IsTrue(file.Content.Contains("public vmBlock_2_2_ExternalRef Ref"));
             Assert.IsFalse(file.Content.Contains("public partial class vmBlock_2_2_ExternalRef"));
@@ -76,7 +68,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder.Tests
         [Test]
         public void given_schema_with_an_internal_array_schema_then_internal_schame_created_using_singularized_property_name()
         {
-            var file = svc.RunOneBlock(ViewModelType.block, "3_WithSubSchema_NamedArray");
+            var file = Sut.RunOneBlock(ViewModelType.block, "3_WithSubSchema_NamedArray");
 
             Assert.IsTrue(file.Content.Contains("public System.Collections.Generic.List<vmSub_3_WithSubSchema_NamedArrayItem> Items"));
             Assert.IsTrue(file.Content.Contains("public partial class vmSub_3_WithSubSchema_NamedArrayItem"));
@@ -85,7 +77,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder.Tests
         [Test]
         public void given_schema_with_an_internal_named_schema_then_internal_schame_create_as_sub_object_with_name()
         {
-            var file = svc.RunOneBlock(ViewModelType.block, "4_WithSubSchema_Named");
+            var file = Sut.RunOneBlock(ViewModelType.block, "4_WithSubSchema_Named");
 
             Assert.IsTrue(file.Content.Contains("public vmSub_4_WithSubSchema_NamedItem Item"));
             Assert.IsTrue(file.Content.Contains("public partial class vmSub_4_WithSubSchema_NamedItem"));
@@ -94,7 +86,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder.Tests
         [Test]
         public void given_schema_with_an_external_ref_with_child_schema_then_external_property_type_is_set_but_grandchild_schema_is_not_generated()
         {
-            var file = svc.RunOneBlock(ViewModelType.block, "5_1_ExternalRefSub");
+            var file = Sut.RunOneBlock(ViewModelType.block, "5_1_ExternalRefSub");
 
             Assert.IsFalse(file.Content.Contains("public partial class vmSub_5_2_ExternalRefSub_Named"));
         }
@@ -102,7 +94,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder.Tests
         [Test]
         public void given_schema_with_an_external_ref_using_module_then_external_property_types_are_set_but_module_schemas_are_not_generated()
         {
-            var file = svc.RunOneBlock(ViewModelType.block, "6_1_ExternalRefModule");
+            var file = Sut.RunOneBlock(ViewModelType.block, "6_1_ExternalRefModule");
 
             Assert.IsTrue(file.Content.Contains("public vmBlock_6_3_ExternalRefModule Module"));
             Assert.IsFalse(file.Content.Contains("public partial class vmBlock_6_3_ExternalRefModule2"));
@@ -115,7 +107,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder.Tests
 
             try
             {
-                svc.RunOneBlock(ViewModelType.block, "7_WrongRootName");
+                Sut.RunOneBlock(ViewModelType.block, "7_WrongRootName");
             }
             catch(Exception ex)
             {
@@ -129,7 +121,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder.Tests
         [Test]
         public void given_schema_with_an_external_ref_as_an_array_then_array_is_created_with_the_correct_type()
         {
-            var file = svc.RunOneBlock(ViewModelType.block, "8_1_ExternalRefSubArray");
+            var file = Sut.RunOneBlock(ViewModelType.block, "8_1_ExternalRefSubArray");
 
             Assert.IsTrue(file.Content.Contains("System.Collections.Generic.List<vmBlock_8_2_ExternalRefSubArray> Ref"));
         }
@@ -137,7 +129,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder.Tests
         [Test]
         public void given_enum_in_child_schema_then_add_sucessfully()
         {
-            var file = svc.RunOneBlock(ViewModelType.block, "9_EnumInSubObject");
+            var file = Sut.RunOneBlock(ViewModelType.block, "9_EnumInSubObject");
 
             Assert.IsTrue(file.Content.Contains("public enum vmSub_9_EnumInSubObjectVmSub_9_EnumInSubObjectItemAllowed"));
         }
@@ -145,7 +137,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder.Tests
         [Test]
         public void given_any_of_array_then_add_as_object()
         {
-            var file = svc.RunOneBlock(ViewModelType.block, "10_AnyOf_Array");
+            var file = Sut.RunOneBlock(ViewModelType.block, "10_AnyOf_Array");
 
             Assert.IsTrue(file.Content.Contains("public System.Collections.Generic.List<object> Items { get; set; }"));
         }
@@ -153,7 +145,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder.Tests
         [Test]
         public void given_any_of_object_then_add_as_object()
         {
-            var file = svc.RunOneBlock(ViewModelType.block, "11_AnyOf_Object");
+            var file = Sut.RunOneBlock(ViewModelType.block, "11_AnyOf_Object");
 
             Assert.IsTrue(file.Content.Contains("public object Item { get; set; }"));
         }
@@ -161,7 +153,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder.Tests
         [Test]
         public void given_root_array_the_create_block_for_array()
         {
-            var file = svc.RunOneBlock(ViewModelType.block, "12_Root_Array");
+            var file = Sut.RunOneBlock(ViewModelType.block, "12_Root_Array");
 
             Assert.IsTrue(file.Content.Contains("public partial class vmBlock_12_Root_Array"));
         }
@@ -169,7 +161,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder.Tests
         [Test]
         public void given_root_array_and_item_has_external_ref()
         {
-            var file = svc.RunOneBlock(ViewModelType.block, "13_1_Root_Array_External_Ref");
+            var file = Sut.RunOneBlock(ViewModelType.block, "13_1_Root_Array_External_Ref");
 
             Assert.IsTrue(file.Content.Contains("public partial class vmBlock_13_2_ExternalRef"));
         }
@@ -178,7 +170,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder.Tests
         [Test]
         public void given_standalone_enum_then_create_enum()
         {
-            var file = svc.RunOneBlock(ViewModelType.block, "14_DirectEnum");
+            var file = Sut.RunOneBlock(ViewModelType.block, "14_DirectEnum");
 
             Assert.IsTrue(file.Content.Contains("public enum vmBlock_14_DirectEnum"));
         }
@@ -186,7 +178,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder.Tests
         [Test]
         public void RunOneBlock_WithYuzuBaseClassKeywordPresentInSchema_ProducesSubClass()
         {
-            var file = svc.RunOneBlock(ViewModelType.block, "15_yuzuBaseClass");
+            var file = Sut.RunOneBlock(ViewModelType.block, "15_yuzuBaseClass");
 
             file.Content.Should().Contain("class vmBlock_15_yuzuBaseClass : TestYuzuBlock");
         }
@@ -194,11 +186,45 @@ namespace YuzuDelivery.Core.ViewModelBuilder.Tests
         [Test]
         public void RunOneBlock_WithAdditionalNamespacesInConfig_IncludesUsingDirectives()
         {
-            var file = svc.RunOneBlock(ViewModelType.block, "15_yuzuBaseClass");
+            BuilderConfig.AddNamespacesAtGeneration = new List<string>
+            {
+                "Yuzu.Test.Extra.One",
+                "using Yuzu.Test.Extra.Two;"
+            };
 
-            file.Content.Should().Contain("using Yuzu.Test.Extra.Namespace;");
-            file.Content.Should().MatchRegex(new Regex(@"^using Foo\.Bar;\s+?$", RegexOptions.Multiline)); // handles the legacy setup
+            var file = Sut.RunOneBlock(ViewModelType.block, "1_JustRootNode");
+
+            file.Content.Should().MatchRegex(new Regex(@"^using Yuzu\.Test\.Extra\.One;", RegexOptions.Multiline));
+            file.Content.Should().MatchRegex(new Regex(@"^using Yuzu\.Test\.Extra\.Two;", RegexOptions.Multiline)); // handles the legacy setup
         }
 
+        [Test]
+        public void RunOneBlock_ClassLevelAttributeTemplateInConfig_RendersAttribute()
+        {
+            BuilderConfig.ClassLevelAttributeTemplates = new Dictionary<string, string>
+            {
+                ["testing"] = @"[Foo(""{{ ClassName | strip_vm_prefix }}"")]"
+            };
+
+            var file = Sut.RunOneBlock(ViewModelType.block, "1_JustRootNode");
+
+            file.Content.Should().MatchRegex(new Regex(@"\[Foo\(""1_JustRootNode""\)\]\s+public partial class", RegexOptions.Multiline));
+        }
+
+        [Test]
+        public void RunOneBlock_CustomFilterRegisteredInConfig_CustomFilterIsUsable()
+        {
+            BuilderConfig.ClassLevelAttributeTemplates = new Dictionary<string, string>
+            {
+                ["testing"] = @"[Foo(""{{ ClassName | strip_vm_prefix | bar }}"")]"
+            };
+
+            BuilderConfig.CustomFilters.Add(KeyValuePair.Create<string,FilterDelegate>("bar", (fv, fa, tc)
+                => new ValueTask<FluidValue>(new StringValue("bar", encode: false))));
+
+            var file = Sut.RunOneBlock(ViewModelType.block, "1_JustRootNode");
+
+            file.Content.Should().Contain(@"[Foo(""bar"")]");
+        }
     }
 }

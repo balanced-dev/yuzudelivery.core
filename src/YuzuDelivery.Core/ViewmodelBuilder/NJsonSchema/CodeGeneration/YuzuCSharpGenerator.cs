@@ -1,32 +1,24 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.Extensions.Logging;
 using NJsonSchema.CodeGeneration;
 using NJsonSchema.CodeGeneration.CSharp;
-using YuzuDelivery.Core.ViewmodelBuilder.NJsonSchema.CodeGeneration.Models;
+using NJsonSchema.CodeGeneration.CSharp.Models;
 
 namespace YuzuDelivery.Core.ViewmodelBuilder.NJsonSchema.CodeGeneration;
 
 public class YuzuCSharpGenerator : CSharpGenerator
 {
-    private readonly ILogger<YuzuCSharpGenerator> _logger;
-
-    public YuzuCSharpGenerator(ILogger<YuzuCSharpGenerator> logger, object rootObject, YuzuCSharpGeneratorSettings settings)
+    public YuzuCSharpGenerator(object rootObject, CSharpGeneratorSettings settings)
         : base(rootObject, settings)
-    {
-        _logger = logger;
-    }
+    { }
 
     protected override string GenerateFile(IEnumerable<CodeArtifact> artifactCollection)
     {
-        var model = new YuzuFileTemplateModel()
+        var model = new FileTemplateModel()
         {
             Namespace = Settings.Namespace ?? string.Empty,
             TypesCode = artifactCollection.Concatenate(),
-            AdditionalNamespaces = GetAdditionalNamespaces().ToList()
         };
 
         var template = Settings.TemplateFactory.CreateTemplate("CSharp", "File", model);
@@ -34,24 +26,5 @@ public class YuzuCSharpGenerator : CSharpGenerator
 
         var ast = CSharpSyntaxTree.ParseText(output);
         return ast.GetRoot().NormalizeWhitespace().ToFullString();
-    }
-
-    private IEnumerable<string> GetAdditionalNamespaces()
-    {
-        var settings = (YuzuCSharpGeneratorSettings) Settings;
-
-        foreach (var ns in settings.AdditionalNamespaces)
-        {
-            var match = Regex.Match(ns, @"using\s+(.+);");
-            if (match.Success)
-            {
-                _logger.LogWarning("Additional namespaces no longer require the full using directive: \"{setting}\"", ns);
-                yield return match.Groups[1].Value;
-            }
-            else
-            {
-                yield return ns;
-            }
-        }
     }
 }
