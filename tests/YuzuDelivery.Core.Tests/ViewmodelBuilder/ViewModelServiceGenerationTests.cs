@@ -225,5 +225,15 @@ namespace YuzuDelivery.Core.Test.ViewmodelBuilder
 
             file.Content.Should().Contain(@"[Foo(""bar"")]");
         }
+
+        [Test]
+        public void RunOneBlock_WithConfiguredTemplateAssemblies_RespectsDownstreamTemplates()
+        {
+            BuilderConfig.TemplateAssemblies.Add(GetType().Assembly);
+
+            var file = Sut.RunOneBlock(ViewModelType.block, "1_JustRootNode");
+
+            file.Content.Should().Be("YuzuDelivery.Core.Tests.File");
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Fluid;
 
 namespace YuzuDelivery.Core.ViewModelBuilder
@@ -19,6 +20,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder
                 AddNamespacesAtGeneration = AddNamespacesAtGeneration.Union(c.AddNamespacesAtGeneration).ToList();
                 ExcludeViewmodelsAtGeneration = ExcludeViewmodelsAtGeneration.Union(c.ExcludeViewmodelsAtGeneration).ToList();
                 CustomFilters = CustomFilters.Union(c.CustomFilters).ToList();
+                TemplateAssemblies = TemplateAssemblies.Union(c.TemplateAssemblies).ToList();
 
                 foreach (var kvp in c.ClassLevelAttributeTemplates)
                 {
@@ -35,6 +37,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder
         public List<string> ExcludeViewmodelsAtGeneration { get; set; } = new();
         public Dictionary<string, string> ClassLevelAttributeTemplates { get; set; } = new();
         public List<KeyValuePair<string, FilterDelegate>> CustomFilters { get; set; } = new();
+        public List<Assembly> TemplateAssemblies { get; set; } = new();
     }
 
     public abstract class UpdateableVmBuilderConfig : IUpdateableVmBuilderConfig
@@ -43,6 +46,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder
         public List<string> ExcludeViewmodelsAtGeneration { get; set; } = new();
         public Dictionary<string, string> ClassLevelAttributeTemplates { get; set; } = new();
         public List<KeyValuePair<string, FilterDelegate>> CustomFilters { get; set; } = new();
+        public List<Assembly> TemplateAssemblies { get; set; } = new();
     }
 
 }

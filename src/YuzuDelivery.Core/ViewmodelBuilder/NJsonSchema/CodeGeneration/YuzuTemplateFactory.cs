@@ -46,11 +46,11 @@ public class YuzuTemplateFactory : ITemplateFactory
             _templateOptions.Filters.AddFilter(filter.Key, filter.Value);
         }
 
-        _templateAssemblies = new[]
+        _templateAssemblies = config.TemplateAssemblies.Concat(new[]
         {
             Assembly.GetExecutingAssembly(), // 1) Our custom templates
             typeof(CSharpGenerator).Assembly // 2) Fallback to upstream templates
-        };
+        }).ToArray();
 
         _fluidParser = new YuzuFluidParser(this);
     }
