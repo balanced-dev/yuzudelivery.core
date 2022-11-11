@@ -24,7 +24,6 @@ namespace YuzuDelivery.Core.Test.ViewmodelBuilder
             var blockPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ViewmodelBuilder", "Input");
 
             var generate = new GenerateViewmodelService();
-            var post = new List<IViewmodelPostProcessor>();
 
             var config = Substitute.For<IYuzuConfiguration>();
             config.TemplateLocations = new List<ITemplateLocation>
@@ -35,7 +34,7 @@ namespace YuzuDelivery.Core.Test.ViewmodelBuilder
 
             BuilderConfig = new YuzuViewmodelsBuilderConfig();
 
-            Sut = Substitute.For<BuildViewModelsService>(generate, post, config, BuilderConfig);
+            Sut = Substitute.For<BuildViewModelsService>(generate, config, BuilderConfig);
             Sut.Configure().WriteOutputFile(Arg.Any<string>(), Arg.Any<string>());
         }
 

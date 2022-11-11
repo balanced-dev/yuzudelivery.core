@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
-using YuzuDelivery.Core;
 
 namespace YuzuDelivery.Core.ViewModelBuilder
 {
     public class BuildViewModelsService
     {
         private readonly GenerateViewmodelService generateViewmodelService;
-        private readonly IEnumerable<IViewmodelPostProcessor> postProcessors;
         private readonly IYuzuViewmodelsBuilderConfig builderConfig;
 
         private string pagePath;
@@ -21,12 +17,10 @@ namespace YuzuDelivery.Core.ViewModelBuilder
 
         public BuildViewModelsService(
             GenerateViewmodelService generateViewmodelService,
-            IEnumerable<IViewmodelPostProcessor> postProcessors,
             IYuzuConfiguration config,
             IYuzuViewmodelsBuilderConfig builderConfig)
         {
             this.generateViewmodelService = generateViewmodelService;
-            this.postProcessors = postProcessors;
             this.builderConfig = builderConfig;
 
             pagePath = config.TemplateLocations.Where(x => x.Name == "Pages").Select(x => x.Schema).FirstOrDefault();
@@ -59,12 +53,6 @@ namespace YuzuDelivery.Core.ViewModelBuilder
                 catch (Exception ex)
                 {
                     throw new Exception(string.Format("Failed on schema file {0}", i.Name), ex);
-                }
-
-                foreach(var p in postProcessors)
-                {
-                    if (p.IsValid(file.Name))
-                        file.Content = p.Apply(file.Content);
                 }
 
                 if(file.Content.Contains("public partial class") || file.Content.Contains("public enum"))
