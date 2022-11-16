@@ -167,8 +167,8 @@ namespace YuzuDelivery.Core.Test
         {
             var output = svc.GetPossiblePathFileName("c:/test", "vmPage_Test");
 
-            Assert.AreEqual("c:/test/Test.schema", output[0]);
-            Assert.AreEqual("c:/test/parTest.schema", output[1]);
+            Assert.AreEqual("c:/test/parTest.schema", output[0]);
+            Assert.AreEqual("c:/test/test.schema", output[1]);
         }
 
         public void CreatePathDataLocations(string[] locations)

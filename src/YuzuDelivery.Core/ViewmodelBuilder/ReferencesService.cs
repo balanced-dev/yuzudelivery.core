@@ -21,8 +21,16 @@ namespace YuzuDelivery.Core.ViewModelBuilder
         {
             pagePath = config.TemplateLocations.Where(x => x.Name == "Pages").Select(x => x.Schema).FirstOrDefault();
             blockPath = config.TemplateLocations.Where(x => x.Name == "Partials").Select(x => x.Schema).FirstOrDefault();
-            pagePath = pagePath.EndsWith("/") ? pagePath : string.Format("{0}\\", pagePath);
-            blockPath = blockPath.EndsWith("/") ? blockPath : string.Format("{0}\\", blockPath);
+
+            if (pagePath != null && !pagePath.EndsWith(Path.DirectorySeparatorChar))
+            {
+                pagePath += Path.DirectorySeparatorChar;
+            }
+
+            if (blockPath != null && !blockPath.EndsWith(Path.DirectorySeparatorChar))
+            {
+                blockPath += Path.DirectorySeparatorChar;
+            }
         }
 
         public void FixMultiple(ViewModelType viewModelType, int limit = 99999)

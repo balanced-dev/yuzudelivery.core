@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
@@ -73,31 +74,32 @@ namespace YuzuDelivery.Core
         public virtual JObject GetPathFileData(Type propertyType)
         {
             var typeName = propertyType.Name;
-            string pathFilename = string.Empty;
 
             //get paths file from frontend solution
-            foreach(var location in config.SchemaMetaLocations) { 
+            foreach(var location in config.SchemaMetaLocations) {
                 var possibleFilenames = GetPossiblePathFileName(location.Path, typeName);
-                foreach (var filename in possibleFilenames)
+                foreach (var schemaMetaFile in possibleFilenames)
                 {
-                    if (FileExists(filename))
-                        pathFilename = filename;
+                    if (FileExists(schemaMetaFile))
+                    {
+                        return JsonConvert.DeserializeObject<JObject>(FileRead(schemaMetaFile));
+                    }
                 }
             };
 
-            if (pathFilename != string.Empty)
-                return JsonConvert.DeserializeObject<JObject>(FileRead(pathFilename));
-            else
-                throw new Exception(string.Format("Schema meta file not found for {0}", typeName));
+            throw new Exception(string.Format("Schema meta file not found for {0}", typeName));
         }
 
         public virtual string[] GetPossiblePathFileName(string rootPath, string declaringTypeName)
         {
-            string[] patterns = new string[] { "{0}/{1}.schema", "{0}/{2}{1}.schema" };
+            var typeNameNoPrefix = declaringTypeName.RemoveAllVmPrefixes();
+            var blockPrefix = YuzuConstants.Configuration.BlockRefPrefix.RemoveFirstForwardSlash();
 
-            return patterns.Select(pattern => {
-                return string.Format(pattern, rootPath, declaringTypeName.RemoveAllVmPrefixes(), YuzuConstants.Configuration.BlockRefPrefix.RemoveFirstForwardSlash());
-            }).ToArray();
+            return new[]
+            {
+                Path.Combine(rootPath, $"{blockPrefix}{typeNameNoPrefix}.schema"), // blocks prioritized over pages
+                Path.Combine(rootPath, $"{typeNameNoPrefix.FirstCharacterToLower()}.schema"),
+            };
         }
 
         public virtual bool FileExists(string pathFilename)
@@ -110,5 +112,5 @@ namespace YuzuDelivery.Core
             return System.IO.File.ReadAllText(pathFilename);
         }
     }
-        
+
 }
