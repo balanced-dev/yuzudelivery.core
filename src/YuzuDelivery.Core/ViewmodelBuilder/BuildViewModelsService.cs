@@ -25,8 +25,16 @@ namespace YuzuDelivery.Core.ViewModelBuilder
 
             pagePath = config.TemplateLocations.Where(x => x.Name == "Pages").Select(x => x.Schema).FirstOrDefault();
             blockPath = config.TemplateLocations.Where(x => x.Name == "Partials").Select(x => x.Schema).FirstOrDefault();
-            pagePath = pagePath.EndsWith("/") ? pagePath : string.Format("{0}\\", pagePath);
-            blockPath = blockPath.EndsWith("/") ? blockPath : string.Format("{0}\\", blockPath);
+
+            if (pagePath != null && !pagePath.EndsWith(Path.DirectorySeparatorChar))
+            {
+                pagePath += Path.DirectorySeparatorChar;
+            }
+
+            if (blockPath != null && !blockPath.EndsWith(Path.DirectorySeparatorChar))
+            {
+                blockPath += Path.DirectorySeparatorChar;
+            }
         }
 
         public string GetDirectoryForType(ViewModelType viewModelType)
@@ -69,12 +77,14 @@ namespace YuzuDelivery.Core.ViewModelBuilder
 
         public (string Name, string Content) RunOneBlock(ViewModelType viewModelType, string schemaName)
         {
-            return generateViewmodelService.Create(string.Format(@"{0}par{1}.schema", GetDirectoryForType(viewModelType), schemaName), schemaName, viewModelType,  blockPath, builderConfig);
+            var schemaFilename = $"par{schemaName}.schema";
+            return generateViewmodelService.Create(Path.Combine(GetDirectoryForType(viewModelType), schemaFilename), schemaName, viewModelType,  blockPath, builderConfig);
         }
 
         public virtual void WriteOutputFile(string outputFilename, string content)
         {
-            File.WriteAllText(string.Format(@"{0}\{1}.cs", OutputPath, outputFilename), content);
+            var outputFilenameWithExtension = $"{outputFilename}.cs";
+            File.WriteAllText(Path.Combine(OutputPath, outputFilenameWithExtension), content);
         }
 
     }
