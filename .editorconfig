@@ -13,3 +13,6 @@ indent_size = 2
 
 [*.{json,schema,js}]
 indent_size = 2
+
+[*.sh]
+end_of_line = lf
