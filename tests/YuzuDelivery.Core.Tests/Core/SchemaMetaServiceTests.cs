@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using YuzuDelivery.Core;
@@ -165,10 +166,20 @@ namespace YuzuDelivery.Core.Test
         [Test]
         public void GetPossiblePathFileName_return_possible_paths_with_par_prefix_and_without_prefix()
         {
-            var output = svc.GetPossiblePathFileName("c:/test", "vmPage_Test");
+            if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                var output = svc.GetPossiblePathFileName(@"c:\test", "vmPage_Test");
 
-            Assert.AreEqual("c:/test/parTest.schema", output[0]);
-            Assert.AreEqual("c:/test/test.schema", output[1]);
+                Assert.AreEqual(@"c:\test\parTest.schema", output[0]);
+                Assert.AreEqual(@"c:\test\test.schema", output[1]);
+            }
+            else
+            {
+                var output = svc.GetPossiblePathFileName("/foo/test", "vmPage_Test");
+
+                Assert.AreEqual("/foo/test/parTest.schema", output[0]);
+                Assert.AreEqual("/foo/test/test.schema", output[1]);
+            }
         }
 
         public void CreatePathDataLocations(string[] locations)
