@@ -77,7 +77,6 @@ namespace YuzuDelivery.Core.Test
 
             mapper.WhenForAnyArgs(x => x.Map<vmPage_ExampleViewModel>(null, null)).Do(x => doFunction(x.Arg<object>(), x.Arg<IDictionary<string, object>>()));
 
-            Mapper.Reset();
         }
 
         #region render from mappings
@@ -110,7 +109,7 @@ namespace YuzuDelivery.Core.Test
 
         [Test]
         public void given_automapped_model_and_mapped_actions_then_apply()
-        { 
+        {
             var mappedItem = Substitute.For<IMapperAddItem>();
 
             mapperAddItems.Add(mappedItem);
@@ -391,7 +390,7 @@ namespace YuzuDelivery.Core.Test
         {
             return new vmBlock_ExampleViewModelSub()
             {
-                OptionItem = context.Options.Items["test"].ToString()
+                OptionItem = context.Items["test"].ToString()
             };
         }
     }
