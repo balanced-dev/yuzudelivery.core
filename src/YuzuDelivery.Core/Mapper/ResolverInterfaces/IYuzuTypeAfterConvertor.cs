@@ -1,8 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-
-namespace YuzuDelivery.Core
+﻿namespace YuzuDelivery.Core
 {
-    public interface IYuzuTypeAfterConvertor { }
+    public interface IYuzuTypeAfterConvertor {}
+
+    public interface IYuzuTypeAfterConvertor<in TSource, in TDest, in TContext>
+        : IYuzuTypeAfterConvertor
+        where TContext : YuzuMappingContext
+    {
+        void Apply(TSource source, TDest dest, TContext context);
+    }
 }
