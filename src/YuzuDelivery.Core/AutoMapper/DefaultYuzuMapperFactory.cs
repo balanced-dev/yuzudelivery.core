@@ -22,15 +22,16 @@ public class DefaultYuzuMapperFactory
 
     public IMapper Create(Action<IYuzuConfiguration, AutoMapper.MapperConfigurationExpression, AddedMapContext> configure)
     {
-        var configExpression = new AutoMapper.MapperConfigurationExpression();
-        configExpression.ConstructServicesUsing(_serviceProvider.GetService);
+        var cfg = new AutoMapper.MapperConfigurationExpression();
+        cfg.ConstructServicesUsing(_serviceProvider.GetService);
 
-        configure(_yuzuConfig, configExpression, _addedMapContext);
+        configure(_yuzuConfig, cfg, _addedMapContext);
 
-        AddYuzuMappersFromContainer(configExpression);
-        AddProfilesFromContainer(configExpression);
+        AddYuzuMappersFromContainer(cfg);
+        AddProfilesFromContainer(cfg);
 
-        return new DefaultYuzuMapper(configExpression);
+        var config = new AutoMapper.MapperConfiguration(cfg);
+        return new DefaultYuzuMapper(config.CreateMapper());
     }
 
     private void AddProfilesFromContainer(AutoMapper.MapperConfigurationExpression cfg)

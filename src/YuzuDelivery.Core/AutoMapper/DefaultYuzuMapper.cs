@@ -7,10 +7,9 @@ namespace YuzuDelivery.Core
     {
         private readonly AutoMapper.IMapper _inner;
 
-        public DefaultYuzuMapper(AutoMapper.MapperConfigurationExpression cfg)
+        public DefaultYuzuMapper(AutoMapper.IMapper inner)
         {
-            var config = new AutoMapper.MapperConfiguration(cfg);
-            _inner = new AutoMapper.Mapper(config);
+            _inner = inner;
         }
 
         public object Concrete => _inner;
