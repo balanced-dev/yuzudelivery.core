@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using YuzuDelivery.Core.AutoMapper.Mappers;
 
 namespace YuzuDelivery.Core.AutoMapper;
 
@@ -59,8 +60,7 @@ public class DefaultYuzuMapperFactory
                     continue;
                 }
 
-                var generic = mapper.MakeGenericMethod(item);
-                _addedMapContext = generic.Invoke(mapper, new object[] { cfg, item, _serviceProvider, _addedMapContext, config }) as AddedMapContext;
+                mapper.CreateMapAbstraction(cfg, item, _serviceProvider, _addedMapContext, _yuzuConfig);
             }
         }
     }

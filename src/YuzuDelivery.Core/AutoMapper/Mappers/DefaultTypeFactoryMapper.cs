@@ -10,7 +10,7 @@ namespace YuzuDelivery.Core.AutoMapper.Mappers
     public interface IYuzuTypeFactoryMapper<out TContext> : IYuzuBaseMapper
         where TContext : YuzuMappingContext
     {
-        AddedMapContext CreateMap<Dest, TService>(MapperConfigurationExpression cfg, YuzuMapperSettings baseSettings, IServiceProvider serviceProvider, AddedMapContext mapContext, IYuzuConfiguration config)
+        void CreateMap<Dest, TService>(MapperConfigurationExpression cfg, YuzuMapperSettings baseSettings, IServiceProvider serviceProvider, AddedMapContext mapContext, IYuzuConfiguration config)
             where TService : class, IYuzuTypeFactory<Dest, TContext>;
     }
 
@@ -18,21 +18,18 @@ namespace YuzuDelivery.Core.AutoMapper.Mappers
     public class DefaultTypeFactoryMapper<TContext> : IYuzuTypeFactoryMapper<TContext>
         where TContext : YuzuMappingContext
     {
-        public MethodInfo MakeGenericMethod(YuzuMapperSettings baseSettings)
+        public void CreateMapAbstraction(
+            MapperConfigurationExpression cfg,
+            YuzuMapperSettings baseSettings,
+            IServiceProvider factory,
+            AddedMapContext mapContext,
+            IYuzuConfiguration config)
         {
-            if (baseSettings is not YuzuTypeFactoryMapperSettings settings)
-            {
-                throw new Exception($"Mapping settings not of type {nameof(YuzuTypeFactoryMapperSettings)}");
-            }
-
-            var genericArguments = settings.Factory.GetInterfaces().First().GetGenericArguments().ToList();
-            genericArguments.Add(settings.Factory);
-
-            var method = GetType().GetMethod("CreateMap")!;
-            return method.MakeGenericMethod(genericArguments.ToArray());
+            var method = MakeGenericMethod(baseSettings);
+            method.Invoke(this, new object[] {cfg, baseSettings, factory, mapContext, config});
         }
 
-        public AddedMapContext CreateMap<TDest, TService>(
+        public void CreateMap<TDest, TService>(
             MapperConfigurationExpression cfg,
             YuzuMapperSettings baseSettings,
             IServiceProvider serviceProvider,
@@ -51,8 +48,20 @@ namespace YuzuDelivery.Core.AutoMapper.Mappers
             }
 
             config.AddActiveManualMap<TService, TDest>();
+        }
 
-            return mapContext;
+        private MethodInfo MakeGenericMethod(YuzuMapperSettings baseSettings)
+        {
+            if (baseSettings is not YuzuTypeFactoryMapperSettings settings)
+            {
+                throw new Exception($"Mapping settings not of type {nameof(YuzuTypeFactoryMapperSettings)}");
+            }
+
+            var genericArguments = settings.Factory.GetInterfaces().First().GetGenericArguments().ToList();
+            genericArguments.Add(settings.Factory);
+
+            var method = GetType().GetMethod("CreateMap")!;
+            return method.MakeGenericMethod(genericArguments.ToArray());
         }
     }
 }

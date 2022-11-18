@@ -10,7 +10,7 @@ namespace YuzuDelivery.Core.AutoMapper.Mappers
     public interface IYuzuPropertyReplaceMapper<out TContext> : IYuzuBaseMapper
         where TContext : YuzuMappingContext
     {
-        AddedMapContext CreateMap<M, PropertyType, V, TService>(MapperConfigurationExpression cfg, YuzuMapperSettings settings, IServiceProvider factory, AddedMapContext mapContext, IYuzuConfiguration config)
+        void CreateMap<M, PropertyType, V, TService>(MapperConfigurationExpression cfg, YuzuMapperSettings settings, IServiceProvider factory, AddedMapContext mapContext, IYuzuConfiguration config)
             where TService : class, IYuzuPropertyReplaceResolver<M, PropertyType, TContext>;
     }
 
@@ -24,22 +24,18 @@ namespace YuzuDelivery.Core.AutoMapper.Mappers
             this.contextFactory = contextFatcory;
         }
 
-        public MethodInfo MakeGenericMethod(YuzuMapperSettings baseSettings)
+        public void CreateMapAbstraction(
+            MapperConfigurationExpression cfg,
+            YuzuMapperSettings baseSettings,
+            IServiceProvider factory,
+            AddedMapContext mapContext,
+            IYuzuConfiguration config)
         {
-            if (baseSettings is not YuzuPropertyReplaceMapperSettings settings)
-            {
-                throw new Exception($"Mapping settings not of type {nameof(YuzuPropertyReplaceMapperSettings)}");
-            }
-
-            var genericArguments = settings.Resolver.GetInterfaces().First().GetGenericArguments().ToList();
-            genericArguments.Add(settings.Dest);
-            genericArguments.Add(settings.Resolver);
-
-            var method = GetType().GetMethod("CreateMap")!;
-            return method.MakeGenericMethod(genericArguments.ToArray());
+            var method = MakeGenericMethod(baseSettings);
+            method.Invoke(this, new object[] {cfg, baseSettings, factory, mapContext, config});
         }
 
-        public AddedMapContext CreateMap<TSource, TDest, TMember, TResolver>(MapperConfigurationExpression cfg,
+        public void CreateMap<TSource, TDest, TMember, TResolver>(MapperConfigurationExpression cfg,
             YuzuMapperSettings baseSettings, IServiceProvider factory, AddedMapContext mapContext,
             IYuzuConfiguration config)
             where TResolver : class, IYuzuPropertyReplaceResolver<TSource, TDest, TContext>
@@ -65,8 +61,22 @@ namespace YuzuDelivery.Core.AutoMapper.Mappers
                     return propertyResolver.Resolve(m, mappingContext);
                 });
             });
-
-            return mapContext;
         }
+
+        private MethodInfo MakeGenericMethod(YuzuMapperSettings baseSettings)
+        {
+            if (baseSettings is not YuzuPropertyReplaceMapperSettings settings)
+            {
+                throw new Exception($"Mapping settings not of type {nameof(YuzuPropertyReplaceMapperSettings)}");
+            }
+
+            var genericArguments = settings.Resolver.GetInterfaces().First().GetGenericArguments().ToList();
+            genericArguments.Add(settings.Dest);
+            genericArguments.Add(settings.Resolver);
+
+            var method = GetType().GetMethod("CreateMap")!;
+            return method.MakeGenericMethod(genericArguments.ToArray());
+        }
+
     }
 }

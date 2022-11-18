@@ -8,31 +8,24 @@ namespace YuzuDelivery.Core.AutoMapper.Mappers
 {
     public interface IYuzuGroupMapper : IYuzuBaseMapper
     {
-        AddedMapContext CreateMap<Model, VParent, VChild>(MapperConfigurationExpression cfg, YuzuMapperSettings baseSettings, IServiceProvider factory, AddedMapContext mapContext, IYuzuConfiguration config);
+        void CreateMap<Model, VParent, VChild>(MapperConfigurationExpression cfg, YuzuMapperSettings baseSettings, IServiceProvider factory, AddedMapContext mapContext, IYuzuConfiguration config);
     }
 
     // ReSharper disable once ClassNeverInstantiated.Global
     public class DefaultGroupMapper : IYuzuGroupMapper
     {
-        public MethodInfo MakeGenericMethod(YuzuMapperSettings baseSettings)
+        public void CreateMapAbstraction(
+            MapperConfigurationExpression cfg,
+            YuzuMapperSettings baseSettings,
+            IServiceProvider factory,
+            AddedMapContext mapContext,
+            IYuzuConfiguration config)
         {
-            if (baseSettings is not YuzuGroupMapperSettings settings)
-            {
-                throw new Exception($"Mapping settings not of type {nameof(YuzuGroupMapperSettings)}");
-            }
-
-            var genericArguments = new List<Type>
-            {
-                settings.Source,
-                settings.DestParent,
-                settings.DestChild
-            };
-
-            var method = GetType().GetMethod("CreateMap")!;
-            return method.MakeGenericMethod(genericArguments.ToArray());
+            var method = MakeGenericMethod(baseSettings);
+            method.Invoke(this, new object[] {cfg, baseSettings, factory, mapContext, config});
         }
 
-        public AddedMapContext CreateMap<Source, DestParent, DestChild>(
+        public void CreateMap<Source, DestParent, DestChild>(
             MapperConfigurationExpression cfg,
             YuzuMapperSettings baseSettings,
             IServiceProvider factory,
@@ -52,8 +45,25 @@ namespace YuzuDelivery.Core.AutoMapper.Mappers
 
             var parentMap = mapContext.AddOrGet<Source, DestParent>(cfg);
             parentMap.ForMember(settings.PropertyName, opt => opt.MapFrom(y => y));
+        }
 
-            return mapContext;
+
+        private MethodInfo MakeGenericMethod(YuzuMapperSettings baseSettings)
+        {
+            if (baseSettings is not YuzuGroupMapperSettings settings)
+            {
+                throw new Exception($"Mapping settings not of type {nameof(YuzuGroupMapperSettings)}");
+            }
+
+            var genericArguments = new List<Type>
+            {
+                settings.Source,
+                settings.DestParent,
+                settings.DestChild
+            };
+
+            var method = GetType().GetMethod("CreateMap")!;
+            return method.MakeGenericMethod(genericArguments.ToArray());
         }
     }
 }

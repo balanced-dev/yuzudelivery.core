@@ -10,7 +10,7 @@ namespace YuzuDelivery.Core.AutoMapper.Mappers
     public interface IYuzuTypeAfterMapper<out TContext> : IYuzuBaseMapper
         where TContext : YuzuMappingContext
     {
-        AddedMapContext CreateMap<Source, Dest, TService>(
+        void CreateMap<Source, Dest, TService>(
             MapperConfigurationExpression cfg,
             YuzuMapperSettings baseSettings,
             IServiceProvider serviceProvider,
@@ -30,21 +30,18 @@ namespace YuzuDelivery.Core.AutoMapper.Mappers
             _mappingContextFactory = mappingContextFactory;
         }
 
-        public MethodInfo MakeGenericMethod(YuzuMapperSettings settings)
+        public void CreateMapAbstraction(
+            MapperConfigurationExpression cfg,
+            YuzuMapperSettings baseSettings,
+            IServiceProvider factory,
+            AddedMapContext mapContext,
+            IYuzuConfiguration config)
         {
-            if (settings is not YuzuTypeAfterMapperSettings afterMapperSettings)
-            {
-                throw new Exception($"Mapping settings not of type {nameof(YuzuTypeAfterMapperSettings)}");
-            }
-
-            var genericArguments = afterMapperSettings.Action.GetInterfaces().First().GetGenericArguments().ToList();
-            genericArguments.Add(afterMapperSettings.Action);
-
-            var method = GetType().GetMethod(nameof(CreateMap))!;
-            return method.MakeGenericMethod(genericArguments.ToArray());
+            var method = MakeGenericMethod(baseSettings);
+            method.Invoke(this, new object[] {cfg, baseSettings, factory, mapContext, config});
         }
 
-        public AddedMapContext CreateMap<TSource, TDest, TConverter>(
+        public void CreateMap<TSource, TDest, TConverter>(
             MapperConfigurationExpression cfg,
             YuzuMapperSettings baseSettings,
             IServiceProvider serviceProvider,
@@ -62,8 +59,21 @@ namespace YuzuDelivery.Core.AutoMapper.Mappers
                 var mappingContext = _mappingContextFactory.Create<TContext>(ctx.Items);
                 converter.Apply(src, dest, mappingContext);
             });
-
-            return mapContext;
         }
+
+        private MethodInfo MakeGenericMethod(YuzuMapperSettings settings)
+        {
+            if (settings is not YuzuTypeAfterMapperSettings afterMapperSettings)
+            {
+                throw new Exception($"Mapping settings not of type {nameof(YuzuTypeAfterMapperSettings)}");
+            }
+
+            var genericArguments = afterMapperSettings.Action.GetInterfaces().First().GetGenericArguments().ToList();
+            genericArguments.Add(afterMapperSettings.Action);
+
+            var method = GetType().GetMethod(nameof(CreateMap))!;
+            return method.MakeGenericMethod(genericArguments.ToArray());
+        }
+
     }
 }
