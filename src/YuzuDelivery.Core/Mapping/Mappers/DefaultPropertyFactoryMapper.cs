@@ -78,7 +78,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
             genericArguments.Add(settings.Dest);
             genericArguments.Add(settings.Factory);
 
-            var method = GetType().GetMethod("CreateMap")!;
+            var method = GetType().GetMethod(nameof(CreateMap))!;
             return method.MakeGenericMethod(genericArguments.ToArray());
         }
 

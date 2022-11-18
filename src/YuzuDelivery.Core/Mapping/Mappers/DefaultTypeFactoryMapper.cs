@@ -44,7 +44,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
 
             if (!config.ViewmodelFactories.ContainsKey(settings.Dest))
             {
-                config.ViewmodelFactories.Add(settings.Dest, () => serviceProvider.GetRequiredService(typeof(TService)) as TService);
+                config.ViewmodelFactories.Add(settings.Dest, serviceProvider.GetRequiredService<TService>);
             }
 
             config.AddActiveManualMap<TService, TDest>();
@@ -60,7 +60,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
             var genericArguments = settings.Factory.GetInterfaces().First().GetGenericArguments().ToList();
             genericArguments.Add(settings.Factory);
 
-            var method = GetType().GetMethod("CreateMap")!;
+            var method = GetType().GetMethod(nameof(CreateMap))!;
             return method.MakeGenericMethod(genericArguments.ToArray());
         }
     }

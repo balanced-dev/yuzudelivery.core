@@ -73,7 +73,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
             var genericArguments = settings.Convertor.GetInterfaces().First().GetGenericArguments().ToList();
             genericArguments.Add(settings.Convertor);
 
-            var method = GetType().GetMethod("CreateMap")!;
+            var method = GetType().GetMethod(nameof(CreateMap))!;
             return method.MakeGenericMethod(genericArguments.ToArray());
         }
     }

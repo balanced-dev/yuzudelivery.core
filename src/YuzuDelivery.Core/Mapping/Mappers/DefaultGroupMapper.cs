@@ -62,7 +62,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
                 settings.DestChild
             };
 
-            var method = GetType().GetMethod("CreateMap")!;
+            var method = GetType().GetMethod(nameof(CreateMap))!;
             return method.MakeGenericMethod(genericArguments.ToArray());
         }
     }

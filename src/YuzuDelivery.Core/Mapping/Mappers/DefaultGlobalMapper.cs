@@ -8,7 +8,12 @@ namespace YuzuDelivery.Core.Mapping.Mappers
 {
     public interface IYuzuGlobalMapper : IYuzuBaseMapper
     {
-        void CreateMap<Model, V>(MapperConfigurationExpression cfg, YuzuMapperSettings baseSettings, IServiceProvider factory, AddedMapContext mapContext, IYuzuConfiguration config);
+        void CreateMap<TSource, TDest>(
+            MapperConfigurationExpression cfg,
+            YuzuMapperSettings baseSettings,
+            IServiceProvider factory,
+            AddedMapContext mapContext,
+            IYuzuConfiguration config);
     }
 
     // ReSharper disable once ClassNeverInstantiated.Global
@@ -25,7 +30,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
             method.Invoke(this, new object[] {cfg, baseSettings, factory, mapContext, config});
         }
 
-        public void CreateMap<Source, Dest>(
+        public void CreateMap<TSource, TDest>(
             MapperConfigurationExpression cfg,
             YuzuMapperSettings baseSettings,
             IServiceProvider factory,
@@ -42,7 +47,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
                 cfg.RecognizePrefixes(settings.GroupName);
             }
 
-            mapContext.AddOrGet<Source, Dest>(cfg);
+            mapContext.AddOrGet<TSource, TDest>(cfg);
         }
 
         private MethodInfo MakeGenericMethod(YuzuMapperSettings baseSettings)
@@ -58,7 +63,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
                 settings.Dest
             };
 
-            var method = GetType().GetMethod("CreateMap")!;
+            var method = GetType().GetMethod(nameof(CreateMap))!;
             return method.MakeGenericMethod(genericArguments.ToArray());
         }
     }

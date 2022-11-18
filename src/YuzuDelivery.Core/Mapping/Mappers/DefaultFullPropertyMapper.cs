@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using AutoMapper;
+using Microsoft.Extensions.DependencyInjection;
 using YuzuDelivery.Core.Mapping.Mappers.Settings;
 
 namespace YuzuDelivery.Core.Mapping.Mappers
@@ -9,8 +10,13 @@ namespace YuzuDelivery.Core.Mapping.Mappers
     public interface IYuzuFullPropertyMapper<TContext> : IYuzuBaseMapper
         where TContext : YuzuMappingContext
     {
-        void CreateMap<Source, Destination, SourceMember, DestMember, TService>(MapperConfigurationExpression cfg, YuzuMapperSettings baseSettings, IServiceProvider factory, AddedMapContext mapContext, IYuzuConfiguration config)
-            where TService : class, IYuzuFullPropertyResolver<Source, Destination, SourceMember, DestMember, TContext>;
+        void CreateMap<TSource, TDest, TSourceMember, TDestMember, TService>(
+            MapperConfigurationExpression cfg,
+            YuzuMapperSettings baseSettings,
+            IServiceProvider factory,
+            AddedMapContext mapContext,
+            IYuzuConfiguration config)
+            where TService : class, IYuzuFullPropertyResolver<TSource, TDest, TSourceMember, TDestMember, TContext>;
     }
 
     public class DefaultFullPropertyMapper<TContext> : IYuzuFullPropertyMapper<TContext>
@@ -44,24 +50,24 @@ namespace YuzuDelivery.Core.Mapping.Mappers
                 throw new Exception($"Mapping settings not of type {nameof(YuzuFullPropertyMapperSettings)}");
             }
 
-
             if (!string.IsNullOrEmpty(settings.GroupName))
+            {
                 cfg.RecognizePrefixes(settings.GroupName);
-
-            Func<TSource, TDest, object, ResolutionContext, TDestMember> mappingFunction =
-                (TSource m, TDest v, object o, ResolutionContext context) =>
-                {
-                    var propertyResolver = factory.GetService(typeof(TService)) as TService;
-                    var sourceValue =
-                        ((TSourceMember) typeof(TSource).GetProperty(settings.SourcePropertyName).GetValue(m));
-                    var yuzuContext = contextFactory.Create<TContext>(context.Items);
-
-                    return propertyResolver.Resolve(m, v, sourceValue, settings.DestPropertyName, yuzuContext);
-                };
+            }
 
             var map = mapContext.AddOrGet<TSource, TDest>(cfg);
 
-            map.ForMember(settings.DestPropertyName, opt => opt.MapFrom(mappingFunction));
+            map.ForMember(settings.DestPropertyName, opt =>
+            {
+                opt.MapFrom((src, dest, _, ctx) =>
+                {
+                    var propertyResolver = factory.GetRequiredService<TService>();
+                    var sourceValue = ((TSourceMember) typeof(TSource).GetProperty(settings.SourcePropertyName)!.GetValue(src));
+                    var mappingContext = contextFactory.Create<TContext>(ctx.Items);
+
+                    return propertyResolver.Resolve(src, dest, sourceValue, settings.DestPropertyName, mappingContext);
+                });
+            });
         }
 
         private MethodInfo MakeGenericMethod(YuzuMapperSettings baseSettings)
@@ -74,7 +80,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
             var genericArguments = settings.Resolver.GetInterfaces().First().GetGenericArguments().ToList();
             genericArguments.Add(settings.Resolver);
 
-            var method = GetType().GetMethod("CreateMap")!;
+            var method = GetType().GetMethod(nameof(CreateMap))!;
             return method.MakeGenericMethod(genericArguments.ToArray());
         }
     }
