@@ -21,7 +21,7 @@ namespace YuzuDelivery.Core
         {
             if (settings is not YuzuTypeAfterMapperSettings afterMapperSettings)
             {
-                throw new Exception("Mapping settings not of type YuzuTypeAfterMapperSettings");
+                throw new Exception($"Mapping settings not of type {nameof(YuzuTypeAfterMapperSettings)}");
             }
 
             var genericArguments = afterMapperSettings.Action.GetInterfaces().First().GetGenericArguments().ToList();

@@ -25,10 +25,10 @@ public class DefaultYuzuMapperFactory
         var cfg = new AutoMapper.MapperConfigurationExpression();
         cfg.ConstructServicesUsing(_serviceProvider.GetService);
 
-        configure(_yuzuConfig, cfg, _addedMapContext);
-
         AddYuzuMappersFromContainer(cfg);
         AddProfilesFromContainer(cfg);
+
+        configure(_yuzuConfig, cfg, _addedMapContext);
 
         var config = new AutoMapper.MapperConfiguration(cfg);
         return new DefaultYuzuMapper(config.CreateMapper());
