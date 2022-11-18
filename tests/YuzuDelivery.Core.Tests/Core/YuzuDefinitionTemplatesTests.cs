@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using AutoMapper;
 using Newtonsoft.Json;
+using YuzuDelivery.Core.Mapping;
+using IMapper = YuzuDelivery.Core.Mapping.IMapper;
 #if NETCOREAPP
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Http;

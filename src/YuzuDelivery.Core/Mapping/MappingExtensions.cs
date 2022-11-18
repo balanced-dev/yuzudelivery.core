@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using YuzuDelivery.Core.AutoMapper.Mappers.Settings;
-using YuzuDelivery.Core.AutoMapper.Mappers;
+using YuzuDelivery.Core.Mapping.Mappers;
+using YuzuDelivery.Core.Mapping.Mappers.Settings;
 
 namespace YuzuDelivery.Core.Mapping;
 
