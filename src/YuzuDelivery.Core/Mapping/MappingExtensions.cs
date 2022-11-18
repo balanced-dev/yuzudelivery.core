@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using YuzuDelivery.Umbraco.Core;
 
 namespace YuzuDelivery.Core.Mapping;
 
@@ -15,7 +16,10 @@ public static class MappingExtensions
         });
     }
 
-    public static void AddTypeReplace<TContext>(this List<YuzuMapperSettings> resolvers, Type convertorType, bool ignoreReturnType = true)
+    public static void AddTypeReplace<TContext>(
+        this List<YuzuMapperSettings> resolvers,
+        Type convertorType,
+        bool ignoreReturnType = true)
         where TContext : YuzuMappingContext
     {
         resolvers.Add(new YuzuTypeConvertorMapperSettings()
@@ -26,7 +30,10 @@ public static class MappingExtensions
         });
     }
 
-    public static void AddTypeFactory<TContext>(this List<YuzuMapperSettings> resolvers, Type factoryType, Type destType)
+    public static void AddTypeFactory<TContext>(
+        this List<YuzuMapperSettings> resolvers,
+        Type factoryType,
+        Type destType)
         where TContext : YuzuMappingContext
     {
         resolvers.Add(new YuzuTypeFactoryMapperSettings()
@@ -36,4 +43,27 @@ public static class MappingExtensions
             Dest = destType,
         });
     }
+
+    public static void AddPropertyReplace<TContext>(
+        this List<YuzuMapperSettings> resolvers,
+        Type resolverType,
+        Type destType,
+        string destMemberName,
+        string groupName = "",
+        bool ignoreProperty = true,
+        bool ignoreReturnType = true)
+        where TContext : YuzuMappingContext
+    {
+        resolvers.Add(new YuzuPropertyReplaceMapperSettings()
+        {
+            Mapper = typeof(IYuzuPropertyReplaceMapper<TContext>),
+            Resolver = resolverType,
+            Dest = destType,
+            DestPropertyName = destMemberName,
+            GroupName = groupName,
+            IgnoreProperty = ignoreProperty,
+            IgnoreReturnType = ignoreReturnType
+        });
+    }
+
 }
