@@ -12,7 +12,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
     {
         void CreateMap<Source, Dest, TService>(
             MapperConfigurationExpression cfg,
-            YuzuMapperSettings settings,
+            YuzuTypeConvertorMapperSettings settings,
             IServiceProvider factory,
             AddedMapContext mapContext,
             IYuzuConfiguration config)
@@ -20,7 +20,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
     }
 
     // ReSharper disable once ClassNeverInstantiated.Global
-    public class DefaultTypeConvertorMapper<TContext> : IYuzuTypeConvertorMapper<TContext>
+    public class DefaultTypeConvertorMapper<TContext> : YuzuBaseMapper<YuzuTypeConvertorMapperSettings>, IYuzuTypeConvertorMapper<TContext>
         where TContext : YuzuMappingContext
     {
         private readonly IMappingContextFactory contextFactory;
@@ -30,26 +30,14 @@ namespace YuzuDelivery.Core.Mapping.Mappers
             this.contextFactory = contextFactory;
         }
 
-        public void CreateMapAbstraction(
-            MapperConfigurationExpression cfg,
-            YuzuMapperSettings baseSettings,
-            IServiceProvider factory,
-            AddedMapContext mapContext,
-            IYuzuConfiguration config)
-        {
-            var method = MakeGenericMethod(baseSettings);
-            method.Invoke(this, new object[] {cfg, baseSettings, factory, mapContext, config});
-        }
-
         public void CreateMap<TSource, TDest, TConverter>(
             MapperConfigurationExpression cfg,
-            YuzuMapperSettings settings,
+            YuzuTypeConvertorMapperSettings settings,
             IServiceProvider factory,
             AddedMapContext mapContext,
             IYuzuConfiguration config)
             where TConverter : class, IYuzuTypeConvertor<TSource, TDest, TContext>
         {
-
             config.AddActiveManualMap<TConverter, TDest>();
 
             var map = mapContext.AddOrGet<TSource, TDest>(cfg);
@@ -63,13 +51,8 @@ namespace YuzuDelivery.Core.Mapping.Mappers
             });
         }
 
-        private MethodInfo MakeGenericMethod(YuzuMapperSettings baseSettings)
+        protected override MethodInfo MakeGenericMethod(YuzuTypeConvertorMapperSettings settings)
         {
-            if (baseSettings is not YuzuTypeConvertorMapperSettings settings)
-            {
-                throw new Exception("Mapping settings not of type YuzuTypeMappingSettings");
-            }
-
             var genericArguments = settings.Convertor.GetInterfaces().First().GetGenericArguments().ToList();
             genericArguments.Add(settings.Convertor);
 

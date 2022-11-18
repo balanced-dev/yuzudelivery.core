@@ -10,38 +10,22 @@ namespace YuzuDelivery.Core.Mapping.Mappers
     {
         void CreateMap<TSource, TDest>(
             MapperConfigurationExpression cfg,
-            YuzuMapperSettings baseSettings,
+            YuzuGlobalMapperSettings settings,
             IServiceProvider factory,
             AddedMapContext mapContext,
             IYuzuConfiguration config);
     }
 
     // ReSharper disable once ClassNeverInstantiated.Global
-    public class DefaultGlobalMapper : IYuzuGlobalMapper
+    public class DefaultGlobalMapper : YuzuBaseMapper<YuzuGlobalMapperSettings>, IYuzuGlobalMapper
     {
-        public void CreateMapAbstraction(
-            MapperConfigurationExpression cfg,
-            YuzuMapperSettings baseSettings,
-            IServiceProvider factory,
-            AddedMapContext mapContext,
-            IYuzuConfiguration config)
-        {
-            var method = MakeGenericMethod(baseSettings);
-            method.Invoke(this, new object[] {cfg, baseSettings, factory, mapContext, config});
-        }
-
         public void CreateMap<TSource, TDest>(
             MapperConfigurationExpression cfg,
-            YuzuMapperSettings baseSettings,
+            YuzuGlobalMapperSettings settings,
             IServiceProvider factory,
             AddedMapContext mapContext,
             IYuzuConfiguration config)
         {
-            if (baseSettings is not YuzuGlobalMapperSettings settings)
-            {
-                throw new Exception($"Mapping settings not of type {nameof(YuzuGlobalMapperSettings)}");
-            }
-
             if (settings.GroupName != null)
             {
                 cfg.RecognizePrefixes(settings.GroupName);
@@ -50,13 +34,8 @@ namespace YuzuDelivery.Core.Mapping.Mappers
             mapContext.AddOrGet<TSource, TDest>(cfg);
         }
 
-        private MethodInfo MakeGenericMethod(YuzuMapperSettings baseSettings)
+        protected override MethodInfo MakeGenericMethod(YuzuGlobalMapperSettings settings)
         {
-            if (baseSettings is not YuzuGlobalMapperSettings settings)
-            {
-                throw new Exception($"Mapping settings not of type {nameof(YuzuGlobalMapperSettings)}");
-            }
-
             var genericArguments = new List<Type>
             {
                 settings.Source,

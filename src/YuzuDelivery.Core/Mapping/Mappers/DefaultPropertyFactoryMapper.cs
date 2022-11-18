@@ -10,25 +10,18 @@ namespace YuzuDelivery.Core.Mapping.Mappers
     public interface IYuzuPropertyFactoryMapper<TContext> : IYuzuBaseMapper
         where TContext : YuzuMappingContext
     {
-        void CreateMap<DestMember, Source, Dest, TService>(MapperConfigurationExpression cfg, YuzuMapperSettings baseSettings, IServiceProvider factory, AddedMapContext mapContext, IYuzuConfiguration config)
-            where TService : class, IYuzuTypeFactory<DestMember,TContext>;
-    }
-
-    public class DefaultPropertyFactoryMapper<TContext> : IYuzuPropertyFactoryMapper<TContext>
-        where TContext : YuzuMappingContext
-    {
-
-        public void CreateMapAbstraction(
+        void CreateMap<DestMember, Source, Dest, TService>(
             MapperConfigurationExpression cfg,
-            YuzuMapperSettings baseSettings,
+            YuzuPropertyFactoryMapperSettings settings,
             IServiceProvider factory,
             AddedMapContext mapContext,
             IYuzuConfiguration config)
-        {
-            var method = MakeGenericMethod(baseSettings);
-            method.Invoke(this, new object[] {cfg, baseSettings, factory, mapContext, config});
-        }
+            where TService : class, IYuzuTypeFactory<DestMember,TContext>;
+    }
 
+    public class DefaultPropertyFactoryMapper<TContext> : YuzuBaseMapper<YuzuPropertyFactoryMapperSettings>, IYuzuPropertyFactoryMapper<TContext>
+        where TContext : YuzuMappingContext
+    {
         private readonly IMappingContextFactory contextFactory;
 
         public DefaultPropertyFactoryMapper(IMappingContextFactory contextFactory)
@@ -36,21 +29,15 @@ namespace YuzuDelivery.Core.Mapping.Mappers
             this.contextFactory = contextFactory;
         }
 
-
         // TODO: jiggle order to TSource, TDest, TMember, TService
         public void CreateMap<TMember, TSource, TDest, TService>(
             MapperConfigurationExpression cfg,
-            YuzuMapperSettings baseSettings,
+            YuzuPropertyFactoryMapperSettings settings,
             IServiceProvider factory,
             AddedMapContext mapContext,
             IYuzuConfiguration config)
             where TService : class, IYuzuTypeFactory<TMember, TContext>
         {
-            if (baseSettings is not YuzuPropertyFactoryMapperSettings settings)
-            {
-                throw new Exception($"Mapping settings not of type {nameof(YuzuPropertyFactoryMapperSettings)}");
-            }
-
             config.AddActiveManualMap<TService, TDest>(settings.DestPropertyName);
 
             var map = mapContext.AddOrGet<TSource, TDest>(cfg);
@@ -66,13 +53,8 @@ namespace YuzuDelivery.Core.Mapping.Mappers
             });
         }
 
-        private MethodInfo MakeGenericMethod(YuzuMapperSettings baseSettings)
+        protected override MethodInfo MakeGenericMethod(YuzuPropertyFactoryMapperSettings settings)
         {
-            if (baseSettings is not YuzuPropertyFactoryMapperSettings settings)
-            {
-                throw new Exception($"Mapping settings not of type {nameof(YuzuPropertyFactoryMapperSettings)}");
-            }
-
             var genericArguments = settings.Factory.GetInterfaces().First().GetGenericArguments().ToList();
             genericArguments.Add(settings.Source);
             genericArguments.Add(settings.Dest);
@@ -81,6 +63,5 @@ namespace YuzuDelivery.Core.Mapping.Mappers
             var method = GetType().GetMethod(nameof(CreateMap))!;
             return method.MakeGenericMethod(genericArguments.ToArray());
         }
-
     }
 }

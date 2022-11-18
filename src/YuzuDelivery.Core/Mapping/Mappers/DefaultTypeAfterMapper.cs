@@ -12,7 +12,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
     {
         void CreateMap<Source, Dest, TService>(
             MapperConfigurationExpression cfg,
-            YuzuMapperSettings baseSettings,
+            YuzuTypeAfterMapperSettings baseSettings,
             IServiceProvider serviceProvider,
             AddedMapContext mapContext,
             IYuzuConfiguration config)
@@ -20,30 +20,17 @@ namespace YuzuDelivery.Core.Mapping.Mappers
     }
 
     // ReSharper disable once ClassNeverInstantiated.Global
-    public class DefaultTypeAfterMapper<TContext> : IYuzuTypeAfterMapper<TContext>
+    public class DefaultTypeAfterMapper<TContext> : YuzuBaseMapper<YuzuTypeAfterMapperSettings>, IYuzuTypeAfterMapper<TContext>
         where TContext : YuzuMappingContext
     {
         private readonly IMappingContextFactory _mappingContextFactory;
 
         public DefaultTypeAfterMapper(IMappingContextFactory mappingContextFactory)
-        {
-            _mappingContextFactory = mappingContextFactory;
-        }
-
-        public void CreateMapAbstraction(
-            MapperConfigurationExpression cfg,
-            YuzuMapperSettings baseSettings,
-            IServiceProvider factory,
-            AddedMapContext mapContext,
-            IYuzuConfiguration config)
-        {
-            var method = MakeGenericMethod(baseSettings);
-            method.Invoke(this, new object[] {cfg, baseSettings, factory, mapContext, config});
-        }
+            => _mappingContextFactory = mappingContextFactory;
 
         public void CreateMap<TSource, TDest, TConverter>(
             MapperConfigurationExpression cfg,
-            YuzuMapperSettings baseSettings,
+            YuzuTypeAfterMapperSettings settings,
             IServiceProvider serviceProvider,
             AddedMapContext mapContext,
             IYuzuConfiguration config)
@@ -61,19 +48,13 @@ namespace YuzuDelivery.Core.Mapping.Mappers
             });
         }
 
-        private MethodInfo MakeGenericMethod(YuzuMapperSettings settings)
+        protected override MethodInfo MakeGenericMethod(YuzuTypeAfterMapperSettings settings)
         {
-            if (settings is not YuzuTypeAfterMapperSettings afterMapperSettings)
-            {
-                throw new Exception($"Mapping settings not of type {nameof(YuzuTypeAfterMapperSettings)}");
-            }
-
-            var genericArguments = afterMapperSettings.Action.GetInterfaces().First().GetGenericArguments().ToList();
-            genericArguments.Add(afterMapperSettings.Action);
+            var genericArguments = settings.Action.GetInterfaces().First().GetGenericArguments().ToList();
+            genericArguments.Add(settings.Action);
 
             var method = GetType().GetMethod(nameof(CreateMap))!;
             return method.MakeGenericMethod(genericArguments.ToArray());
         }
-
     }
 }

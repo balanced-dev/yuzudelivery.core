@@ -10,40 +10,30 @@ namespace YuzuDelivery.Core.Mapping.Mappers
 {
     public interface IYuzuPropertyAfterMapper : IYuzuBaseMapper
     {
-        void CreateMap<M, PropertyType, V, TService>(MapperConfigurationExpression cfg, YuzuMapperSettings settings, IServiceProvider factory, AddedMapContext mapContext, IYuzuConfiguration config)
-            where TService : class, IYuzuPropertyAfterResolver<M, PropertyType>;
-    }
-
-    public interface IYuzuPropertyAfterResolver<M, Type> : IYuzuPropertyAfterResolver, IYuzuMappingResolver
-    {
-        Type Apply(Type value);
-    }
-
-    public class DefaultPropertyAfterMapper : IYuzuPropertyAfterMapper
-    {
-        public void CreateMapAbstraction(
+        void CreateMap<TSource, TMember, TDest, TService>(
             MapperConfigurationExpression cfg,
-            YuzuMapperSettings baseSettings,
+            YuzuPropertyAfterMapperSettings settings,
             IServiceProvider factory,
             AddedMapContext mapContext,
             IYuzuConfiguration config)
-        {
-            var method = MakeGenericMethod(baseSettings);
-            method.Invoke(this, new object[] {cfg, baseSettings, factory, mapContext, config});
-        }
+            where TService : class, IYuzuPropertyAfterResolver<TMember>;
+    }
 
+    public interface IYuzuPropertyAfterResolver<TMember> : IYuzuPropertyAfterResolver, IYuzuMappingResolver
+    {
+        TMember Apply(TMember value);
+    }
+
+    public class DefaultPropertyAfterMapper : YuzuBaseMapper<YuzuPropertyAfterMapperSettings>,  IYuzuPropertyAfterMapper
+    {
         public void CreateMap<TSource, TMember, TDest, TService>(
             MapperConfigurationExpression cfg,
-            YuzuMapperSettings baseSettings,
+            YuzuPropertyAfterMapperSettings settings,
             IServiceProvider factory,
             AddedMapContext mapContext,
             IYuzuConfiguration config)
-            where TService : class, IYuzuPropertyAfterResolver<TSource, TMember>
+            where TService : class, IYuzuPropertyAfterResolver<TMember>
         {
-            if (baseSettings is not YuzuPropertyAfterMapperSettings settings)
-            {
-                throw new Exception($"Mapping settings not of type {nameof(YuzuPropertyAfterMapperSettings)}");
-            }
 
             //need a fix here
             //config.AddActiveManualMap<Resolver, Dest>(settings.DestProperty);
@@ -66,13 +56,8 @@ namespace YuzuDelivery.Core.Mapping.Mappers
             });
         }
 
-        private MethodInfo MakeGenericMethod(YuzuMapperSettings baseSettings)
+        protected override MethodInfo MakeGenericMethod(YuzuPropertyAfterMapperSettings settings)
         {
-            if (baseSettings is not YuzuPropertyAfterMapperSettings settings)
-            {
-                throw new Exception($"Mapping settings not of type {nameof(YuzuPropertyAfterMapperSettings)}");
-            }
-
             var genericArguments = settings.Resolver.GetInterfaces().First().GetGenericArguments().ToList();
             genericArguments.Add(settings.Dest);
             genericArguments.Add(settings.Resolver);
