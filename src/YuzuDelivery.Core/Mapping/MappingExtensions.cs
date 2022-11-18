@@ -25,4 +25,15 @@ public static class MappingExtensions
             IgnoreReturnType = ignoreReturnType
         });
     }
+
+    public static void AddTypeFactory<TContext>(this List<YuzuMapperSettings> resolvers, Type factoryType, Type destType)
+        where TContext : YuzuMappingContext
+    {
+        resolvers.Add(new YuzuTypeFactoryMapperSettings()
+        {
+            Mapper = typeof(IYuzuTypeFactoryMapper<TContext>),
+            Factory = factoryType,
+            Dest = destType,
+        });
+    }
 }
