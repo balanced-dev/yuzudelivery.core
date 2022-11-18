@@ -84,4 +84,27 @@ public static class MappingExtensions
         });
     }
 
+    public static void AddFullProperty<TContext>(
+        this List<YuzuMapperSettings> resolvers,
+        Type resolverType,
+        string sourceMemberName,
+        string destMemberName,
+        string groupName = "",
+        bool ignoreProperty = true,
+        bool ignoreReturnType = true)
+        where TContext : YuzuMappingContext
+    {
+        resolvers.Add(new YuzuFullPropertyMapperSettings()
+        {
+            Mapper = typeof(IYuzuFullPropertyMapper<TContext>),
+            Resolver = resolverType,
+            SourcePropertyName = sourceMemberName,
+            DestPropertyName = destMemberName,
+            GroupName = groupName,
+            IgnoreProperty = ignoreProperty,
+            IgnoreReturnType = ignoreReturnType
+        });
+    }
+
+
 }
