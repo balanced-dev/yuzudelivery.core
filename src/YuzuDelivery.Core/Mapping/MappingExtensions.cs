@@ -66,4 +66,22 @@ public static class MappingExtensions
         });
     }
 
+    public static void AddPropertyFactory<TContext>(
+        this List<YuzuMapperSettings> resolvers,
+        Type factoryType,
+        Type sourceType,
+        Type destType,
+        string destMemberName)
+        where TContext : YuzuMappingContext
+    {
+        resolvers.Add(new YuzuPropertyFactoryMapperSettings()
+        {
+            Mapper = typeof(IYuzuPropertyFactoryMapper<TContext>),
+            Factory = factoryType,
+            Source = sourceType,
+            Dest = destType,
+            DestPropertyName = destMemberName
+        });
+    }
+
 }
