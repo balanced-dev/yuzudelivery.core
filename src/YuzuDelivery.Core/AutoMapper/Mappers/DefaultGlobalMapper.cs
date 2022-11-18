@@ -2,9 +2,15 @@
 using System.Collections.Generic;
 using System.Reflection;
 using AutoMapper;
+using YuzuDelivery.Core.AutoMapper.Mappers.Settings;
 
-namespace YuzuDelivery.Core
+namespace YuzuDelivery.Core.AutoMapper.Mappers
 {
+    public interface IYuzuGlobalMapper : IYuzuBaseMapper
+    {
+        AddedMapContext CreateMap<Model, V>(MapperConfigurationExpression cfg, YuzuMapperSettings baseSettings, IServiceProvider factory, AddedMapContext mapContext, IYuzuConfiguration config);
+    }
+
     // ReSharper disable once ClassNeverInstantiated.Global
     public class DefaultGlobalMapper : IYuzuGlobalMapper
     {

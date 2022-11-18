@@ -1,11 +1,24 @@
-﻿using AutoMapper;
-using System;
+﻿using System;
 using System.Linq;
 using System.Reflection;
+using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
+using YuzuDelivery.Core.AutoMapper.Mappers.Settings;
 
-namespace YuzuDelivery.Core
+namespace YuzuDelivery.Core.AutoMapper.Mappers
 {
+    public interface IYuzuTypeConvertorMapper<out TContext> : IYuzuBaseMapper
+        where TContext : YuzuMappingContext
+    {
+        AddedMapContext CreateMap<Source, Dest, TService>(
+            MapperConfigurationExpression cfg,
+            YuzuMapperSettings settings,
+            IServiceProvider factory,
+            AddedMapContext mapContext,
+            IYuzuConfiguration config)
+            where TService : class, IYuzuTypeConvertor<Source, Dest, TContext>;
+    }
+
     // ReSharper disable once ClassNeverInstantiated.Global
     public class DefaultTypeConvertorMapper<TContext> : IYuzuTypeConvertorMapper<TContext>
         where TContext : YuzuMappingContext

@@ -1,10 +1,16 @@
-﻿using AutoMapper;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using AutoMapper;
+using YuzuDelivery.Core.AutoMapper.Mappers.Settings;
 
-namespace YuzuDelivery.Core
+namespace YuzuDelivery.Core.AutoMapper.Mappers
 {
+    public interface IYuzuGroupMapper : IYuzuBaseMapper
+    {
+        AddedMapContext CreateMap<Model, VParent, VChild>(MapperConfigurationExpression cfg, YuzuMapperSettings baseSettings, IServiceProvider factory, AddedMapContext mapContext, IYuzuConfiguration config);
+    }
+
     // ReSharper disable once ClassNeverInstantiated.Global
     public class DefaultGroupMapper : IYuzuGroupMapper
     {

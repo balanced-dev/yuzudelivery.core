@@ -1,13 +1,24 @@
-﻿using AutoMapper;
-using System;
+﻿using System;
 using System.Linq;
-using System.Reflection;
-using YuzuDelivery.Core;
 using System.Linq.Expressions;
+using System.Reflection;
+using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
+using YuzuDelivery.Core.AutoMapper.Mappers.Settings;
 
-namespace YuzuDelivery.Umbraco.Core
+namespace YuzuDelivery.Core.AutoMapper.Mappers
 {
+    public interface IYuzuPropertyAfterMapper : IYuzuBaseMapper
+    {
+        AddedMapContext CreateMap<M, PropertyType, V, TService>(MapperConfigurationExpression cfg, YuzuMapperSettings settings, IServiceProvider factory, AddedMapContext mapContext, IYuzuConfiguration config)
+            where TService : class, IYuzuPropertyAfterResolver<M, PropertyType>;
+    }
+
+    public interface IYuzuPropertyAfterResolver<M, Type> : IYuzuPropertyAfterResolver, IYuzuMappingResolver
+    {
+        Type Apply(Type value);
+    }
+
     public class DefaultPropertyAfterMapper : IYuzuPropertyAfterMapper
     {
         public MethodInfo MakeGenericMethod(YuzuMapperSettings baseSettings)

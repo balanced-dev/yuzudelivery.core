@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace YuzuDelivery.Core
+namespace YuzuDelivery.Core.AutoMapper.Mappers.Settings
 {
     public class YuzuPropertyFactoryMapperSettings : YuzuMapperSettings
     {

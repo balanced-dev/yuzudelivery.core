@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using YuzuDelivery.Umbraco.Core;
+using YuzuDelivery.Core.AutoMapper.Mappers.Settings;
+using YuzuDelivery.Core.AutoMapper.Mappers;
 
 namespace YuzuDelivery.Core.Mapping;
 

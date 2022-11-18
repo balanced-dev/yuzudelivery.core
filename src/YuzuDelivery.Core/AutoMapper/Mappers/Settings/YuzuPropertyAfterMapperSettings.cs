@@ -1,8 +1,6 @@
 ﻿using System;
-using YuzuDelivery.Core;
-using System.Linq.Expressions;
 
-namespace YuzuDelivery.Umbraco.Core
+namespace YuzuDelivery.Core.AutoMapper.Mappers.Settings
 {
     public class YuzuPropertyAfterMapperSettings : YuzuMapperSettings
     {

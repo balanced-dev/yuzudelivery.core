@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace YuzuDelivery.Core;
+namespace YuzuDelivery.Core.AutoMapper;
 
 public class DefaultYuzuMapperFactory
 {
@@ -20,9 +20,9 @@ public class DefaultYuzuMapperFactory
         _addedMapContext = new AddedMapContext();
     }
 
-    public IMapper Create(Action<IYuzuConfiguration, AutoMapper.MapperConfigurationExpression, AddedMapContext> configure)
+    public IMapper Create(Action<IYuzuConfiguration, global::AutoMapper.MapperConfigurationExpression, AddedMapContext> configure)
     {
-        var cfg = new AutoMapper.MapperConfigurationExpression();
+        var cfg = new global::AutoMapper.MapperConfigurationExpression();
         cfg.ConstructServicesUsing(_serviceProvider.GetService);
 
         AddYuzuMappersFromContainer(cfg);
@@ -30,22 +30,22 @@ public class DefaultYuzuMapperFactory
 
         configure(_yuzuConfig, cfg, _addedMapContext);
 
-        var config = new AutoMapper.MapperConfiguration(cfg);
+        var config = new global::AutoMapper.MapperConfiguration(cfg);
         return new DefaultYuzuMapper(config.CreateMapper());
     }
 
-    private void AddProfilesFromContainer(AutoMapper.MapperConfigurationExpression cfg)
+    private void AddProfilesFromContainer(global::AutoMapper.MapperConfigurationExpression cfg)
     {
         var loadedProfiles = GetProfiles(_yuzuConfig.MappingAssemblies);
 
         foreach (var profile in loadedProfiles)
         {
-            var resolvedProfile = _serviceProvider.GetService(profile) as AutoMapper.Profile;
+            var resolvedProfile = _serviceProvider.GetService(profile) as global::AutoMapper.Profile;
             cfg.AddProfile(resolvedProfile);
         }
     }
 
-    private void AddYuzuMappersFromContainer(AutoMapper.MapperConfigurationExpression cfg)
+    private void AddYuzuMappersFromContainer(global::AutoMapper.MapperConfigurationExpression cfg)
     {
         var mappingConfigs = _serviceProvider.GetServices<YuzuMappingConfig>();
         var config = _serviceProvider.GetService<IYuzuConfiguration>();
@@ -70,7 +70,7 @@ public class DefaultYuzuMapperFactory
         var profiles = new List<Type>();
         foreach (var assembly in assemblies)
         {
-            var assemblyProfiles = assembly.ExportedTypes.Where(type => type.IsSubclassOf(typeof(AutoMapper.Profile)));
+            var assemblyProfiles = assembly.ExportedTypes.Where(type => type.IsSubclassOf(typeof(global::AutoMapper.Profile)));
             profiles.AddRange(assemblyProfiles);
         }
         return profiles;

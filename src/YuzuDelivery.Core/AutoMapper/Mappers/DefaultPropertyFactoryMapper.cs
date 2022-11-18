@@ -1,12 +1,19 @@
-﻿using AutoMapper;
-using System;
+﻿using System;
 using System.Linq;
 using System.Reflection;
+using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
-using YuzuDelivery.Core;
+using YuzuDelivery.Core.AutoMapper.Mappers.Settings;
 
-namespace YuzuDelivery.Umbraco.Core
+namespace YuzuDelivery.Core.AutoMapper.Mappers
 {
+    public interface IYuzuPropertyFactoryMapper<TContext> : IYuzuBaseMapper
+        where TContext : YuzuMappingContext
+    {
+        AddedMapContext CreateMap<DestMember, Source, Dest, TService>(MapperConfigurationExpression cfg, YuzuMapperSettings baseSettings, IServiceProvider factory, AddedMapContext mapContext, IYuzuConfiguration config)
+            where TService : class, IYuzuTypeFactory<DestMember,TContext>;
+    }
+
     public class DefaultPropertyFactoryMapper<TContext> : IYuzuPropertyFactoryMapper<TContext>
         where TContext : YuzuMappingContext
     {

@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace YuzuDelivery.Core
+namespace YuzuDelivery.Core.AutoMapper
 {
     internal class DefaultYuzuMapper : IMapper
     {
-        private readonly AutoMapper.IMapper _inner;
+        private readonly global::AutoMapper.IMapper _inner;
 
-        public DefaultYuzuMapper(AutoMapper.IMapper inner)
+        public DefaultYuzuMapper(global::AutoMapper.IMapper inner)
         {
             _inner = inner;
         }
