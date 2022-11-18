@@ -43,11 +43,11 @@ namespace YuzuDelivery.Core
 
             var map = mapContext.AddOrGet<TSource, TDest>(cfg);
 
-            map.AfterMap((s, d, ctx) =>
+            map.AfterMap((src, dest, ctx) =>
             {
                 var converter = serviceProvider.GetRequiredService<TConverter>();
                 var mappingContext = _mappingContextFactory.Create<TContext>(ctx.Items);
-                converter.Apply(s, d, mappingContext);
+                converter.Apply(src, dest, mappingContext);
             });
 
             return mapContext;
