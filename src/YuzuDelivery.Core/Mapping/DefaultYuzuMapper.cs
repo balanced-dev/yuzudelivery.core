@@ -34,7 +34,7 @@ namespace YuzuDelivery.Core.Mapping
             return _inner.Map(source, sourceType, destinationType, opt => {
                 foreach (var i in items)
                 {
-                    opt.Items.Add(i.Key, i.Value);
+                    opt.Items[i.Key] = i.Value;
                 }
             });
         }
