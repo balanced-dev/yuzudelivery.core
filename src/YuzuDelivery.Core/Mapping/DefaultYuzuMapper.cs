@@ -19,9 +19,26 @@ namespace YuzuDelivery.Core.Mapping
             return _inner.Map<TDest>(source, _ => { });
         }
 
+        public TDest Map<TSource, TDest>(TSource source)
+        {
+            return _inner.Map<TSource, TDest>(source, _ => { });
+        }
+
         public TDest Map<TDest>(object source, IDictionary<string, object> items)
         {
-            return _inner.Map<TDest>(source, opt => {
+            return _inner.Map<TDest>(source, opt =>
+            {
+                foreach (var i in items)
+                {
+                    opt.Items[i.Key] = i.Value;
+                }
+            });
+        }
+
+        public TDest Map<TSource, TDest>(TSource source, IDictionary<string, object> items)
+        {
+            return _inner.Map<TSource, TDest>(source, opt =>
+            {
                 foreach (var i in items)
                 {
                     opt.Items[i.Key] = i.Value;
@@ -31,7 +48,8 @@ namespace YuzuDelivery.Core.Mapping
 
         public object Map(object source, Type sourceType, Type destinationType, IDictionary<string, object> items)
         {
-            return _inner.Map(source, sourceType, destinationType, opt => {
+            return _inner.Map(source, sourceType, destinationType, opt =>
+            {
                 foreach (var i in items)
                 {
                     opt.Items[i.Key] = i.Value;
