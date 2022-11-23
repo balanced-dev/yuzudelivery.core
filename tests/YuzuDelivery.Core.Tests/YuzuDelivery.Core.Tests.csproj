@@ -17,7 +17,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <RootNamespace>YuzuDelivery.Core.Test</RootNamespace>
+    <RootNamespace>YuzuDelivery.Core</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

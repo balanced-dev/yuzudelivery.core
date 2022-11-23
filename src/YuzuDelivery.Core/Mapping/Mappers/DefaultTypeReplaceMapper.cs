@@ -7,7 +7,7 @@ using YuzuDelivery.Core.Mapping.Mappers.Settings;
 
 namespace YuzuDelivery.Core.Mapping.Mappers
 {
-    public interface IYuzuTypeConvertorMapper<out TContext> : IYuzuBaseMapper
+    public interface IYuzuTypeReplaceMapper<out TContext> : IYuzuBaseMapper
         where TContext : YuzuMappingContext
     {
         void CreateMap<Source, Dest, TService>(
@@ -19,13 +19,12 @@ namespace YuzuDelivery.Core.Mapping.Mappers
             where TService : class, IYuzuTypeConvertor<Source, Dest, TContext>;
     }
 
-    // ReSharper disable once ClassNeverInstantiated.Global
-    public class DefaultTypeConvertorMapper<TContext> : YuzuBaseMapper<YuzuTypeConvertorMapperSettings>, IYuzuTypeConvertorMapper<TContext>
+    public class DefaultTypeReplaceMapper<TContext> : YuzuBaseMapper<YuzuTypeConvertorMapperSettings>, IYuzuTypeReplaceMapper<TContext>
         where TContext : YuzuMappingContext
     {
         private readonly IMappingContextFactory contextFactory;
 
-        public DefaultTypeConvertorMapper(IMappingContextFactory contextFactory)
+        public DefaultTypeReplaceMapper(IMappingContextFactory contextFactory)
         {
             this.contextFactory = contextFactory;
         }
@@ -53,7 +52,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
 
         protected override MethodInfo MakeGenericMethod(YuzuTypeConvertorMapperSettings settings)
         {
-            var genericArguments = settings.Convertor.GetInterfaces().First().GetGenericArguments().ToList();
+            var genericArguments = settings.Convertor.GetRelatedTypeParameters().ToList();
             genericArguments.Add(settings.Convertor);
 
             var method = GetType().GetMethod(nameof(CreateMap))!;

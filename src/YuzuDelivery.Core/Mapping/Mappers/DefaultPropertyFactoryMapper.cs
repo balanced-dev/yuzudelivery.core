@@ -55,7 +55,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
 
         protected override MethodInfo MakeGenericMethod(YuzuPropertyFactoryMapperSettings settings)
         {
-            var genericArguments = settings.Factory.GetInterfaces().First().GetGenericArguments().ToList();
+            var genericArguments = settings.Factory.GetRelatedTypeParameters();
             genericArguments.Add(settings.Source);
             genericArguments.Add(settings.Dest);
             genericArguments.Add(settings.Factory);

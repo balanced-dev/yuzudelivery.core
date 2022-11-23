@@ -19,7 +19,6 @@ namespace YuzuDelivery.Core.Mapping.Mappers
             where TService : class, IYuzuTypeAfterConvertor<Source, Dest, TContext>;
     }
 
-    // ReSharper disable once ClassNeverInstantiated.Global
     public class DefaultTypeAfterMapper<TContext> : YuzuBaseMapper<YuzuTypeAfterMapperSettings>, IYuzuTypeAfterMapper<TContext>
         where TContext : YuzuMappingContext
     {
@@ -50,7 +49,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
 
         protected override MethodInfo MakeGenericMethod(YuzuTypeAfterMapperSettings settings)
         {
-            var genericArguments = settings.Action.GetInterfaces().First().GetGenericArguments().ToList();
+            var genericArguments = settings.Action.GetRelatedTypeParameters();
             genericArguments.Add(settings.Action);
 
             var method = GetType().GetMethod(nameof(CreateMap))!;

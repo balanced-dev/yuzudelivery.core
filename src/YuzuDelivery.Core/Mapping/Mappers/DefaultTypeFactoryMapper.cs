@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Reflection;
 using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,7 +13,6 @@ namespace YuzuDelivery.Core.Mapping.Mappers
             where TService : class, IYuzuTypeFactory<Dest, TContext>;
     }
 
-    // ReSharper disable once ClassNeverInstantiated.Global
     public class DefaultTypeFactoryMapper<TContext> : YuzuBaseMapper<YuzuTypeFactoryMapperSettings>, IYuzuTypeFactoryMapper<TContext>
         where TContext : YuzuMappingContext
     {
@@ -37,7 +35,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
 
         protected override MethodInfo MakeGenericMethod(YuzuTypeFactoryMapperSettings settings)
         {
-            var genericArguments = settings.Factory.GetInterfaces().First().GetGenericArguments().ToList();
+            var genericArguments = settings.Factory.GetRelatedTypeParameters();
             genericArguments.Add(settings.Factory);
 
             var method = GetType().GetMethod(nameof(CreateMap))!;

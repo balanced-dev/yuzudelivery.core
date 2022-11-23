@@ -16,7 +16,6 @@ namespace YuzuDelivery.Core.Mapping.Mappers
             IYuzuConfiguration config);
     }
 
-    // ReSharper disable once ClassNeverInstantiated.Global
     public class DefaultGroupMapper : YuzuBaseMapper<YuzuGroupMapperSettings>, IYuzuGroupMapper
     {
         public void CreateMap<Source, DestParent, DestChild>(

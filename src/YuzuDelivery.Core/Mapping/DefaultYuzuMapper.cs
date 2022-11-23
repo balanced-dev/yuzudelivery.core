@@ -16,7 +16,7 @@ namespace YuzuDelivery.Core.Mapping
 
         public TDest Map<TDest>(object source)
         {
-            return _inner.Map<TDest>(source);
+            return _inner.Map<TDest>(source, _ => { });
         }
 
         public TDest Map<TDest>(object source, IDictionary<string, object> items)

@@ -17,6 +17,13 @@ public static class MappingExtensions
         });
     }
 
+    public static void AddTypeReplaceWithContext<TContext, ConvertorType>(this List<YuzuMapperSettings> resolvers, bool ignoreReturnType = true)
+        where TContext : YuzuMappingContext
+        where ConvertorType : IYuzuTypeConvertor
+    {
+        resolvers.AddTypeReplaceWithContext<TContext>(typeof(ConvertorType), ignoreReturnType);
+    }
+
     public static void AddTypeReplaceWithContext<TContext>(
         this List<YuzuMapperSettings> resolvers,
         Type convertorType,
@@ -25,10 +32,17 @@ public static class MappingExtensions
     {
         resolvers.Add(new YuzuTypeConvertorMapperSettings()
         {
-            Mapper = typeof(IYuzuTypeConvertorMapper<TContext>),
+            Mapper = typeof(IYuzuTypeReplaceMapper<TContext>),
             Convertor = convertorType,
             IgnoreReturnType = ignoreReturnType
         });
+    }
+
+    public static void AddTypeFactoryWithContext<TContext, TFactory, TDest>(this List<YuzuMapperSettings> resolvers)
+        where TContext : YuzuMappingContext
+        where TFactory : IYuzuTypeFactory
+    {
+        resolvers.AddTypeFactoryWithContext<TContext>(typeof(TFactory), typeof(TDest));
     }
 
     public static void AddTypeFactoryWithContext<TContext>(
