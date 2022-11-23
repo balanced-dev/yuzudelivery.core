@@ -8,7 +8,10 @@ public class DefaultYuzuMapperTests
     public void DefaultYuzuMapper_WithRegisteredTypeReplaceMapper_MapsAsExpected()
     {
         var mapper = new MapperBuilder()
-                     .AddTypeReplaceMapper<SourceConverter>()
+                     .AddManualMapper(r =>
+                     {
+                         r.AddTypeReplaceWithContext<TestMappingContext, SourceConverter>();
+                     })
                      .Build();
 
         var dest = mapper.Map<Dest>(new Source {Input = "Foo"});

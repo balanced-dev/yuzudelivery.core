@@ -59,13 +59,6 @@ public class MapperBuilder
         return this;
     }
 
-    public MapperBuilder AddTypeReplaceMapper<TConverter>()
-        where TConverter : class, IYuzuTypeConvertor
-    {
-        _defaultMappingConfig.ManualMaps.AddTypeReplaceWithContext<TestMappingContext, TConverter>();
-        return this;
-    }
-
     public IMapper Build()
     {
         // Default mapper implementations
