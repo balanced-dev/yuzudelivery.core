@@ -33,20 +33,6 @@ public class DefaultYuzuMapperFactory
 
         var config = new global::AutoMapper.MapperConfiguration(cfg);
 
-        var info = typeof(AutoMapper.MapperConfiguration).GetField("_resolvedMaps", BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(config);
-        if (info is Dictionary<AutoMapper.Internal.TypePair, AutoMapper.TypeMap> resolvedMaps)
-        {
-            for (var i = resolvedMaps.Keys.Count - 1; i > 0; i--)
-            {
-                var key = resolvedMaps.Keys.ElementAt(i);
-                if (resolvedMaps[key] == null)
-                {
-                    resolvedMaps.Remove(key);
-                }
-            }
-            resolvedMaps.TrimExcess();
-        }
-
         return new DefaultYuzuMapper(config.CreateMapper());
     }
 

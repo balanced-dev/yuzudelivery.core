@@ -18,7 +18,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
 
     public class DefaultGlobalMapper : YuzuBaseMapper<YuzuGlobalMapperSettings>, IYuzuGlobalMapper
     {
-        public void CreateMap<TSource, TDest>(
+        public virtual void CreateMap<TSource, TDest>(
             MapperConfigurationExpression cfg,
             YuzuGlobalMapperSettings settings,
             IServiceProvider factory,
