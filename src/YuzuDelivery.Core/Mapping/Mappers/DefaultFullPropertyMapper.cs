@@ -22,9 +22,9 @@ namespace YuzuDelivery.Core.Mapping.Mappers
     public class DefaultFullPropertyMapper<TContext> : YuzuBaseMapper<YuzuFullPropertyMapperSettings>, IYuzuFullPropertyMapper<TContext>
         where TContext : YuzuMappingContext
     {
-        private readonly IMappingContextFactory _contextFactory;
+        private readonly IMappingContextFactory<TContext> _contextFactory;
 
-        public DefaultFullPropertyMapper(IMappingContextFactory contextFactory) =>
+        public DefaultFullPropertyMapper(IMappingContextFactory<TContext> contextFactory) =>
             _contextFactory = contextFactory;
 
         public void CreateMap<TSource, TDest, TSourceMember, TDestMember, TService>(
@@ -48,7 +48,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
                 {
                     var propertyResolver = factory.GetRequiredService<TService>();
                     var sourceValue = ((TSourceMember) typeof(TSource).GetProperty(settings.SourcePropertyName)!.GetValue(src));
-                    var mappingContext = _contextFactory.Create<TContext>(ctx.Items);
+                    var mappingContext = _contextFactory.Create(ctx.Items);
 
                     return propertyResolver.Resolve(src, dest, sourceValue, settings.DestPropertyName, mappingContext);
                 });

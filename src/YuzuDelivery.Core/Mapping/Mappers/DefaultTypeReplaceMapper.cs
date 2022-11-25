@@ -22,9 +22,9 @@ namespace YuzuDelivery.Core.Mapping.Mappers
     public class DefaultTypeReplaceMapper<TContext> : YuzuBaseMapper<YuzuTypeConvertorMapperSettings>, IYuzuTypeReplaceMapper<TContext>
         where TContext : YuzuMappingContext
     {
-        private readonly IMappingContextFactory contextFactory;
+        private readonly IMappingContextFactory<TContext> contextFactory;
 
-        public DefaultTypeReplaceMapper(IMappingContextFactory contextFactory)
+        public DefaultTypeReplaceMapper(IMappingContextFactory<TContext> contextFactory)
         {
             this.contextFactory = contextFactory;
         }
@@ -44,7 +44,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
             map.ConvertUsing((src, _, context) =>
             {
                 var typeConvertor = factory.GetRequiredService<TConverter>();
-                var mappingContext = contextFactory.Create<TContext>(context.Items);
+                var mappingContext = contextFactory.Create(context.Items);
 
                 return typeConvertor.Convert(src, mappingContext);
             });

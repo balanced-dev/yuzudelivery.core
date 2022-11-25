@@ -2,12 +2,11 @@
 
 namespace YuzuDelivery.Core.Mapping
 {
-    public class MappingContextFactory : IMappingContextFactory
+    public class MappingContextFactory : IMappingContextFactory<YuzuMappingContext>
     {
-        public virtual T Create<T>(IDictionary<string, object> items)
-            where T : YuzuMappingContext
+        public YuzuMappingContext Create(IDictionary<string, object> items)
         {
-            return new YuzuMappingContext(items) as T;
+            return new YuzuMappingContext(items);
         }
     }
 }

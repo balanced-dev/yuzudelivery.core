@@ -3,9 +3,9 @@ using AutoMapper;
 
 namespace YuzuDelivery.Core.Mapping
 {
-    public interface IMappingContextFactory
+    public interface IMappingContextFactory<out TContext>
+        where TContext : YuzuMappingContext
     {
-        T Create<T>(IDictionary<string, object> items) where T : YuzuMappingContext;
-
+        TContext Create(IDictionary<string, object> items);
     }
 }
