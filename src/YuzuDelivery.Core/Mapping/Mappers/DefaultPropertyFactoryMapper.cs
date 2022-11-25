@@ -22,9 +22,9 @@ namespace YuzuDelivery.Core.Mapping.Mappers
     public class DefaultPropertyFactoryMapper<TContext> : YuzuBaseMapper<YuzuPropertyFactoryMapperSettings>, IYuzuPropertyFactoryMapper<TContext>
         where TContext : YuzuMappingContext
     {
-        private readonly IMappingContextFactory contextFactory;
+        private readonly IMappingContextFactory<TContext> contextFactory;
 
-        public DefaultPropertyFactoryMapper(IMappingContextFactory contextFactory)
+        public DefaultPropertyFactoryMapper(IMappingContextFactory<TContext> contextFactory)
         {
             this.contextFactory = contextFactory;
         }
@@ -47,7 +47,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
                 opt.MapFrom( (_, _, _, context) =>
                 {
                     var propertyResolver = factory.GetRequiredService<TService>();
-                    var mappingContext = contextFactory.Create<TContext>(context.Items);
+                    var mappingContext = contextFactory.Create(context.Items);
                     return propertyResolver.Create(mappingContext);
                 });
             });

@@ -72,7 +72,7 @@ public class MapperBuilder
                 .AddSingleton<IYuzuTypeReplaceMapper<TestMappingContext>, DefaultTypeReplaceMapper<TestMappingContext>>()
                 .AddSingleton<IYuzuTypeFactoryMapper<TestMappingContext>, DefaultTypeFactoryMapper<TestMappingContext>>();
 
-        Services.AddSingleton<IMappingContextFactory, TestContextFactory>();
+        Services.AddSingleton<IMappingContextFactory<TestMappingContext>, TestContextFactory>();
         Services.AddSingleton(_defaultMappingConfig);
 
         // Register all discovered downstream converters
@@ -84,11 +84,11 @@ public class MapperBuilder
         return factory.Create(_action);
     }
 
-    class TestContextFactory : IMappingContextFactory
+    class TestContextFactory : IMappingContextFactory<TestMappingContext>
     {
-        public T Create<T>(IDictionary<string, object> items) where T : YuzuMappingContext
+        public TestMappingContext Create(IDictionary<string, object> items)
         {
-            return new TestMappingContext(items) as T;
+            return new TestMappingContext(items);
         }
     }
 }

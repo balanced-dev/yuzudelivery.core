@@ -22,9 +22,9 @@ namespace YuzuDelivery.Core.Mapping.Mappers
     public class DefaultTypeAfterMapper<TContext> : YuzuBaseMapper<YuzuTypeAfterMapperSettings>, IYuzuTypeAfterMapper<TContext>
         where TContext : YuzuMappingContext
     {
-        private readonly IMappingContextFactory _mappingContextFactory;
+        private readonly IMappingContextFactory<TContext> _mappingContextFactory;
 
-        public DefaultTypeAfterMapper(IMappingContextFactory mappingContextFactory)
+        public DefaultTypeAfterMapper(IMappingContextFactory<TContext> mappingContextFactory)
             => _mappingContextFactory = mappingContextFactory;
 
         public void CreateMap<TSource, TDest, TConverter>(
@@ -42,7 +42,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
             map.AfterMap((src, dest, ctx) =>
             {
                 var converter = serviceProvider.GetRequiredService<TConverter>();
-                var mappingContext = _mappingContextFactory.Create<TContext>(ctx.Items);
+                var mappingContext = _mappingContextFactory.Create(ctx.Items);
                 converter.Apply(src, dest, mappingContext);
             });
         }

@@ -22,9 +22,9 @@ namespace YuzuDelivery.Core.Mapping.Mappers
     public class DefaultPropertyReplaceMapper<TContext> : YuzuBaseMapper<YuzuPropertyReplaceMapperSettings>, IYuzuPropertyReplaceMapper<TContext>
         where TContext : YuzuMappingContext
     {
-        private readonly IMappingContextFactory contextFactory;
+        private readonly IMappingContextFactory<TContext> contextFactory;
 
-        public DefaultPropertyReplaceMapper(IMappingContextFactory contextFactory)
+        public DefaultPropertyReplaceMapper(IMappingContextFactory<TContext> contextFactory)
         {
             this.contextFactory = contextFactory;
         }
@@ -49,7 +49,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
                 opt.MapFrom((TSource m, TMember v, object o, ResolutionContext context) =>
                 {
                     var propertyResolver = factory.GetRequiredService<TResolver>();
-                    var mappingContext = contextFactory.Create<TContext>(context.Items);
+                    var mappingContext = contextFactory.Create(context.Items);
                     return propertyResolver.Resolve(m, mappingContext);
                 });
             });
