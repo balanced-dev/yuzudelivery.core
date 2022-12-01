@@ -7,6 +7,13 @@ namespace YuzuDelivery.Core.Mapping;
 
 public static class MappingExtensions
 {
+    public static void AddTypeAfterMapWithContext<TContext, TConverter>(this List<YuzuMapperSettings> resolvers)
+        where TContext : YuzuMappingContext
+        where TConverter : IYuzuTypeAfterConvertor
+    {
+        resolvers.AddTypeAfterMapWithContext<TContext>(typeof(TConverter));
+    }
+
     public static void AddTypeAfterMapWithContext<TContext>(this List<YuzuMapperSettings> resolvers, Type afterMapType)
         where TContext : YuzuMappingContext
     {

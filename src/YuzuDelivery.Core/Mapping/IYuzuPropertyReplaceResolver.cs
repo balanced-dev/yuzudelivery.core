@@ -2,10 +2,10 @@
 {
     public interface IYuzuPropertyReplaceResolver { }
 
-    public interface IYuzuPropertyReplaceResolver<in TSource, out TDest, in TContext>
+    public interface IYuzuPropertyReplaceResolver<in TSource, out TMember, in TContext>
         : IYuzuPropertyReplaceResolver
         where TContext : YuzuMappingContext
     {
-        TDest Resolve(TSource source, TContext context);
+        TMember Resolve(TSource source, TContext context);
     }
 }
