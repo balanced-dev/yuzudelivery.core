@@ -45,6 +45,11 @@ namespace YuzuDelivery.Core.Mapping.Mappers
                 var mappingContext = _mappingContextFactory.Create(ctx.Items);
                 converter.Apply(src, dest, mappingContext);
             });
+
+            if (settings.ApplyToDerivedTypes)
+            {
+                map.IncludeAllDerived();
+            }
         }
 
         protected override MethodInfo MakeGenericMethod(YuzuTypeAfterMapperSettings settings)
