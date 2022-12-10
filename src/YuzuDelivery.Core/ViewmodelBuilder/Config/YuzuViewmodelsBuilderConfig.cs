@@ -14,6 +14,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder
         public YuzuViewmodelsBuilderConfig(IEnumerable<IUpdateableVmBuilderConfig> extraConfig)
         {
             GeneratedViewmodelsNamespace = "YuzuDelivery.ViewModels";
+            AddNamespacesAtGeneration.Add("YuzuDelivery.Core");
 
             foreach (var c in extraConfig)
             {

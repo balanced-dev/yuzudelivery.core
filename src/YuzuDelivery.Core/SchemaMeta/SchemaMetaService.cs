@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -55,6 +56,18 @@ namespace YuzuDelivery.Core
             }
             else
                 return new string[] { };
+        }
+
+        public virtual string GetString(Type propertyType, string area, string path)
+        {
+            var pathData = GetPathFileData(propertyType.GetComponent(config));
+
+            if (pathData[area] != null && pathData[area][path] != null)
+            {
+                return pathData[area][path].ToString();
+            }
+            else
+                return null;
         }
 
         public virtual string[] Get(PropertyInfo property, string area)

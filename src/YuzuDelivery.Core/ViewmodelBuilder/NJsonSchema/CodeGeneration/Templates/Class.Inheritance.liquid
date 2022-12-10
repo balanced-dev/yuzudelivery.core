@@ -5,5 +5,5 @@
 {%- elsif RenderPrism %}
     {% if HasInheritance %} : {{ BaseClassName }}{% else %} : Prism.Mvvm.BindableBase{% endif %}
 {%- else %}
-    {% if HasInheritance %} : {{ BaseClassName }}{% endif %}
+    {% if HasInheritance %} : {{ BaseClassName }}, IYuzuViewModel{% else %} : IYuzuViewModel{% endif %}
 {%- endif %}
