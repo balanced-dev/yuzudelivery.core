@@ -46,6 +46,10 @@
     {% template Class.Constructor.Record -%}
 {%- endif -%}
 {%- for property in Properties -%}
+    {%- if property.Name == "_ref" %}
+        [Newtonsoft.Json.JsonProperty("_ref", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string _ref { get { return this.GetType().GetBlockName(true); } }
+    {% else %}
     {%-   if property.HasDescription -%}
         /// <summary>
         /// {{ property.Description | csharpdocs }}
@@ -118,6 +122,7 @@
         {%-         endif -%}
     {%-     endif -%}
     }
+{%-   endif %}
 {%-   endif %}
 {%- endfor -%}
 

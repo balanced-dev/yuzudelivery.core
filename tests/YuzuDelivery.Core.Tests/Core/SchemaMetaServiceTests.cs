@@ -50,7 +50,7 @@ namespace YuzuDelivery.Core.Test
             jsonOfTypeParent = @"{
                 'refs': {
                     '/content': [
-                        '/parDataGridRows^parGrid'
+                        '/dataGrid^parGridBuilder'
                     ],
                 }
             }";
@@ -94,7 +94,7 @@ namespace YuzuDelivery.Core.Test
 
             var output = svc.Get(p.DeclaringType, "refs", "/content");
 
-            Assert.AreEqual("vmBlock_DataGridRows^parGrid", output[0]);
+            Assert.AreEqual("dataGrid^vmBlock_GridBuilder", output[0]);
         }
 
         [Test]

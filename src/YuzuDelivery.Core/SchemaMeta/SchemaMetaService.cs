@@ -22,7 +22,17 @@ namespace YuzuDelivery.Core
 
         public virtual string GetOfType(PropertyInfo property, string area)
         {
-            var types = Get(property, area);
+            var component = schemaMetaPropertyService.Get(property);
+            var pathData = GetPathFileData(component.Type);
+            var types = new string[] { };
+
+            if (pathData[area] != null && pathData[area][component.Path] != null)
+            {
+                var allowedTypes = pathData[area][component.Path].ToObject<string[]>();
+                //don't convert this to vmBlock notation
+                types = allowedTypes.Select(x => x).ToArray();
+            }
+
             var firstType = types.FirstOrDefault();
             if (firstType != null && firstType.Contains("^"))
             {

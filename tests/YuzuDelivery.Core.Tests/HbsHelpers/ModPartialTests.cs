@@ -10,15 +10,21 @@ namespace YuzuDelivery.Core.Test.HbsHelpers
     public class ModPartialTests
     {
         private YuzuDelivery.Core.ModPartial helper;
+        
         [SetUp]
         public void Setup()
         {
             helper = new YuzuDelivery.Core.ModPartial();
         }
-        
-        
-        
-                [Test]
+
+        [OneTimeSetUp]
+        public void FixtureSetup()
+        {
+            YuzuConstants.Reset();
+            YuzuConstants.Initialize(new YuzuConstantsConfig());
+        }
+
+        [Test]
         public void given_empty_path_and_context()
         {
             var source = "{{{modPartial '' foo ''}}}";

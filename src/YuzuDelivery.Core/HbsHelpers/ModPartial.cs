@@ -41,11 +41,11 @@ namespace YuzuDelivery.Core
                             vmType = vmType.GetGenericArguments().FirstOrDefault();
                         }
 
-                        _ref = vmType.Name.Replace("vmBlock_", "par");
+                        _ref = vmType.GetBlockName();
                     }
 
                     var r = HandlebarsDotNet.Handlebars.Configuration.RegisteredTemplates
-                        .Where(x => x.Key == _ref)
+                        .Where(x => x.Key == _ref.RemoveFirstForwardSlash())
                         .Select(x => x.Value).FirstOrDefault();
 
                     if (r != null)

@@ -84,6 +84,7 @@ namespace YuzuDelivery.Core
 
         public static string BlockRefToVmTypeName(this string refName)
         {
+            refName = refName.RemoveFirstForwardSlash();
             return refName.Replace(YuzuConstants.Configuration.BlockRefPrefix, YuzuConstants.Configuration.BlockPrefix);
         }
 

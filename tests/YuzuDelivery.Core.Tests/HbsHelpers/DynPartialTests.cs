@@ -21,6 +21,13 @@ namespace YuzuDelivery.Core.Test.HbsHelpers
     {
         private YuzuDelivery.Core.DynPartial helper;
 
+        [OneTimeSetUp]
+        public void FixtureSetup()
+        {
+            YuzuConstants.Reset();
+            YuzuConstants.Initialize(new YuzuConstantsConfig());
+        }
+
         [SetUp]
         public void Setup()
         {
