@@ -11,6 +11,7 @@ namespace YuzuDelivery.Core
     {
         public Array()
         {
+
             HandlebarsDotNet.Handlebars.RegisterHelper("array", (writer, options, context, parameters) =>
             {
                 writer.WriteSafeString(parameters[0]);
