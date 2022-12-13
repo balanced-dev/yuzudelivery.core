@@ -10,13 +10,13 @@ namespace YuzuDelivery.Core.Mapping.Mappers
     public interface IYuzuPropertyReplaceMapper<out TContext> : IYuzuBaseMapper
         where TContext : YuzuMappingContext
     {
-        void CreateMap<M, PropertyType, V, TService>(
+        void CreateMap<TSource, TMember, TDest, TService>(
             MapperConfigurationExpression cfg,
             YuzuPropertyReplaceMapperSettings settings,
             IServiceProvider factory,
             AddedMapContext mapContext,
             IYuzuConfiguration config)
-            where TService : class, IYuzuPropertyReplaceResolver<M, PropertyType, TContext>;
+            where TService : class, IYuzuPropertyReplaceResolver<TSource, TMember, TContext>;
     }
 
     public class DefaultPropertyReplaceMapper<TContext> : YuzuBaseMapper<YuzuPropertyReplaceMapperSettings>, IYuzuPropertyReplaceMapper<TContext>
@@ -29,28 +29,28 @@ namespace YuzuDelivery.Core.Mapping.Mappers
             this.contextFactory = contextFactory;
         }
 
-        public void CreateMap<TSource, TDest, TMember, TResolver>(
+        public void CreateMap<TSource, TMember, TDest, TResolver>(
             MapperConfigurationExpression cfg,
             YuzuPropertyReplaceMapperSettings settings,
             IServiceProvider factory,
             AddedMapContext mapContext,
             IYuzuConfiguration config)
-            where TResolver : class, IYuzuPropertyReplaceResolver<TSource, TDest, TContext>
+            where TResolver : class, IYuzuPropertyReplaceResolver<TSource, TMember, TContext>
         {
-            config.AddActiveManualMap<TResolver, TMember>(settings.DestPropertyName);
+            config.AddActiveManualMap<TResolver, TDest>(settings.DestPropertyName);
 
             if (!string.IsNullOrEmpty(settings.GroupName))
                 cfg.RecognizePrefixes(settings.GroupName);
 
-            var map = mapContext.AddOrGet<TSource, TMember>(cfg);
+            var map = mapContext.AddOrGet<TSource, TDest>(cfg);
 
             map.ForMember(settings.DestPropertyName, opt =>
             {
-                opt.MapFrom((TSource m, TMember v, object o, ResolutionContext context) =>
+                opt.MapFrom((source, dest, member, context) =>
                 {
                     var propertyResolver = factory.GetRequiredService<TResolver>();
                     var mappingContext = contextFactory.Create(context.Items);
-                    return propertyResolver.Resolve(m, mappingContext);
+                    return propertyResolver.Resolve(source, mappingContext);
                 });
             });
         }

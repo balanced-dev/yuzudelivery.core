@@ -59,6 +59,21 @@ public class MapperBuilder
         return this;
     }
 
+    private IServiceProvider _container;
+
+    public IYuzuTypeFactoryRunner TypeFactoryRunner
+    {
+        get
+        {
+            if (_container == null)
+            {
+                throw new InvalidOperationException("Call Build first");
+            }
+
+            return _container.GetRequiredService<IYuzuTypeFactoryRunner>();
+        }
+    }
+
     public IMapper Build()
     {
         // Default mapper implementations
@@ -72,14 +87,18 @@ public class MapperBuilder
                 .AddSingleton<IYuzuTypeReplaceMapper<TestMappingContext>, DefaultTypeReplaceMapper<TestMappingContext>>()
                 .AddSingleton<IYuzuTypeFactoryMapper<TestMappingContext>, DefaultTypeFactoryMapper<TestMappingContext>>();
 
+        Services.AddSingleton<IYuzuTypeFactoryRunner, DefaultTypeFactoryRunner<TestMappingContext>>();
+
         Services.AddSingleton<IMappingContextFactory<TestMappingContext>, TestContextFactory>();
         Services.AddSingleton(_defaultMappingConfig);
+
+        Services.AddSingleton<IYuzuConfiguration>(YuzuConfig);
 
         // Register all discovered downstream converters
         Services.RegisterYuzuManualMapping(Assembly.GetExecutingAssembly());
 
-        var container = Services.BuildServiceProvider();
-        var factory = new DefaultYuzuMapperFactory(YuzuConfig, container);
+        _container = Services.BuildServiceProvider();
+        var factory = new DefaultYuzuMapperFactory(YuzuConfig, _container);
 
         return factory.Create(_action);
     }
