@@ -1,0 +1,14 @@
+{
+  "id": "/par15_yuzuDerivedClass",
+  "type": "object",
+  "properties":
+  {
+    "bar":
+    {
+      "type": "string"
+    }
+  },
+  "allOf": [{"$ref": "./par15_yuzuBaseClass.schema"}],
+  "required": ["bar"],
+  "additionalProperties": true
+}

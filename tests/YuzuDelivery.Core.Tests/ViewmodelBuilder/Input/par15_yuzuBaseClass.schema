@@ -1,17 +1,13 @@
 {
   "id": "/par15_yuzuBaseClass",
   "type": "object",
-  "yuzuBaseClass": "TestYuzuBlock",
   "properties":
   {
     "foo":
     {
       "type": "string"
-    },
-    "bar":
-    {
-      "type": "string"
     }
   },
-  "additionalProperties": false
+  "required": ["foo"],
+  "additionalProperties": true
 }

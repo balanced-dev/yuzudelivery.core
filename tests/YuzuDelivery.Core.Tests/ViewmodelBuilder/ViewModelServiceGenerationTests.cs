@@ -44,6 +44,8 @@ namespace YuzuDelivery.Core.Test.ViewmodelBuilder
             var file = Sut.RunOneBlock(ViewModelType.block, "1_JustRootNode");
 
             Assert.IsTrue(file.Content.Contains("public partial class vmBlock_1_JustRootNode"));
+
+            TestContext.Out.Write(file.Content);
         }
 
         [Test]
@@ -53,6 +55,8 @@ namespace YuzuDelivery.Core.Test.ViewmodelBuilder
 
             Assert.IsTrue(file.Content.Contains("public string Discount"));
             Assert.IsTrue(file.Content.Contains("public string DiscountAmount"));
+
+            TestContext.Out.Write(file.Content);
         }
 
         [Test]
@@ -62,6 +66,8 @@ namespace YuzuDelivery.Core.Test.ViewmodelBuilder
 
             Assert.IsTrue(file.Content.Contains("public vmBlock_2_2_ExternalRef Ref"));
             Assert.IsFalse(file.Content.Contains("public partial class vmBlock_2_2_ExternalRef"));
+
+            TestContext.Out.Write(file.Content);
         }
 
         [Test]
@@ -71,6 +77,8 @@ namespace YuzuDelivery.Core.Test.ViewmodelBuilder
 
             Assert.IsTrue(file.Content.Contains("public System.Collections.Generic.List<vmSub_3_WithSubSchema_NamedArrayItem> Items"));
             Assert.IsTrue(file.Content.Contains("public partial class vmSub_3_WithSubSchema_NamedArrayItem"));
+
+            TestContext.Out.Write(file.Content);
         }
 
         [Test]
@@ -80,6 +88,8 @@ namespace YuzuDelivery.Core.Test.ViewmodelBuilder
 
             Assert.IsTrue(file.Content.Contains("public vmSub_4_WithSubSchema_NamedItem Item"));
             Assert.IsTrue(file.Content.Contains("public partial class vmSub_4_WithSubSchema_NamedItem"));
+
+            TestContext.Out.Write(file.Content);
         }
 
         [Test]
@@ -88,6 +98,8 @@ namespace YuzuDelivery.Core.Test.ViewmodelBuilder
             var file = Sut.RunOneBlock(ViewModelType.block, "5_1_ExternalRefSub");
 
             Assert.IsFalse(file.Content.Contains("public partial class vmSub_5_2_ExternalRefSub_Named"));
+
+            TestContext.Out.Write(file.Content);
         }
 
         [Test]
@@ -97,6 +109,8 @@ namespace YuzuDelivery.Core.Test.ViewmodelBuilder
 
             Assert.IsTrue(file.Content.Contains("public vmBlock_6_3_ExternalRefModule Module"));
             Assert.IsFalse(file.Content.Contains("public partial class vmBlock_6_3_ExternalRefModule2"));
+
+            TestContext.Out.Write(file.Content);
         }
 
         [Test]
@@ -123,6 +137,8 @@ namespace YuzuDelivery.Core.Test.ViewmodelBuilder
             var file = Sut.RunOneBlock(ViewModelType.block, "8_1_ExternalRefSubArray");
 
             Assert.IsTrue(file.Content.Contains("System.Collections.Generic.List<vmBlock_8_2_ExternalRefSubArray> Ref"));
+
+            TestContext.Out.Write(file.Content);
         }
 
         [Test]
@@ -131,6 +147,8 @@ namespace YuzuDelivery.Core.Test.ViewmodelBuilder
             var file = Sut.RunOneBlock(ViewModelType.block, "9_EnumInSubObject");
 
             Assert.IsTrue(file.Content.Contains("public enum vmSub_9_EnumInSubObjectVmSub_9_EnumInSubObjectItemAllowed"));
+
+            TestContext.Out.Write(file.Content);
         }
 
         [Test]
@@ -139,6 +157,8 @@ namespace YuzuDelivery.Core.Test.ViewmodelBuilder
             var file = Sut.RunOneBlock(ViewModelType.block, "10_AnyOf_Array");
 
             Assert.IsTrue(file.Content.Contains("public System.Collections.Generic.List<object> Items { get; set; }"));
+
+            TestContext.Out.Write(file.Content);
         }
 
         [Test]
@@ -147,6 +167,8 @@ namespace YuzuDelivery.Core.Test.ViewmodelBuilder
             var file = Sut.RunOneBlock(ViewModelType.block, "11_AnyOf_Object");
 
             Assert.IsTrue(file.Content.Contains("public object Item { get; set; }"));
+
+            TestContext.Out.Write(file.Content);
         }
 
         [Test]
@@ -155,6 +177,8 @@ namespace YuzuDelivery.Core.Test.ViewmodelBuilder
             var file = Sut.RunOneBlock(ViewModelType.block, "12_Root_Array");
 
             Assert.IsTrue(file.Content.Contains("public partial class vmBlock_12_Root_Array"));
+
+            TestContext.Out.Write(file.Content);
         }
 
         [Test]
@@ -163,6 +187,8 @@ namespace YuzuDelivery.Core.Test.ViewmodelBuilder
             var file = Sut.RunOneBlock(ViewModelType.block, "13_1_Root_Array_External_Ref");
 
             Assert.IsTrue(file.Content.Contains("public partial class vmBlock_13_2_ExternalRef"));
+
+            TestContext.Out.Write(file.Content);
         }
 
 
@@ -172,14 +198,18 @@ namespace YuzuDelivery.Core.Test.ViewmodelBuilder
             var file = Sut.RunOneBlock(ViewModelType.block, "14_DirectEnum");
 
             Assert.IsTrue(file.Content.Contains("public enum vmBlock_14_DirectEnum"));
+
+            TestContext.Out.Write(file.Content);
         }
 
         [Test]
-        public void RunOneBlock_WithYuzuBaseClassKeywordPresentInSchema_ProducesSubClass()
+        public void RunOneBlock_SchemaWithAllOf_ProducesSubClass()
         {
-            var file = Sut.RunOneBlock(ViewModelType.block, "15_yuzuBaseClass");
+            var file = Sut.RunOneBlock(ViewModelType.block, "15_yuzuDerivedClass");
 
-            file.Content.Should().Contain("class vmBlock_15_yuzuBaseClass : TestYuzuBlock");
+            file.Content.Should().Contain("class vmBlock_15_yuzuDerivedClass : vmBlock_15_yuzuBaseClass");
+
+            TestContext.Out.Write(file.Content);
         }
 
         [Test]
@@ -195,6 +225,8 @@ namespace YuzuDelivery.Core.Test.ViewmodelBuilder
 
             file.Content.Should().MatchRegex(new Regex(@"^using Yuzu\.Test\.Extra\.One;", RegexOptions.Multiline));
             file.Content.Should().MatchRegex(new Regex(@"^using Yuzu\.Test\.Extra\.Two;", RegexOptions.Multiline)); // handles the legacy setup
+
+            TestContext.Out.Write(file.Content);
         }
 
         [Test]
@@ -208,6 +240,8 @@ namespace YuzuDelivery.Core.Test.ViewmodelBuilder
             var file = Sut.RunOneBlock(ViewModelType.block, "1_JustRootNode");
 
             file.Content.Should().MatchRegex(new Regex(@"\[Foo\(""1_JustRootNode""\)\]\s+public partial class", RegexOptions.Multiline));
+
+            TestContext.Out.Write(file.Content);
         }
 
         [Test]
@@ -224,6 +258,8 @@ namespace YuzuDelivery.Core.Test.ViewmodelBuilder
             var file = Sut.RunOneBlock(ViewModelType.block, "1_JustRootNode");
 
             file.Content.Should().Contain(@"[Foo(""bar"")]");
+
+            TestContext.Out.Write(file.Content);
         }
 
         [Test]
@@ -234,6 +270,8 @@ namespace YuzuDelivery.Core.Test.ViewmodelBuilder
             var file = Sut.RunOneBlock(ViewModelType.block, "1_JustRootNode");
 
             file.Content.Should().Be("YuzuDelivery.Core.Tests.File");
+
+            TestContext.Out.Write(file.Content);
         }
     }
 }

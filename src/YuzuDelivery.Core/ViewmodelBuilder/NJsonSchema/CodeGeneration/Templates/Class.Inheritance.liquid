@@ -1,6 +1,4 @@
-{%- if ExtensionData["yuzuBaseClass"] %}
-    : {{ ExtensionData["yuzuBaseClass"] }}
-{%- elsif RenderInpc %}
+{%- if RenderInpc %}
     {% if HasInheritance %} : {{ BaseClassName }}{% else %} : System.ComponentModel.INotifyPropertyChanged{% endif %}
 {%- elsif RenderPrism %}
     {% if HasInheritance %} : {{ BaseClassName }}{% else %} : Prism.Mvvm.BindableBase{% endif %}
