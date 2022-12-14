@@ -16,8 +16,6 @@ namespace YuzuDelivery.Core
         List<ManualMapInstalledType> InstalledManualMaps { get; }
         List<ManualMapActiveType> ActiveManualMaps { get; }
         Dictionary<Type, Func<IYuzuTypeFactory>> ViewmodelFactories { get; }
-
-        List<IDataLocation> SchemaMetaLocations { get; set; }
         List<ITemplateLocation> TemplateLocations { get; set; }
 
         Func<IRenderSettings, string> GetRenderedHtmlCache { get; set; }

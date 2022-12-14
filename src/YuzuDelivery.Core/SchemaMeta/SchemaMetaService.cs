@@ -99,30 +99,28 @@ namespace YuzuDelivery.Core
             var typeName = propertyType.Name;
 
             //get paths file from frontend solution
-            foreach(var location in config.SchemaMetaLocations) {
-                var possibleFilenames = GetPossiblePathFileName(location.Path, typeName);
-                foreach (var schemaMetaFile in possibleFilenames)
+
+            foreach (var schemaMetaFile in GetPossiblePathFileName(typeName))
+            {
+                if (FileExists(schemaMetaFile))
                 {
-                    if (FileExists(schemaMetaFile))
-                    {
-                        return JsonConvert.DeserializeObject<JObject>(FileRead(schemaMetaFile));
-                    }
+                    return JsonConvert.DeserializeObject<JObject>(FileRead(schemaMetaFile));
                 }
             };
 
             throw new Exception(string.Format("Schema meta file not found for {0}", typeName));
         }
 
-        public virtual string[] GetPossiblePathFileName(string rootPath, string declaringTypeName)
+        public virtual IEnumerable<string> GetPossiblePathFileName(string declaringTypeName)
         {
             var typeNameNoPrefix = declaringTypeName.RemoveAllVmPrefixes();
             var blockPrefix = YuzuConstants.Configuration.BlockRefPrefix.RemoveFirstForwardSlash();
 
-            return new[]
+            foreach (var templateLocation in config.TemplateLocations)
             {
-                Path.Combine(rootPath, $"{blockPrefix}{typeNameNoPrefix}.schema"), // blocks prioritized over pages
-                Path.Combine(rootPath, $"{typeNameNoPrefix.FirstCharacterToLower()}.schema"),
-            };
+                yield return Path.Combine(templateLocation.Schema, $"{blockPrefix}{typeNameNoPrefix}.meta"); // blocks prioritized over pages
+                yield return Path.Combine(templateLocation.Schema, $"{typeNameNoPrefix.FirstCharacterToLower()}.meta");
+            }
         }
 
         public virtual bool FileExists(string pathFilename)

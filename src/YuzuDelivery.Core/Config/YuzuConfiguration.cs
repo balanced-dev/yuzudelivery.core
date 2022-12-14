@@ -12,7 +12,6 @@ namespace YuzuDelivery.Core
     {
         public YuzuConfiguration(IEnumerable<IUpdateableConfig> extraConfigs)
         {
-            SchemaMetaLocations = new List<IDataLocation>();
             TemplateLocations = new List<ITemplateLocation>();
 
             MappingAssemblies = new List<Assembly>();
@@ -50,7 +49,6 @@ namespace YuzuDelivery.Core
         public Dictionary<Type, Func<IYuzuTypeFactory>> ViewmodelFactories { get; private set; }
 
         public List<ITemplateLocation> TemplateLocations { get; set; }
-        public List<IDataLocation> SchemaMetaLocations { get; set; }
 
         public Func<Dictionary<string, Func<object, string>>> GetTemplatesCache { get; set; }
         public Func<Dictionary<string, Func<object, string>>> SetTemplatesCache { get; set; }
