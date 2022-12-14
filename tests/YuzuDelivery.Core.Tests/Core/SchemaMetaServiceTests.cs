@@ -35,7 +35,6 @@ namespace YuzuDelivery.Core.Test
         {
             schemaMetaPropertyService = Substitute.For<ISchemaMetaPropertyService>();
             config = Substitute.For<IYuzuConfiguration>();
-            config.SchemaMetaLocations = new List<IDataLocation>();
 
             svc = Substitute.ForPartsOf<SchemaMetaService>(schemaMetaPropertyService, config);
 
@@ -130,6 +129,14 @@ namespace YuzuDelivery.Core.Test
         [Test]
         public void GetPathFileData_given_vm_property_when_paths_file_exists_then_return_parsed_path_file_object()
         {
+            config.TemplateLocations.Returns(new List<ITemplateLocation>
+            {
+                new TemplateLocation
+                {
+                    Schema = "c:/test"
+                }
+            });
+
             var p = typeof(vmBlock_Test).GetProperty("ContentRows");
             CreatePathDataLocations(new string[] { "c:/test" });
             StubPathFile("c:/test", "vmBlock_Test", "path");
@@ -142,6 +149,18 @@ namespace YuzuDelivery.Core.Test
         [Test]
         public void GetPathFileData_given_two_locations_when_paths_file_exists_in_second_location_then_return_parsed_path_file_object()
         {
+            config.TemplateLocations.Returns(new List<ITemplateLocation>
+            {
+                new TemplateLocation
+                {
+                    Schema = "c:/test"
+                },
+                new TemplateLocation
+                {
+                    Schema = "c:/test2"
+                }
+            });
+
             var p = typeof(vmBlock_Test).GetProperty("ContentRows");
             CreatePathDataLocations(new string[] { "c:/test", "c:/test2" });
             StubPathFile("c:/test", "vmBlock_Test", "not-here", false);
@@ -156,7 +175,8 @@ namespace YuzuDelivery.Core.Test
         public void GetPathFileData_given_path_file_found_then_throw_exception()
         {
             var p = typeof(vmBlock_Test).GetProperty("ContentRows");
-            config.SchemaMetaLocations.Returns(new List<IDataLocation>());
+
+            config.TemplateLocations.Returns(new List<ITemplateLocation>());
 
             var ex = Assert.Throws<Exception>(() => svc.GetPathFileData(p.DeclaringType));
 
@@ -166,32 +186,45 @@ namespace YuzuDelivery.Core.Test
         [Test]
         public void GetPossiblePathFileName_return_possible_paths_with_par_prefix_and_without_prefix()
         {
+
             if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                var output = svc.GetPossiblePathFileName(@"c:\test", "vmPage_Test");
+                config.TemplateLocations.Returns(new List<ITemplateLocation>
+                {
+                    new TemplateLocation
+                    {
+                        Schema = @"c:\test\"
+                    }
+                });
+                var output = svc.GetPossiblePathFileName("vmPage_Test");
 
-                Assert.That(output[0], Is.EqualTo(@"c:\test\parTest.schema"));
-                Assert.That(output[1], Is.EqualTo(@"c:\test\test.schema"));
+                Assert.That(output.First(), Is.EqualTo(@"c:\test\parTest.meta"));
+                Assert.That(output.Last(), Is.EqualTo(@"c:\test\test.meta"));
             }
             else
             {
-                var output = svc.GetPossiblePathFileName("/foo/test", "vmPage_Test");
+                config.TemplateLocations.Returns(new List<ITemplateLocation>
+                {
+                    new TemplateLocation
+                    {
+                        Schema = @"/foo/test/"
+                    }
+                });
+                var output = svc.GetPossiblePathFileName("vmPage_Test");
 
-                Assert.That(output[0], Is.EqualTo("/foo/test/parTest.schema"));
-                Assert.That(output[1], Is.EqualTo("/foo/test/test.schema"));
+                Assert.That(output.First(), Is.EqualTo("/foo/test/parTest.meta"));
+                Assert.That(output.Last(), Is.EqualTo("/foo/test/test.meta"));
             }
         }
 
         public void CreatePathDataLocations(string[] locations)
         {
             var schemaMetaLocations = locations.Select(x => new DataLocation() { Path = x }).Cast<IDataLocation>().ToList();
-
-            config.SchemaMetaLocations.Returns(schemaMetaLocations);
         }
 
         public void StubPathFile(string rootPath, string declaringTypeName, string filePath, bool exists = true)
         {
-            svc.Configure().GetPossiblePathFileName(rootPath, declaringTypeName).Returns(new string[] { filePath });
+            svc.Configure().GetPossiblePathFileName(declaringTypeName).Returns(new string[] { filePath });
             svc.Configure().FileExists(filePath).Returns(exists);
             svc.Configure().FileRead(filePath).Returns(jsonPaths);
         }
