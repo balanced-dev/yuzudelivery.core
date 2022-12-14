@@ -80,8 +80,8 @@ namespace YuzuDelivery.Core.Test
 
             var output = svc.Get(p, "refs");
 
-            Assert.AreEqual("vmBlock_Test", output[0]);
-            Assert.AreEqual("vmBlock_Test2", output[1]);
+            Assert.That(output[0], Is.EqualTo("vmBlock_Test"));
+            Assert.That(output[1], Is.EqualTo("vmBlock_Test2"));
         }
 
         [Test]
@@ -94,7 +94,7 @@ namespace YuzuDelivery.Core.Test
 
             var output = svc.Get(p.DeclaringType, "refs", "/content");
 
-            Assert.AreEqual("dataGrid^vmBlock_GridBuilder", output[0]);
+            Assert.That(output[0], Is.EqualTo("dataGrid^vmBlock_GridBuilder"));
         }
 
         [Test]
@@ -107,8 +107,8 @@ namespace YuzuDelivery.Core.Test
 
             var output = svc.Get(p.DeclaringType, "refs", "/rows/columns/items", "parGrid");
 
-            Assert.AreEqual("vmBlock_Rte", output[0]);
-            Assert.AreEqual("vmBlock_Image", output[1]);
+            Assert.That(output[0], Is.EqualTo("vmBlock_Rte"));
+            Assert.That(output[1], Is.EqualTo("vmBlock_Image"));
         }
 
         [Test]
@@ -123,8 +123,8 @@ namespace YuzuDelivery.Core.Test
 
             var output = svc.Get(p.PropertyType, "refs", "/rows/columns/items", "parGrid");
 
-            Assert.AreEqual("vmBlock_Rte", output[0]);
-            Assert.AreEqual("vmBlock_Image", output[1]);
+            Assert.That(output[0], Is.EqualTo("vmBlock_Rte"));
+            Assert.That(output[1], Is.EqualTo("vmBlock_Image"));
         }
 
         [Test]
@@ -136,7 +136,7 @@ namespace YuzuDelivery.Core.Test
 
             var output = svc.GetPathFileData(p.DeclaringType);
 
-            Assert.AreEqual(JObject.Parse(jsonPaths), output);
+            Assert.That(output, Is.EqualTo(JObject.Parse(jsonPaths)));
         }
 
         [Test]
@@ -149,7 +149,7 @@ namespace YuzuDelivery.Core.Test
 
             var output = svc.GetPathFileData(p.DeclaringType);
 
-            Assert.AreEqual(JObject.Parse(jsonPaths), output);
+            Assert.That(output, Is.EqualTo(JObject.Parse(jsonPaths)));
         }
 
         [Test]
@@ -170,15 +170,15 @@ namespace YuzuDelivery.Core.Test
             {
                 var output = svc.GetPossiblePathFileName(@"c:\test", "vmPage_Test");
 
-                Assert.AreEqual(@"c:\test\parTest.schema", output[0]);
-                Assert.AreEqual(@"c:\test\test.schema", output[1]);
+                Assert.That(output[0], Is.EqualTo(@"c:\test\parTest.schema"));
+                Assert.That(output[1], Is.EqualTo(@"c:\test\test.schema"));
             }
             else
             {
                 var output = svc.GetPossiblePathFileName("/foo/test", "vmPage_Test");
 
-                Assert.AreEqual("/foo/test/parTest.schema", output[0]);
-                Assert.AreEqual("/foo/test/test.schema", output[1]);
+                Assert.That(output[0], Is.EqualTo("/foo/test/parTest.schema"));
+                Assert.That(output[1], Is.EqualTo("/foo/test/test.schema"));
             }
         }
 

@@ -92,7 +92,7 @@ namespace YuzuDelivery.Core.Test
 
             svc.Render<vmPage_ExampleViewModel>(exampleModel, false, settings);
 
-            Assert.AreEqual(settings.Data(), exampleViewModel);
+            Assert.That(exampleViewModel, Is.EqualTo(settings.Data()));
         }
 
         [Test]
@@ -134,7 +134,7 @@ namespace YuzuDelivery.Core.Test
 
             svc.Render<vmPage_ExampleViewModel>(exampleModel, false, settings, null, inputMappingItems);
 
-            Assert.AreEqual(settings.Data(), exampleViewModel);
+            Assert.That(exampleViewModel, Is.EqualTo(settings.Data()));
             typeFactoryRunner.Received().Run<vmPage_ExampleViewModel>(inputMappingItems);
         }
 
@@ -187,7 +187,7 @@ namespace YuzuDelivery.Core.Test
 
             var output = svc.Render(settings);
 
-            Assert.AreEqual(html, output);
+            Assert.That(output, Is.EqualTo(html));
         }
 
         [Test]
@@ -228,7 +228,7 @@ namespace YuzuDelivery.Core.Test
 
             var output = svc.CreateData(settings);
 
-            Assert.AreEqual(data, output);
+            Assert.That(output, Is.EqualTo(data));
         }
 
         [Test]
@@ -361,7 +361,7 @@ namespace YuzuDelivery.Core.Test
         {
             var output = svc.AddCurrentJsonToTemplate(settings, dataObject, html);
 
-            Assert.AreEqual(html, output);
+            Assert.That(output, Is.EqualTo(html));
         }
 
         #endregion

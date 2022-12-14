@@ -262,7 +262,7 @@ namespace YuzuDelivery.Core.Test
             svc.AddCompiledTemplates(file, ref templates);
 
             Assert.IsTrue(templates.ContainsKey(fileName));
-            Assert.AreEqual(templates[fileName], compiled);
+            Assert.That(compiled, Is.EqualTo(templates[fileName]));
         }
 
         #endregion

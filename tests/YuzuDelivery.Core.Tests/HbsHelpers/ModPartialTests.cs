@@ -40,7 +40,7 @@ namespace YuzuDelivery.Core.Test.HbsHelpers
             var data = new { foo = new vmBlock_PartialName() };
 
             var output = template(data);
-            Assert.AreEqual("test bar", output);
+            Assert.That(output, Is.EqualTo("test bar"));
         }
 
         [Test]
@@ -59,7 +59,7 @@ namespace YuzuDelivery.Core.Test.HbsHelpers
             var data = new { foo = new vmBlock_PartialName() };
 
             var output = template(data);
-            Assert.AreEqual("test bar test", output);
+            Assert.That(output, Is.EqualTo("test bar test"));
         }
 
         [Test]
@@ -78,7 +78,7 @@ namespace YuzuDelivery.Core.Test.HbsHelpers
             var data = new { foo = new[] { new vmBlock_PartialName() } };
 
             var output = template(data);
-            Assert.AreEqual("test bar", output);
+            Assert.That(output, Is.EqualTo("test bar"));
         }
 
         [Test]
@@ -103,7 +103,7 @@ namespace YuzuDelivery.Core.Test.HbsHelpers
             };
 
             var output = template(data);
-            Assert.AreEqual("test foo bar", output);
+            Assert.That(output, Is.EqualTo("test foo bar"));
         }
         
         [Test]
@@ -128,7 +128,7 @@ namespace YuzuDelivery.Core.Test.HbsHelpers
             };
 
             var output = template(data);
-            Assert.AreEqual("test foo bar modifier", output);
+            Assert.That(output, Is.EqualTo("test foo bar modifier"));
         }
         
 
@@ -154,7 +154,7 @@ namespace YuzuDelivery.Core.Test.HbsHelpers
             };
 
             var output = template(data);
-            Assert.AreEqual("test foo bar test", output);
+            Assert.That(output, Is.EqualTo("test foo bar test"));
         }
         
         [Test]
@@ -179,7 +179,7 @@ namespace YuzuDelivery.Core.Test.HbsHelpers
             };
 
             var output = template(data);
-            Assert.AreEqual("test foo bar test modifier", output);
+            Assert.That(output, Is.EqualTo("test foo bar test modifier"));
         }
         
         [Test]
@@ -204,7 +204,7 @@ namespace YuzuDelivery.Core.Test.HbsHelpers
             };
 
             var output = template(data);
-            Assert.AreEqual("test foo bar test test again", output);
+            Assert.That(output, Is.EqualTo("test foo bar test test again"));
         }
 
     }
