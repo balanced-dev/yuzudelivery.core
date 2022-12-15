@@ -1,14 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NUnit.Framework;
-using System.Reflection;
 using System.Runtime.InteropServices;
-using Newtonsoft.Json;
+using FluentAssertions;
 using Newtonsoft.Json.Linq;
-using YuzuDelivery.Core;
 
 namespace YuzuDelivery.Core.Test
 {
@@ -66,6 +61,34 @@ namespace YuzuDelivery.Core.Test
                     'parGrid'
                 ]
             }";
+        }
+
+        [Test]
+        public void GetPathSegments_PathPresentInSchemaMeta_ReturnsExpectedPathSegments()
+        {
+            var json = @"{
+                'path': '/foo/bar/baz/baz.schema'
+            }";
+
+            var pathsJson = JObject.Parse(json);
+            var vmType = typeof(vmBlock_Test);
+
+            svc.Configure().GetPathFileData(vmType).Returns(pathsJson);
+
+            var output = svc.GetPathSegments(vmType);
+            output.Should().BeEquivalentTo("Foo", "Bar");
+        }
+
+        [Test]
+        public void GetPathSegments_PathMissingFromSchemaMeta_Throws()
+        {
+            var pathsJson = new JObject();
+            var vmType = typeof(vmBlock_Test);
+
+            svc.Configure().GetPathFileData(vmType).Returns(pathsJson);
+
+            Action action = () => svc.GetPathSegments(vmType);
+            action.Should().Throw<Exception>().WithMessage("* has no path configured");
         }
 
         [Test]

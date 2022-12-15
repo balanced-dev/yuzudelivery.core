@@ -11,5 +11,6 @@ namespace YuzuDelivery.Core
         string[] Get(Type propertyType, string area, string path);
         string[] Get(PropertyInfo property, string area);
         string GetString(Type propertyType, string area, string path);
+        string[] GetPathSegments(Type vmType);
     }
 }

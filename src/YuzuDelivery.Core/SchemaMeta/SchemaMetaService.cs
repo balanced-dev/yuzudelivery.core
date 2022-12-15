@@ -80,6 +80,23 @@ namespace YuzuDelivery.Core
                 return null;
         }
 
+        public string[] GetPathSegments(Type vmType)
+        {
+            var meta = GetPathFileData(vmType);
+            if (!meta.ContainsKey("path"))
+            {
+                throw new InvalidOperationException($"Schema meta for type: {vmType.FullName} has no path configured");
+            }
+            var path = meta["path"].ToString();
+
+            return path
+                   .TrimStart('/')
+                   .Split('/')
+                   .SkipLast(2)
+                   .Select(StringExtensions.FirstCharacterToUpper)
+                   .ToArray();
+        }
+
         public virtual string[] Get(PropertyInfo property, string area)
         {
             var component = schemaMetaPropertyService.Get(property);
