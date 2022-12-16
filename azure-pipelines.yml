@@ -20,9 +20,9 @@ steps:
     pathToPublish: '$(Build.SourcesDirectory)/output/packages'
 
 - task: NuGetCommand@2
-  displayName: Push to prereleases
+  displayName: Push to MyGet Pre-releases
   inputs:
     command: 'push'
-    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
+    packagesToPush: '$(Build.SourcesDirectory)/output/packages/*.nupkg'
     nuGetFeedType: 'external'
     publishFeedCredentials: 'Myget Yuzu Prereleases'
