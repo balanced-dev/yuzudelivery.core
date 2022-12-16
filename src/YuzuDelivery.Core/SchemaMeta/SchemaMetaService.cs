@@ -93,6 +93,7 @@ namespace YuzuDelivery.Core
                    .TrimStart('/')
                    .Split('/')
                    .SkipLast(2)
+                   .Select(x => x.Replace("_", ""))
                    .Select(StringExtensions.FirstCharacterToUpper)
                    .ToArray();
         }
