@@ -260,7 +260,7 @@ namespace YuzuDelivery.Core.Test.HbsHelpers
             };
 
             var output = template(data);
-            Assert.AreEqual("test foo bar test", output);
+            Assert.That(output, Is.EqualTo("test foo bar test"));
         }
     }
 }

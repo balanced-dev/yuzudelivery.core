@@ -69,7 +69,7 @@ namespace YuzuDelivery.Core.Test
 
             var output = subBlockType.GetComponent(config);
 
-            Assert.AreEqual(blockType, output);
+            Assert.That(output, Is.EqualTo(blockType));
         }
 
         [Test]
@@ -79,7 +79,7 @@ namespace YuzuDelivery.Core.Test
 
             var output = subBlockType.GetComponent(config);
 
-            Assert.AreEqual(blockType, output);
+            Assert.That(output, Is.EqualTo(blockType));
         }
 
         [Test]
@@ -90,7 +90,7 @@ namespace YuzuDelivery.Core.Test
 
             var output = subBlockType.GetComponent(config);
 
-            Assert.AreEqual(blockType, output);
+            Assert.That(output, Is.EqualTo(blockType));
         }
 
         [Test]
@@ -101,7 +101,7 @@ namespace YuzuDelivery.Core.Test
 
             var output = subBlockType.GetComponent(config);
 
-            Assert.AreEqual(blockType, output);
+            Assert.That(output, Is.EqualTo(blockType));
         }
 
         [Test]

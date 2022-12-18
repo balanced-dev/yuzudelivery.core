@@ -106,7 +106,7 @@ namespace YuzuDelivery.Core.Test
 
             settings.Data();
 
-            Assert.AreEqual(inputMappingItems["test"], usedMappingItems["test"]);
+            Assert.That(usedMappingItems["test"], Is.EqualTo(inputMappingItems["test"]));
         }
 
         [Test]
