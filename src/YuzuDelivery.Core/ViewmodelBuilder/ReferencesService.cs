@@ -19,8 +19,8 @@ namespace YuzuDelivery.Core.ViewModelBuilder
 
         public ReferencesService(IYuzuConfiguration config)
         {
-            pagePath = config.TemplateLocations.Where(x => x.Name == "Pages").Select(x => x.Schema).FirstOrDefault();
-            blockPath = config.TemplateLocations.Where(x => x.Name == "Partials").Select(x => x.Schema).FirstOrDefault();
+            pagePath = config.TemplateLocations.Where(x => x.TemplateType == TemplateType.Page).Select(x => x.Schema).FirstOrDefault();
+            blockPath = config.TemplateLocations.Where(x => x.TemplateType == TemplateType.Partial).Select(x => x.Schema).FirstOrDefault();
 
             if (pagePath != null && !pagePath.EndsWith(Path.DirectorySeparatorChar))
             {

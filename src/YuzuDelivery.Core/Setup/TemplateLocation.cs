@@ -12,5 +12,12 @@ namespace YuzuDelivery.Core
         public string Schema { get; set; }
         public bool RegisterAllAsPartials { get; set; }
         public bool SearchSubDirectories { get; set; }
+        public TemplateType TemplateType { get; set; }
+    }
+
+    public enum TemplateType
+    {
+        Page,
+        Partial
     }
 }

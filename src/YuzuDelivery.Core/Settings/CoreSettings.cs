@@ -16,5 +16,10 @@ namespace YuzuDelivery.Core.Settings
 
         [DefaultValue(StaticConfigPath)]
         public string ConfigPath { get; set; } = StaticConfigPath;
+
+        /// <summary>
+        /// Only use to manuipulate template locations as part of the plugin development process
+        /// </summary>
+        public bool IsPluginDev { get; set; }
     }
 }

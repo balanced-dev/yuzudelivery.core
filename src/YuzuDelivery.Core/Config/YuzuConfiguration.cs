@@ -14,6 +14,10 @@ namespace YuzuDelivery.Core
         {
             TemplateLocations = new List<ITemplateLocation>();
 
+            ViewModelAssemblies = new List<Assembly>();
+            ViewModels = new List<Type>();
+            CMSModels = new List<Type>();
+
             MappingAssemblies = new List<Assembly>();
 
             InstalledManualMaps = new List<ManualMapInstalledType>();
@@ -27,22 +31,10 @@ namespace YuzuDelivery.Core
         }
 
         public List<Assembly> MappingAssemblies { get; set; }
-        private Assembly[] viewModelAssemblies;
-        public Assembly[] ViewModelAssemblies
-        {
-            get
-            {
-                return viewModelAssemblies;
-            }
-            set
-            {
-                viewModelAssemblies = value;
-                ViewModels = value.SelectMany(x => x.GetTypes().Where(y => y.Name.IsVm()));
-            }
-        }
 
-        public virtual IEnumerable<Type> ViewModels { get; private set; }
-        public IEnumerable<Type> CMSModels { get; set; }
+        public List<Assembly> ViewModelAssemblies { get; private set; }
+        public virtual List<Type> ViewModels { get; private set; }
+        public List<Type> CMSModels { get; set; }
 
         public List<ManualMapInstalledType> InstalledManualMaps { get; private set; }
         public List<ManualMapActiveType> ActiveManualMaps { get; private set; }

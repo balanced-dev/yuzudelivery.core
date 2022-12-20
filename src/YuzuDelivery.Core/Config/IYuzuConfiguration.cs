@@ -6,12 +6,12 @@ using YuzuDelivery.Core.Mapping;
 namespace YuzuDelivery.Core
 {
     public interface IYuzuConfiguration
-    {
-        Assembly[] ViewModelAssemblies { get; set; }
+    { 
         List<Assembly> MappingAssemblies { get; set; }
 
-        IEnumerable<Type> ViewModels { get; }
-        IEnumerable<Type> CMSModels { get; set; }
+        List<Assembly> ViewModelAssemblies { get; }
+        List<Type> ViewModels { get; }
+        List<Type> CMSModels { get; set; }
 
         List<ManualMapInstalledType> InstalledManualMaps { get; }
         List<ManualMapActiveType> ActiveManualMaps { get; }
@@ -31,5 +31,10 @@ namespace YuzuDelivery.Core
     public interface IUpdateableConfig
     {
         List<Assembly> MappingAssemblies { get; set; }
+    }
+
+    public interface IChildSiteConfig 
+    {
+        void Setup(IYuzuConfiguration _config);     
     }
 }

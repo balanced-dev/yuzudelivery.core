@@ -28,8 +28,8 @@ namespace YuzuDelivery.Core.Test.ViewmodelBuilder
             var config = Substitute.For<IYuzuConfiguration>();
             config.TemplateLocations = new List<ITemplateLocation>
             {
-                new TemplateLocation {Name = "Pages", Schema = "some"},
-                new TemplateLocation {Name = "Partials", Schema = blockPath}
+                new TemplateLocation {Name = "Pages", Schema = "some", TemplateType = TemplateType.Page},
+                new TemplateLocation {Name = "Partials", Schema = blockPath, TemplateType = TemplateType.Partial}
             };
 
             BuilderConfig = new YuzuViewmodelsBuilderConfig();
