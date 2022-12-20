@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace YuzuDelivery.Core.Mapping.Mappers.Settings
 {
@@ -9,5 +10,6 @@ namespace YuzuDelivery.Core.Mapping.Mappers.Settings
         public Type DestChild { get; set; }
         public string PropertyName { get; set; }
         public string GroupName { get; set; }
+        public IEnumerable<string> SourceProperties { get; set; }
     }
 }
