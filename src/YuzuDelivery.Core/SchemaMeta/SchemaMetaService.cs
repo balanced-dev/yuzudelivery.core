@@ -80,12 +80,12 @@ namespace YuzuDelivery.Core
                 return null;
         }
 
-        public string[] GetPathSegments(Type vmType)
+        public string[] GetPathSegments(string viewModelName)
         {
-            var meta = GetPathFileData(vmType);
+            var meta = GetPathFileData(viewModelName);
             if (!meta.ContainsKey("path"))
             {
-                throw new InvalidOperationException($"Schema meta for type: {vmType.FullName} has no path configured");
+                throw new InvalidOperationException($"Schema meta for viewModel: '{viewModelName}' has no path configured");
             }
             var path = meta["path"].ToString();
 
@@ -114,11 +114,14 @@ namespace YuzuDelivery.Core
 
         public virtual JObject GetPathFileData(Type propertyType)
         {
-            var typeName = propertyType.Name;
+            return GetPathFileData(propertyType.Name);
+        }
 
+        public virtual JObject GetPathFileData(string propertyType)
+        {
             //get paths file from frontend solution
 
-            foreach (var schemaMetaFile in GetPossiblePathFileName(typeName))
+            foreach (var schemaMetaFile in GetPossiblePathFileName(propertyType))
             {
                 if (FileExists(schemaMetaFile))
                 {
@@ -126,7 +129,7 @@ namespace YuzuDelivery.Core
                 }
             };
 
-            throw new Exception(string.Format("Schema meta file not found for {0}", typeName));
+            throw new Exception(string.Format("Schema meta file not found for {0}", propertyType));
         }
 
         public virtual IEnumerable<string> GetPossiblePathFileName(string declaringTypeName)

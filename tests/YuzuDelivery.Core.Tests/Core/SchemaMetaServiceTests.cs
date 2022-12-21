@@ -73,9 +73,9 @@ namespace YuzuDelivery.Core.Test
             var pathsJson = JObject.Parse(json);
             var vmType = typeof(vmBlock_Test);
 
-            svc.Configure().GetPathFileData(vmType).Returns(pathsJson);
+            svc.Configure().GetPathFileData(vmType.Name).Returns(pathsJson);
 
-            var output = svc.GetPathSegments(vmType);
+            var output = svc.GetPathSegments(vmType.Name);
             output.Should().BeEquivalentTo("Foo", "Bar");
         }
 
@@ -85,9 +85,9 @@ namespace YuzuDelivery.Core.Test
             var pathsJson = new JObject();
             var vmType = typeof(vmBlock_Test);
 
-            svc.Configure().GetPathFileData(vmType).Returns(pathsJson);
+            svc.Configure().GetPathFileData(vmType.Name).Returns(pathsJson);
 
-            Action action = () => svc.GetPathSegments(vmType);
+            Action action = () => svc.GetPathSegments(vmType.Name);
             action.Should().Throw<Exception>().WithMessage("* has no path configured");
         }
 
