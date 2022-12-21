@@ -26,6 +26,7 @@ namespace YuzuDelivery.Core
 
         void AddActiveManualMap<Resolver, Dest>(string destPropertyName = null);
         bool HasActiveManualMap(string dest, string destMemberName = null);
+        List<string> BaseSiteConfigFiles { get; }
     }
 
     public interface IUpdateableConfig
@@ -33,7 +34,7 @@ namespace YuzuDelivery.Core
         List<Assembly> MappingAssemblies { get; set; }
     }
 
-    public interface IChildSiteConfig 
+    public interface IBaseSiteConfig 
     {
         void Setup(IYuzuConfiguration _config);     
     }

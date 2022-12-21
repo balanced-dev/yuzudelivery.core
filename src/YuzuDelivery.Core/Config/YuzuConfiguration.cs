@@ -24,7 +24,9 @@ namespace YuzuDelivery.Core
             ActiveManualMaps = new List<ManualMapActiveType>();
             ViewmodelFactories = new Dictionary<Type, Func<IYuzuTypeFactory>>();
 
-            foreach(var i in extraConfigs)
+            BaseSiteConfigFiles = new List<string>();
+
+            foreach (var i in extraConfigs)
             {
                 MappingAssemblies = MappingAssemblies.Union(i.MappingAssemblies).ToList();
             }
@@ -47,6 +49,8 @@ namespace YuzuDelivery.Core
 
         public Func<IRenderSettings, string> GetRenderedHtmlCache { get; set; }
         public Action<IRenderSettings, string> SetRenderedHtmlCache { get; set; }
+
+        public List<string> BaseSiteConfigFiles { get; }
 
         public void AddActiveManualMap<Resolver, Dest>(string destMemberName = null)
         {
