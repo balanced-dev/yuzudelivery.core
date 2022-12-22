@@ -11,7 +11,7 @@ namespace Microsoft.AspNetCore.Mvc.Rendering
 {
     public static class HtmlExtensions
     {
-        public static IHtmlContent RenderYuzu<E>(this IHtmlHelper html, object model, IDictionary<string, object> mappingItems = null, bool showJson = false)
+        public static IHtmlContent RenderYuzu<E>(this IHtmlHelper html, object model, string templateName = null, IDictionary<string, object> mappingItems = null, bool showJson = false)
         {
             mappingItems ??= new Dictionary<string, object>();
 
@@ -24,7 +24,7 @@ namespace Microsoft.AspNetCore.Mvc.Rendering
             var factory = html.ViewContext.HttpContext.RequestServices.GetRequiredService<IYuzuTypeFactoryRunner>();
             var mapped = factory.Run<E>(mappingItems) ?? mapper.Map<E>(model, mappingItems);
 
-            return html.RenderYuzu(typeof(E).GetTemplateName(), mapped, showJson);
+            return html.RenderYuzu(templateName ?? typeof(E).GetTemplateName(), mapped, showJson);
         }
 
         // ReSharper disable once MemberCanBePrivate.Global - used downstream
