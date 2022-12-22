@@ -1,8 +1,4 @@
-﻿using System;
-using System.Reflection;
-using System.Collections.Generic;
-
-namespace YuzuDelivery.Core
+﻿namespace YuzuDelivery.Core
 {
     public interface IYuzuConstantsConfig
     {
@@ -10,7 +6,5 @@ namespace YuzuDelivery.Core
         string SubPrefix { get; set; }
         string PagePrefix { get; set; }
         string BlockRefPrefix { get; set; }
-
-        string TemplateFileExtension { get; set; }
     }
 }

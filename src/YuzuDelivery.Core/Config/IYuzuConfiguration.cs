@@ -6,7 +6,7 @@ using YuzuDelivery.Core.Mapping;
 namespace YuzuDelivery.Core
 {
     public interface IYuzuConfiguration
-    { 
+    {
         List<Assembly> MappingAssemblies { get; set; }
 
         List<Assembly> ViewModelAssemblies { get; }
@@ -18,12 +18,6 @@ namespace YuzuDelivery.Core
         Dictionary<Type, Func<IYuzuTypeFactory>> ViewmodelFactories { get; }
         List<ITemplateLocation> TemplateLocations { get; set; }
 
-        Func<IRenderSettings, string> GetRenderedHtmlCache { get; set; }
-        Action<IRenderSettings, string> SetRenderedHtmlCache { get; set; }
-
-        Func<Dictionary<string, Func<object, string>>> GetTemplatesCache { get; set; }
-        Func<Dictionary<string, Func<object, string>>> SetTemplatesCache { get; set; }
-
         void AddActiveManualMap<Resolver, Dest>(string destPropertyName = null);
         bool HasActiveManualMap(string dest, string destMemberName = null);
         List<string> BaseSiteConfigFiles { get; }
@@ -34,8 +28,8 @@ namespace YuzuDelivery.Core
         List<Assembly> MappingAssemblies { get; set; }
     }
 
-    public interface IBaseSiteConfig 
+    public interface IBaseSiteConfig
     {
-        void Setup(IYuzuConfiguration _config);     
+        void Setup(IYuzuConfiguration _config);
     }
 }

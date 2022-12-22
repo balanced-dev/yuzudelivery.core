@@ -15,14 +15,12 @@ namespace YuzuDelivery.Core
             SubPrefix = "vmSub_";
             PagePrefix = "vmPage_";
             BlockRefPrefix = "par";
-            TemplateFileExtension = ".hbs";
         }
 
         public string BlockPrefix { get; set; }
         public string SubPrefix { get; set; }
         public string PagePrefix { get; set; }
         public string BlockRefPrefix { get; set; }
-        public string TemplateFileExtension { get; set; }
     }
 
 }

@@ -1,38 +1,46 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
+using System.Web;
 using YuzuDelivery.Core;
 using Microsoft.AspNetCore.Html;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
+using YuzuDelivery.Core.Mapping;
 
+// ReSharper disable once CheckNamespace
 namespace Microsoft.AspNetCore.Mvc.Rendering
 {
     public static class HtmlExtensions
     {
-        public static IHtmlContent RenderYuzu<E>(this IHtmlHelper helper, object model, IRenderSettings settings)
+        public static IHtmlContent RenderYuzu<E>(this IHtmlHelper html, object model, IDictionary<string, object> mappingItems = null, bool showJson = false)
         {
-            var fe = helper.ViewContext.HttpContext.RequestServices.GetService<IYuzuDefinitionTemplates>();
-            return helper.Raw(fe.Render<E>(model, false, settings, helper, null));
+            mappingItems ??= new Dictionary<string, object>();
+
+            if (!mappingItems.ContainsKey("HtmlHelper"))
+            {
+                mappingItems.Add("HtmlHelper", html);
+            }
+
+            var mapper = html.ViewContext.HttpContext.RequestServices.GetRequiredService<IMapper>();
+            var factory = html.ViewContext.HttpContext.RequestServices.GetRequiredService<IYuzuTypeFactoryRunner>();
+            var mapped = factory.Run<E>(mappingItems) ?? mapper.Map<E>(model, mappingItems);
+
+            return html.RenderYuzu(typeof(E).GetTemplateName(), mapped, showJson);
         }
 
-        public static IHtmlContent RenderYuzu<E>(this IHtmlHelper helper, object model, IDictionary<string, object> mappingItems, IRenderSettings settings = null)
+        // ReSharper disable once MemberCanBePrivate.Global - used downstream
+        public static IHtmlContent RenderYuzu(this IHtmlHelper html, string templateName, object model, bool showJson = false)
         {
-            var fe = helper.ViewContext.HttpContext.RequestServices.GetService<IYuzuDefinitionTemplates>();
-            return helper.Raw(fe.Render<E>(model, false, settings, helper, mappingItems));
-        }
+            var templateEngine = html.ViewContext.HttpContext.RequestServices.GetRequiredService<IYuzuTemplateEngine>();
+            var markup = templateEngine.Render(templateName, model);
 
-        public static IHtmlContent RenderYuzu<E>(this IHtmlHelper helper, object model, bool showJson = false, IDictionary<string, object> mappingItems = null)
-        {
-            var fe = helper.ViewContext.HttpContext.RequestServices.GetService<IYuzuDefinitionTemplates>();
-            return helper.Raw(fe.Render<E>(model, showJson, null, helper, mappingItems));
-        }
+            // ReSharper disable once InvertIf
+            if (showJson)
+            {
+                var json = JsonConvert.SerializeObject(model, Formatting.Indented);
+                markup = $"{markup}<pre data-app=\"JSONHelper\">{HttpUtility.HtmlEncode(json)}</pre>";
+            }
 
-        public static IHtmlContent RenderYuzu(this IHtmlHelper helper, IRenderSettings settings)
-        {
-            var fe = helper.ViewContext.HttpContext.RequestServices.GetService<IYuzuDefinitionTemplates>();
-            return helper.Raw(fe.Render(settings));
+            return html.Raw(markup);
         }
     }
 }

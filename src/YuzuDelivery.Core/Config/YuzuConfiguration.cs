@@ -44,12 +44,6 @@ namespace YuzuDelivery.Core
 
         public List<ITemplateLocation> TemplateLocations { get; set; }
 
-        public Func<Dictionary<string, Func<object, string>>> GetTemplatesCache { get; set; }
-        public Func<Dictionary<string, Func<object, string>>> SetTemplatesCache { get; set; }
-
-        public Func<IRenderSettings, string> GetRenderedHtmlCache { get; set; }
-        public Action<IRenderSettings, string> SetRenderedHtmlCache { get; set; }
-
         public List<string> BaseSiteConfigFiles { get; }
 
         public void AddActiveManualMap<Resolver, Dest>(string destMemberName = null)
