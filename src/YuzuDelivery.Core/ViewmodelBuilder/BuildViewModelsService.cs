@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using YuzuDelivery.Core.Settings;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Options;
 
 namespace YuzuDelivery.Core.ViewModelBuilder
 {
@@ -9,45 +12,39 @@ namespace YuzuDelivery.Core.ViewModelBuilder
     {
         private readonly GenerateViewmodelService generateViewmodelService;
         private readonly IYuzuViewmodelsBuilderConfig builderConfig;
+        private readonly IFileProvider schemaFileProvider;
 
-        private string pagePath;
-        private string blockPath;
+        private IList<IFileInfo> all;
+        private IDictionary<string, IFileInfo> blocks;
 
         public string OutputPath { get; set; }
 
         public BuildViewModelsService(
             GenerateViewmodelService generateViewmodelService,
-            IYuzuConfiguration config,
+            IOptions<CoreSettings> coreSettings,
             IYuzuViewmodelsBuilderConfig builderConfig)
         {
             this.generateViewmodelService = generateViewmodelService;
             this.builderConfig = builderConfig;
+            this.schemaFileProvider = coreSettings.Value.SchemaFileProvider;
 
-            pagePath = config.TemplateLocations.Where(x => x.TemplateType == TemplateType.Page).Select(x => x.Schema).FirstOrDefault();
-            blockPath = config.TemplateLocations.Where(x => x.TemplateType == TemplateType.Partial).Select(x => x.Schema).FirstOrDefault();
+            all = new List<IFileInfo>();
+            blocks = new Dictionary<string, IFileInfo>();
 
-            if (pagePath != null && !pagePath.EndsWith(Path.DirectorySeparatorChar))
-            {
-                pagePath += Path.DirectorySeparatorChar;
-            }
-
-            if (blockPath != null && !blockPath.EndsWith(Path.DirectorySeparatorChar))
-            {
-                blockPath += Path.DirectorySeparatorChar;
-            }
+            this.schemaFileProvider.GetPagesAndPartials(".schema", "par", AddFilteredFiles);
         }
 
-        public string GetDirectoryForType(ViewModelType viewModelType)
+        private void AddFilteredFiles(bool isPartial, string name, IFileInfo fileInfo)
         {
-            return viewModelType == ViewModelType.page ? pagePath : blockPath;
+            if(isPartial) blocks.Add(name, fileInfo);
+            all.Add(fileInfo);
         }
 
         public void RunAll(ViewModelType viewModelType, Dictionary<string, string> output = null, int limit = 99999)
         {
-            DirectoryInfo dir = new DirectoryInfo(GetDirectoryForType(viewModelType));
             var count = 0;
 
-            foreach(var i in dir.GetFiles("*.schema"))
+            foreach(var i in all)
             {
                 if (count == limit)
                     break;
@@ -56,14 +53,14 @@ namespace YuzuDelivery.Core.ViewModelBuilder
 
                 try
                 {
-                    file = generateViewmodelService.Create(i.FullName, i.Name.CleanFileExtension().RemoveFileSuffix(), viewModelType, blockPath, builderConfig);
+                    file = generateViewmodelService.Create(i, i.Name.CleanFileExtension().RemoveFileSuffix(), viewModelType, blocks, builderConfig);
                 }
                 catch (Exception ex)
                 {
                     throw new Exception(string.Format("Failed on schema file {0}", i.Name), ex);
                 }
 
-                if(file.Content.Contains("public partial class") || file.Content.Contains("public enum"))
+                if (file.Content.Contains("public partial class") || file.Content.Contains("public enum"))
                 {
                     if (output != null)
                         output.Add(file.Name, file.Content);
@@ -78,7 +75,8 @@ namespace YuzuDelivery.Core.ViewModelBuilder
         public (string Name, string Content) RunOneBlock(ViewModelType viewModelType, string schemaName)
         {
             var schemaFilename = $"par{schemaName}.schema";
-            return generateViewmodelService.Create(Path.Combine(GetDirectoryForType(viewModelType), schemaFilename), schemaName, viewModelType,  blockPath, builderConfig);
+            var fileInfo = all.FirstOrDefault(x => x.Name == schemaFilename);
+            return generateViewmodelService.Create(fileInfo, schemaName, viewModelType, blocks, builderConfig);
         }
 
         public virtual void WriteOutputFile(string outputFilename, string content)

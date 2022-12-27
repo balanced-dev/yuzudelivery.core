@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Fluid;
 using Fluid.Values;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Options;
+using YuzuDelivery.Core.Settings;
 using YuzuDelivery.Core.ViewModelBuilder;
 
 namespace YuzuDelivery.Core.Test.ViewmodelBuilder
@@ -16,6 +20,8 @@ namespace YuzuDelivery.Core.Test.ViewmodelBuilder
 
         IYuzuViewmodelsBuilderConfig BuilderConfig { get; set; }
 
+        IOptions<CoreSettings> coreSettings;
+
         [SetUp]
         public void Setup()
         {
@@ -25,16 +31,15 @@ namespace YuzuDelivery.Core.Test.ViewmodelBuilder
 
             var generate = new GenerateViewmodelService();
 
-            var config = Substitute.For<IYuzuConfiguration>();
-            config.TemplateLocations = new List<ITemplateLocation>
-            {
-                new TemplateLocation {Name = "Pages", Schema = "some", TemplateType = TemplateType.Page},
-                new TemplateLocation {Name = "Partials", Schema = blockPath, TemplateType = TemplateType.Partial}
-            };
-
             BuilderConfig = new YuzuViewmodelsBuilderConfig();
 
-            Sut = Substitute.For<BuildViewModelsService>(generate, config, BuilderConfig);
+            var fileProvider = new EmbeddedFileProvider(Assembly.GetExecutingAssembly(), "YuzuDelivery.Core.ViewmodelBuilder.Input");
+
+            coreSettings = Substitute.For<IOptions<CoreSettings>>();
+            coreSettings.Value.Returns(Substitute.For<CoreSettings>());
+            coreSettings.Value.SchemaFileProvider = fileProvider;
+
+            Sut = Substitute.For<BuildViewModelsService>(generate, coreSettings, BuilderConfig);
             Sut.Configure().WriteOutputFile(Arg.Any<string>(), Arg.Any<string>());
         }
 

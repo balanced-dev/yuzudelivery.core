@@ -5,21 +5,28 @@ using System.IO;
 using NJsonSchema;
 using NJsonSchema.CodeGeneration.CSharp;
 using YuzuDelivery.Core.ViewmodelBuilder.NJsonSchema.CodeGeneration;
+using Microsoft.Extensions.FileProviders;
+using Newtonsoft.Json.Serialization;
+using System.Text.RegularExpressions;
 
 namespace YuzuDelivery.Core.ViewModelBuilder
 {
     public class GenerateViewmodelService
     {
-        public (string Name, string Content) Create(string schemaFilename, string outputFilename, ViewModelType viewModelType,  string blockPath, IYuzuViewmodelsBuilderConfig config)
+        public (string Name, string Content) Create(IFileInfo schemaFile, string outputFilename, ViewModelType viewModelType,  IDictionary<string, IFileInfo> blocks, IYuzuViewmodelsBuilderConfig config)
         {
-            var file = ReadFile(schemaFilename);
+            var fileString = ReadFile(schemaFile);
             string fileOut = string.Empty;
 
-            var excludedTypes = GetExcludedTypesFromFiles(outputFilename, blockPath);
+            var excludedTypes = GetExcludedTypesFromFiles(outputFilename, blocks);
             excludedTypes.Add("DoNotApply");
             excludedTypes = excludedTypes.Union(config.ExcludeViewmodelsAtGeneration).ToList();
 
-            var schema = JsonSchema.FromJsonAsync(file, blockPath).Result;
+            var schema = JsonSchema.FromJsonAsync(fileString, ".", (JsonSchema schema) =>
+            {
+                var schemaResolver = new JsonSchemaAppender(schema, new DefaultTypeNameGenerator());
+                return new JsonReferenceResolverForFileProvider(schemaResolver, blocks);
+            }).Result;
 
             if (outputFilename != schema.Id.SchemaIdToName())
                 throw new Exception(string.Format("Filename and schema id must match, {0} doesn't equal {1} and schema id must start with a /", outputFilename, schema.Id.SchemaIdToName()));
@@ -49,28 +56,26 @@ namespace YuzuDelivery.Core.ViewModelBuilder
             return (Name: actualFilename, Content: fileOut);
         }
 
-        private string ReadFile(string schemaFilename)
+        private string ReadFile(IFileInfo schemaFile)
         {
-            return File.ReadAllText(schemaFilename);
+            var fileStream = schemaFile.CreateReadStream();
+            using var reader = new StreamReader(fileStream);
+            return reader.ReadToEnd();
         }
 
-        private List<string> GetExcludedTypesFromFiles(string outputFile, string blockPath)
+        private List<string> GetExcludedTypesFromFiles(string outputFile, IDictionary<string, IFileInfo> blocks)
         {
-            DirectoryInfo dir = new DirectoryInfo(blockPath);
             var excludedTypes = new List<string>();
             var currentViewModelName = outputFile.AddVmTypePrefix(ViewModelType.block);
 
-            foreach (var i in dir.GetFiles("*.schema"))
+            foreach (var i in blocks)
             {
-                var viewModelName = i.Name.CleanFileExtension().RemoveFileSuffix().AddVmTypePrefix(ViewModelType.block);
+                var viewModelName = i.Key.RemoveFileSuffix().AddVmTypePrefix(ViewModelType.block);
                 if (currentViewModelName != viewModelName)
                     excludedTypes.Add(viewModelName);
             }
 
             return excludedTypes;
         }
-
-
-
     }
 }

@@ -26,8 +26,10 @@
     <PackageReference Include="NJsonSchema.CodeGeneration" Version="10.8.0" />
     <PackageReference Include="NJsonSchema.CodeGeneration.CSharp" Version="10.8.0" />
     <PackageReference Include="DotLiquid " Version="2.0.254.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="6.0.0" />
   </ItemGroup>
-
+  
   <ItemGroup>
     <EmbeddedResource Include="ViewmodelBuilder\NJsonSchema\CodeGeneration\Templates\*.liquid" />
   </ItemGroup>
