@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System.IO;
 using YuzuDelivery.Core;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Options;
+using YuzuDelivery.Core.Settings;
 
 namespace YuzuDelivery.Core.ViewModelBuilder
 {
@@ -13,41 +16,6 @@ namespace YuzuDelivery.Core.ViewModelBuilder
     {
         public const string SchemaFileReferencePattern = @"""\$ref""\s?:\s?""\./(par|data).*schema""";
         public const string SchemaNameReferencePattern = @"""\$ref""\s?:\s?""\/(par|data).*\""";
-
-        private string pagePath;
-        private string blockPath;
-
-        public ReferencesService(IYuzuConfiguration config)
-        {
-            pagePath = config.TemplateLocations.Where(x => x.TemplateType == TemplateType.Page).Select(x => x.Schema).FirstOrDefault();
-            blockPath = config.TemplateLocations.Where(x => x.TemplateType == TemplateType.Partial).Select(x => x.Schema).FirstOrDefault();
-
-            if (pagePath != null && !pagePath.EndsWith(Path.DirectorySeparatorChar))
-            {
-                pagePath += Path.DirectorySeparatorChar;
-            }
-
-            if (blockPath != null && !blockPath.EndsWith(Path.DirectorySeparatorChar))
-            {
-                blockPath += Path.DirectorySeparatorChar;
-            }
-        }
-
-        public void FixMultiple(ViewModelType viewModelType, int limit = 99999)
-        {
-            DirectoryInfo dir = new DirectoryInfo(GetDirectoryForType(viewModelType));
-            var count = 0;
-
-            foreach (var i in dir.GetFiles("*.schema"))
-            {
-                if (count == limit)
-                    break;
-                var file = ReadFile(i.FullName);
-                file = Fix(file);
-                WriteSchemaFile(i.FullName, file);
-                count++;
-            }
-        }
 
         public string Fix(string file)
         {
@@ -71,21 +39,6 @@ namespace YuzuDelivery.Core.ViewModelBuilder
                 }
             }
             return file;
-        }
-
-        private string ReadFile(string schemaFilename)
-        {
-            return File.ReadAllText(schemaFilename);
-        }
-
-        private void WriteSchemaFile(string schemaFileName, string content)
-        {
-            File.WriteAllText(schemaFileName, content);
-        }
-
-        private string GetDirectoryForType(ViewModelType viewModelType)
-        {
-            return viewModelType == ViewModelType.page ? pagePath : blockPath;
         }
 
     }

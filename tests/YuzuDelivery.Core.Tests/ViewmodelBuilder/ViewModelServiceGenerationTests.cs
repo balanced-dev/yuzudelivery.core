@@ -29,7 +29,7 @@ namespace YuzuDelivery.Core.Test.ViewmodelBuilder
 
             var blockPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ViewmodelBuilder", "Input");
 
-            var generate = new GenerateViewmodelService();
+            var generate = new GenerateViewmodelService(Substitute.For<ReferencesService>());
 
             BuilderConfig = new YuzuViewmodelsBuilderConfig();
 

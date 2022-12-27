@@ -14,7 +14,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder
         private readonly IYuzuViewmodelsBuilderConfig builderConfig;
         private readonly IFileProvider schemaFileProvider;
 
-        private IList<IFileInfo> all;
+        private IDictionary<string, IFileInfo> pages;
         private IDictionary<string, IFileInfo> blocks;
 
         public string OutputPath { get; set; }
@@ -28,23 +28,24 @@ namespace YuzuDelivery.Core.ViewModelBuilder
             this.builderConfig = builderConfig;
             this.schemaFileProvider = coreSettings.Value.SchemaFileProvider;
 
-            all = new List<IFileInfo>();
+            pages = new Dictionary<string, IFileInfo>();
             blocks = new Dictionary<string, IFileInfo>();
 
-            this.schemaFileProvider.GetPagesAndPartials(".schema", "par", AddFilteredFiles);
+            this.schemaFileProvider.GetPagesAndPartials(".schema", new string[] { "par", "data" }, new string[] { "_" }, AddFilteredFiles);
         }
 
-        private void AddFilteredFiles(bool isPartial, string name, IFileInfo fileInfo)
+        private void AddFilteredFiles(bool isPartial, bool isLayout, string name, IFileInfo fileInfo)
         {
             if(isPartial) blocks.Add(name, fileInfo);
-            all.Add(fileInfo);
+            if(!isLayout && !isPartial) pages.Add(name, fileInfo);
         }
 
         public void RunAll(ViewModelType viewModelType, Dictionary<string, string> output = null, int limit = 99999)
         {
             var count = 0;
+            var entries = viewModelType == ViewModelType.page ? pages : blocks;
 
-            foreach(var i in all)
+            foreach(var i in entries)
             {
                 if (count == limit)
                     break;
@@ -53,11 +54,11 @@ namespace YuzuDelivery.Core.ViewModelBuilder
 
                 try
                 {
-                    file = generateViewmodelService.Create(i, i.Name.CleanFileExtension().RemoveFileSuffix(), viewModelType, blocks, builderConfig);
+                    file = generateViewmodelService.Create(i.Value, i.Value.Name.CleanFileExtension().RemoveFileSuffix(), viewModelType, blocks, builderConfig);
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception(string.Format("Failed on schema file {0}", i.Name), ex);
+                    throw new Exception(string.Format("Failed on schema file {0}", i.Key), ex);
                 }
 
                 if (file.Content.Contains("public partial class") || file.Content.Contains("public enum"))
@@ -74,8 +75,8 @@ namespace YuzuDelivery.Core.ViewModelBuilder
 
         public (string Name, string Content) RunOneBlock(ViewModelType viewModelType, string schemaName)
         {
-            var schemaFilename = $"par{schemaName}.schema";
-            var fileInfo = all.FirstOrDefault(x => x.Name == schemaFilename);
+            var schemaFilename = $"par{schemaName}";
+            var fileInfo = blocks.FirstOrDefault(x => x.Key == schemaFilename).Value;
             return generateViewmodelService.Create(fileInfo, schemaName, viewModelType, blocks, builderConfig);
         }
 

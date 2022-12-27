@@ -13,6 +13,13 @@ namespace YuzuDelivery.Core.ViewModelBuilder
 {
     public class GenerateViewmodelService
     {
+        private readonly ReferencesService _referencesService;
+
+        public GenerateViewmodelService(ReferencesService referencesService)
+        {
+            _referencesService = referencesService;
+        }
+
         public (string Name, string Content) Create(IFileInfo schemaFile, string outputFilename, ViewModelType viewModelType,  IDictionary<string, IFileInfo> blocks, IYuzuViewmodelsBuilderConfig config)
         {
             var fileString = ReadFile(schemaFile);
@@ -25,7 +32,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder
             var schema = JsonSchema.FromJsonAsync(fileString, ".", (JsonSchema schema) =>
             {
                 var schemaResolver = new JsonSchemaAppender(schema, new DefaultTypeNameGenerator());
-                return new JsonReferenceResolverForFileProvider(schemaResolver, blocks);
+                return new JsonReferenceResolverForFileProvider(schemaResolver, blocks, _referencesService);
             }).Result;
 
             if (outputFilename != schema.Id.SchemaIdToName())
@@ -60,7 +67,8 @@ namespace YuzuDelivery.Core.ViewModelBuilder
         {
             var fileStream = schemaFile.CreateReadStream();
             using var reader = new StreamReader(fileStream);
-            return reader.ReadToEnd();
+            var json = reader.ReadToEnd();
+            return _referencesService.Fix(json);
         }
 
         private List<string> GetExcludedTypesFromFiles(string outputFile, IDictionary<string, IFileInfo> blocks)

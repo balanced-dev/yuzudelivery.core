@@ -20,13 +20,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder.Tests
         [SetUp]
         public void Setup()
         {
-            var configMock = Substitute.For<IYuzuConfiguration>();
-            var config = configMock;
-            config.TemplateLocations = new List<ITemplateLocation>();
-            config.TemplateLocations.Add(new TemplateLocation() { Name = "Pages", Schema = "some" });
-            config.TemplateLocations.Add(new TemplateLocation() { Name = "Partials", Schema = "some" });
-
-            svc = Substitute.For<ReferencesService>(config);
+            svc = Substitute.For<ReferencesService>();
             references = new List<string>();
             excludedTypes = new List<string>();
         }
