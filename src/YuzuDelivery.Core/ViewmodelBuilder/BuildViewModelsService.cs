@@ -31,7 +31,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder
             pages = new Dictionary<string, IFileInfo>();
             blocks = new Dictionary<string, IFileInfo>();
 
-            this.schemaFileProvider.GetPagesAndPartials(".schema", new string[] { "par", "data" }, new string[] { "_" }, AddFilteredFiles);
+            this.schemaFileProvider.GetPagesAndPartials(coreSettings.Value.SchemaFileExtension, coreSettings.Value, AddFilteredFiles);
         }
 
         private void AddFilteredFiles(bool isPartial, bool isLayout, string name, IFileInfo fileInfo)

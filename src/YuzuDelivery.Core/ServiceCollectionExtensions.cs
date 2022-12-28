@@ -27,12 +27,12 @@ namespace YuzuDelivery.Core
                     {
                         cfg.GetSection("Yuzu:Core").Bind(s);
 
-                        if (!Path.IsPathFullyQualified(s.Schema))
+                        if (!Path.IsPathFullyQualified(s.SchemaPath))
                         {
-                            s.Schema = Path.Combine(host.ContentRootPath, s.Schema);
+                            s.SchemaPath = Path.Combine(host.ContentRootPath, s.SchemaPath);
                         }
 
-                        s.SchemaFileProvider = new PhysicalFileProvider(s.Schema);
+                        s.SchemaFileProvider = new PhysicalFileProvider(s.SchemaPath);
                     });
 
             return services;

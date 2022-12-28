@@ -16,14 +16,14 @@ namespace YuzuDelivery.Core
     {
         protected ISchemaMetaPropertyService schemaMetaPropertyService;
         private IYuzuConfiguration config;
-        private readonly IOptions<CoreSettings> coreSettings;
+        private readonly CoreSettings coreSettings;
         private readonly IFileProvider fileProvider;
 
         public SchemaMetaService(ISchemaMetaPropertyService schemaMetaPropertyService, IYuzuConfiguration config, IOptions<CoreSettings> coreSettings)
         {
             this.schemaMetaPropertyService = schemaMetaPropertyService;
             this.config = config;
-            this.coreSettings = coreSettings;
+            this.coreSettings = coreSettings.Value;
             this.fileProvider = coreSettings.Value.SchemaFileProvider;
         }
 
@@ -140,7 +140,7 @@ namespace YuzuDelivery.Core
         public virtual IFileInfo GetFileInfo(string declaringTypeName)
         {
             var files = new List<IFileInfo>();
-            fileProvider.GetPagesAndPartials(".meta", new string[] { "par", "data" }, new string[] { "_" }, 
+            fileProvider.GetPagesAndPartials(coreSettings.SchemaMetaFileExtension, coreSettings, 
                 (bool isPartial, bool isLayout, string name, IFileInfo fileInfo) => {
                     if (isPartial) files.Add(fileInfo);
                     if (!isLayout && !isPartial) files.Add(fileInfo);
