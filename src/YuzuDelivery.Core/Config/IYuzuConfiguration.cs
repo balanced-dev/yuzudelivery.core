@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Collections.Generic;
 using YuzuDelivery.Core.Mapping;
+using Microsoft.Extensions.FileProviders;
 
 namespace YuzuDelivery.Core
 {
@@ -29,6 +30,10 @@ namespace YuzuDelivery.Core
 
     public interface IBaseSiteConfig
     {
+        IFileProvider TemplateFileProvider { get; }
+
+        IFileProvider SchemaFileProvider { get; }
+
         void Setup(IYuzuConfiguration _config);
     }
 }
