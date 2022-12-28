@@ -12,8 +12,6 @@ namespace YuzuDelivery.Core
     {
         public YuzuConfiguration(IEnumerable<IUpdateableConfig> extraConfigs)
         {
-            TemplateLocations = new List<ITemplateLocation>();
-
             ViewModelAssemblies = new List<Assembly>();
             ViewModels = new List<Type>();
             CMSModels = new List<Type>();
@@ -41,8 +39,6 @@ namespace YuzuDelivery.Core
         public List<ManualMapInstalledType> InstalledManualMaps { get; private set; }
         public List<ManualMapActiveType> ActiveManualMaps { get; private set; }
         public Dictionary<Type, Func<IYuzuTypeFactory>> ViewmodelFactories { get; private set; }
-
-        public List<ITemplateLocation> TemplateLocations { get; set; }
 
         public List<string> BaseSiteConfigFiles { get; }
 

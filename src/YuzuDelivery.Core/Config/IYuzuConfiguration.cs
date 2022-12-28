@@ -16,7 +16,6 @@ namespace YuzuDelivery.Core
         List<ManualMapInstalledType> InstalledManualMaps { get; }
         List<ManualMapActiveType> ActiveManualMaps { get; }
         Dictionary<Type, Func<IYuzuTypeFactory>> ViewmodelFactories { get; }
-        List<ITemplateLocation> TemplateLocations { get; set; }
 
         void AddActiveManualMap<Resolver, Dest>(string destPropertyName = null);
         bool HasActiveManualMap(string dest, string destMemberName = null);

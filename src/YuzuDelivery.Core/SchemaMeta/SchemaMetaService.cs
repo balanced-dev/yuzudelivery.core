@@ -4,20 +4,27 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using YuzuDelivery.Core.Settings;
 
 namespace YuzuDelivery.Core
 {
     public class SchemaMetaService : ISchemaMetaService
     {
         protected ISchemaMetaPropertyService schemaMetaPropertyService;
-        protected readonly IYuzuConfiguration config;
+        private IYuzuConfiguration config;
+        private readonly IOptions<CoreSettings> coreSettings;
+        private readonly IFileProvider fileProvider;
 
-        public SchemaMetaService(ISchemaMetaPropertyService schemaMetaPropertyService, IYuzuConfiguration config)
+        public SchemaMetaService(ISchemaMetaPropertyService schemaMetaPropertyService, IYuzuConfiguration config, IOptions<CoreSettings> coreSettings)
         {
             this.schemaMetaPropertyService = schemaMetaPropertyService;
             this.config = config;
+            this.coreSettings = coreSettings;
+            this.fileProvider = coreSettings.Value.SchemaFileProvider;
         }
 
         public virtual string GetOfType(PropertyInfo property, string area)
@@ -119,39 +126,33 @@ namespace YuzuDelivery.Core
 
         public virtual JObject GetPathFileData(string propertyType)
         {
-            //get paths file from frontend solution
-
-            foreach (var schemaMetaFile in GetPossiblePathFileName(propertyType))
+            var fileInfo = GetFileInfo(propertyType);
+            if(fileInfo != null)
             {
-                if (FileExists(schemaMetaFile))
-                {
-                    return JsonConvert.DeserializeObject<JObject>(FileRead(schemaMetaFile));
-                }
-            };
-
-            throw new Exception(string.Format("Schema meta file not found for {0}", propertyType));
+                var fileStream = fileInfo.CreateReadStream();
+                using var reader = new StreamReader(fileStream);
+                return JsonConvert.DeserializeObject<JObject>(reader.ReadToEnd());
+            }
+            else 
+                throw new Exception(string.Format("Schema meta file not found for {0}", propertyType));
         }
 
-        public virtual IEnumerable<string> GetPossiblePathFileName(string declaringTypeName)
+        public virtual IFileInfo GetFileInfo(string declaringTypeName)
         {
+            var files = new List<IFileInfo>();
+            fileProvider.GetPagesAndPartials(".meta", new string[] { "par", "data" }, new string[] { "_" }, 
+                (bool isPartial, bool isLayout, string name, IFileInfo fileInfo) => {
+                    if (isPartial) files.Add(fileInfo);
+                    if (!isLayout && !isPartial) files.Add(fileInfo);
+                });
+
             var typeNameNoPrefix = declaringTypeName.RemoveAllVmPrefixes();
             var blockPrefix = YuzuConstants.Configuration.BlockRefPrefix.RemoveFirstForwardSlash();
 
-            foreach (var templateLocation in config.TemplateLocations)
-            {
-                yield return Path.Combine(templateLocation.Schema, $"{blockPrefix}{typeNameNoPrefix}.meta"); // blocks prioritized over pages
-                yield return Path.Combine(templateLocation.Schema, $"{typeNameNoPrefix.FirstCharacterToLower()}.meta");
-            }
-        }
+            var fromBlock = files.FirstOrDefault(x => x.Name == $"{blockPrefix}{typeNameNoPrefix}.meta");
+            if (fromBlock != null) return fromBlock;
 
-        public virtual bool FileExists(string pathFilename)
-        {
-            return System.IO.File.Exists(pathFilename);
-        }
-
-        public virtual string FileRead(string pathFilename)
-        {
-            return System.IO.File.ReadAllText(pathFilename);
+            return files.FirstOrDefault(x => x.Name == $"{typeNameNoPrefix.FirstCharacterToLower()}.meta");
         }
     }
 

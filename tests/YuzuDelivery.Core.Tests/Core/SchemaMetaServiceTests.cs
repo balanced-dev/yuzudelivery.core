@@ -1,9 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using FluentAssertions;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
+using YuzuDelivery.Core.Settings;
 
 namespace YuzuDelivery.Core.Test
 {
@@ -13,6 +18,9 @@ namespace YuzuDelivery.Core.Test
 
         public SchemaMetaService svc;
         public IYuzuConfiguration config;
+        private IOptions<CoreSettings> coreSettings;
+
+        private IFileProvider fileProvider;
 
         public string jsonPaths;
         public string jsonOfTypeParent;
@@ -31,7 +39,13 @@ namespace YuzuDelivery.Core.Test
             schemaMetaPropertyService = Substitute.For<ISchemaMetaPropertyService>();
             config = Substitute.For<IYuzuConfiguration>();
 
-            svc = Substitute.ForPartsOf<SchemaMetaService>(schemaMetaPropertyService, config);
+            fileProvider = Substitute.For<IFileProvider>();
+
+            coreSettings = Substitute.For<IOptions<CoreSettings>>();
+            coreSettings.Value.Returns(Substitute.For<CoreSettings>());
+            coreSettings.Value.SchemaFileProvider = fileProvider;
+
+            svc = Substitute.ForPartsOf<SchemaMetaService>(schemaMetaPropertyService, config, coreSettings);
 
             jsonPaths = @"{
                 'refs': {
@@ -152,17 +166,8 @@ namespace YuzuDelivery.Core.Test
         [Test]
         public void GetPathFileData_given_vm_property_when_paths_file_exists_then_return_parsed_path_file_object()
         {
-            config.TemplateLocations.Returns(new List<ITemplateLocation>
-            {
-                new TemplateLocation
-                {
-                    Schema = "c:/test"
-                }
-            });
-
-            var p = typeof(vmBlock_Test).GetProperty("ContentRows");
-            CreatePathDataLocations(new string[] { "c:/test" });
-            StubPathFile("c:/test", "vmBlock_Test", "path");
+               var p = typeof(vmBlock_Test).GetProperty("ContentRows");
+            StubPathFile("vmBlock_Test", new Dictionary<string, string> { { "test.meta", jsonPaths } });
 
             var output = svc.GetPathFileData(p.DeclaringType);
 
@@ -172,22 +177,8 @@ namespace YuzuDelivery.Core.Test
         [Test]
         public void GetPathFileData_given_two_locations_when_paths_file_exists_in_second_location_then_return_parsed_path_file_object()
         {
-            config.TemplateLocations.Returns(new List<ITemplateLocation>
-            {
-                new TemplateLocation
-                {
-                    Schema = "c:/test"
-                },
-                new TemplateLocation
-                {
-                    Schema = "c:/test2"
-                }
-            });
-
             var p = typeof(vmBlock_Test).GetProperty("ContentRows");
-            CreatePathDataLocations(new string[] { "c:/test", "c:/test2" });
-            StubPathFile("c:/test", "vmBlock_Test", "not-here", false);
-            StubPathFile("c:/test2", "vmBlock_Test", "path");
+            StubPathFile("vmBlock_Test", new Dictionary<string, string> { { "test.meta", jsonPaths } });
 
             var output = svc.GetPathFileData(p.DeclaringType);
 
@@ -199,57 +190,55 @@ namespace YuzuDelivery.Core.Test
         {
             var p = typeof(vmBlock_Test).GetProperty("ContentRows");
 
-            config.TemplateLocations.Returns(new List<ITemplateLocation>());
-
             var ex = Assert.Throws<Exception>(() => svc.GetPathFileData(p.DeclaringType));
 
             Assert.That(ex.Message == "Schema meta file not found for vmBlock_Test");
         }
 
         [Test]
-        public void GetPossiblePathFileName_return_possible_paths_with_par_prefix_and_without_prefix()
+        public void GetFileInfo_return_block_from_file_provider()
         {
+            StubPathFile("vmBlock_Test", new Dictionary<string, string> { { "parTest.meta", jsonPaths } });
 
-            if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                config.TemplateLocations.Returns(new List<ITemplateLocation>
-                {
-                    new TemplateLocation
-                    {
-                        Schema = @"c:\test\"
-                    }
-                });
-                var output = svc.GetPossiblePathFileName("vmPage_Test");
+            var output = svc.GetFileInfo("vmBlock_Test");
 
-                Assert.That(output.First(), Is.EqualTo(@"c:\test\parTest.meta"));
-                Assert.That(output.Last(), Is.EqualTo(@"c:\test\test.meta"));
-            }
-            else
-            {
-                config.TemplateLocations.Returns(new List<ITemplateLocation>
-                {
-                    new TemplateLocation
-                    {
-                        Schema = @"/foo/test/"
-                    }
-                });
-                var output = svc.GetPossiblePathFileName("vmPage_Test");
-
-                Assert.That(output.First(), Is.EqualTo("/foo/test/parTest.meta"));
-                Assert.That(output.Last(), Is.EqualTo("/foo/test/test.meta"));
-            }
+            Assert.That(output.Name, Is.EqualTo(@"parTest.meta"));
         }
 
-        public void CreatePathDataLocations(string[] locations)
+        [Test]
+        public void GetFileInfo_return_page_from_file_provider()
         {
-            var schemaMetaLocations = locations.Select(x => new DataLocation() { Path = x }).Cast<IDataLocation>().ToList();
+            StubPathFile("vmBlock_Test", new Dictionary<string, string> { { "test.meta", jsonPaths } });
+
+            var output = svc.GetFileInfo("vmPage_Test");
+
+            Assert.That(output.Name, Is.EqualTo(@"test.meta"));
         }
 
-        public void StubPathFile(string rootPath, string declaringTypeName, string filePath, bool exists = true)
+        [Test]
+        public void GetFileInfo_return_block_first_from_file_provider()
         {
-            svc.Configure().GetPossiblePathFileName(declaringTypeName).Returns(new string[] { filePath });
-            svc.Configure().FileExists(filePath).Returns(exists);
-            svc.Configure().FileRead(filePath).Returns(jsonPaths);
+            StubPathFile("vmBlock_Test", new Dictionary<string, string> { { "test.meta", jsonPaths }, { "parTest.meta", jsonPaths } });
+
+            var output = svc.GetFileInfo("vmBlock_Test");
+
+            Assert.That(output.Name, Is.EqualTo(@"parTest.meta"));
+        }
+
+        public void StubPathFile(string declaringTypeName, Dictionary<string, string> files)
+        {
+            var dc = Substitute.For<IDirectoryContents>();
+            var fileInfos = new List<IFileInfo>();
+            foreach(var file in files)
+            {
+                var fileInfo = Substitute.For<IFileInfo>();
+                fileInfo.Name.Returns(file.Key);
+                var filestream = new MemoryStream(Encoding.UTF8.GetBytes(file.Value ?? ""));
+                fileInfo.Configure().CreateReadStream().Returns(filestream);
+                fileInfos.Add(fileInfo);
+            }
+            dc.Configure().GetEnumerator().Returns(fileInfos.GetEnumerator());
+            fileProvider.Configure().GetDirectoryContents(String.Empty).Returns(dc);
         }
 
         public void StubConfigViewmodels(Type type)
