@@ -33,7 +33,8 @@ namespace YuzuDelivery.Core
                         }
 
                         var fileProviders = baseConfigs.Select(c => c.SchemaFileProvider).ToList();
-                        fileProviders.Insert(0, new PhysicalFileProvider(s.SchemaPath));
+                        if (s.IsPluginDev) fileProviders.Clear();
+                        if(Directory.Exists(s.SchemaPath)) fileProviders.Insert(0, new PhysicalFileProvider(s.SchemaPath));
 
                         s.SchemaFileProvider = new CompositeFileProvider(fileProviders);
                     });

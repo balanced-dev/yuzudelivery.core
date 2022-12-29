@@ -6,7 +6,7 @@ namespace YuzuDelivery.Core.Settings
     public class CoreSettings
     {
         private const string DefaultPartialPrefix = "par";
-        private const string DefaultDataStructureSuffix = "data";
+        private const string DefaultDataStructurePrefix = "data";
         private const string DefaultLayoutPrefix = "_";
 
         private const string DefaultSchemaMetaFileExtension = ".meta";
@@ -19,8 +19,8 @@ namespace YuzuDelivery.Core.Settings
         [DefaultValue(DefaultPartialPrefix)]
         public string PartialPrefix { get; set; } = DefaultPartialPrefix;
 
-        [DefaultValue(DefaultDataStructureSuffix)]
-        public string DataStructurePrefix { get; set; } = DefaultDataStructureSuffix;
+        [DefaultValue(DefaultDataStructurePrefix)]
+        public string DataStructurePrefix { get; set; } = DefaultDataStructurePrefix;
 
         [DefaultValue(DefaultLayoutPrefix)]
         public string LayoutPrefix { get; set; } = DefaultLayoutPrefix;
