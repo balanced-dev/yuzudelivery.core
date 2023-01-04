@@ -23,8 +23,13 @@ namespace YuzuDelivery.Core
             services.AddTransient<ISchemaMetaPropertyService, SchemaMetaPropertyService>();
 
             services.AddOptions<CoreSettings>()
-                    .Configure<IConfiguration, IHostingEnvironment, IEnumerable<IBaseSiteConfig>>((s, cfg, host, baseConfigs) =>
+                    .Configure<IConfiguration, IHostingEnvironment>((s, cfg, host) =>
                     {
+                        if (s.SchemaFileProvider != null)
+                        {
+                            return;
+                        }
+
                         cfg.GetSection("Yuzu:Core").Bind(s);
 
                         if (!Path.IsPathFullyQualified(s.SchemaPath))
@@ -32,11 +37,7 @@ namespace YuzuDelivery.Core
                             s.SchemaPath = Path.Combine(host.ContentRootPath, s.SchemaPath);
                         }
 
-                        var fileProviders = baseConfigs.Select(c => c.SchemaFileProvider).ToList();
-                        if (s.IsPluginDev) fileProviders.Clear();
-                        if(Directory.Exists(s.SchemaPath)) fileProviders.Insert(0, new PhysicalFileProvider(s.SchemaPath));
-
-                        s.SchemaFileProvider = new CompositeFileProvider(fileProviders);
+                        s.SchemaFileProvider = new PhysicalFileProvider(s.SchemaPath);
                     });
 
             return services;
