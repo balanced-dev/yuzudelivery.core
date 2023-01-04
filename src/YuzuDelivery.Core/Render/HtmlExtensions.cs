@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Web;
 using YuzuDelivery.Core;
 using Microsoft.AspNetCore.Html;
@@ -11,7 +12,9 @@ namespace Microsoft.AspNetCore.Mvc.Rendering
 {
     public static class HtmlExtensions
     {
-        public static IHtmlContent RenderYuzu<E>(this IHtmlHelper html, object model, string templateName = null, IDictionary<string, object> mappingItems = null, bool showJson = false)
+        // ReSharper disable once MemberCanBePrivate.Global - used downstream
+        [Obsolete("This should probably be called MapAndRenderYuzu")]
+        public static IHtmlContent RenderYuzu<E>(this IHtmlHelper html, object model, string templateName = null, IDictionary<string, object> mappingItems = null)
         {
             mappingItems ??= new Dictionary<string, object>();
 
@@ -24,21 +27,25 @@ namespace Microsoft.AspNetCore.Mvc.Rendering
             var factory = html.ViewContext.HttpContext.RequestServices.GetRequiredService<IYuzuTypeFactoryRunner>();
             var mapped = factory.Run<E>(mappingItems) ?? mapper.Map<E>(model, mappingItems);
 
-            return html.RenderYuzu(templateName ?? typeof(E).GetTemplateName(), mapped, showJson);
+            return html.RenderYuzu(templateName ?? typeof(E).GetTemplateName(), mapped);
         }
 
         // ReSharper disable once MemberCanBePrivate.Global - used downstream
-        public static IHtmlContent RenderYuzu(this IHtmlHelper html, string templateName, object model, bool showJson = false)
+        public static IHtmlContent RenderYuzu(this IHtmlHelper html, string templateName, object model)
         {
             var templateEngine = html.ViewContext.HttpContext.RequestServices.GetRequiredService<IYuzuTemplateEngine>();
             var markup = templateEngine.Render(templateName, model);
 
-            // ReSharper disable once InvertIf
-            if (showJson)
-            {
-                var json = JsonConvert.SerializeObject(model, Formatting.Indented);
-                markup = $"{markup}<pre data-app=\"JSONHelper\">{HttpUtility.HtmlEncode(json)}</pre>";
-            }
+            return html.Raw(markup);
+        }
+
+        // ReSharper disable once MemberCanBePrivate.Global - used downstream
+        public static IHtmlContent RenderYuzu(this IHtmlHelper html, IYuzuViewModel model, string templateName = null)
+        {
+            templateName ??= model.GetType().GetTemplateName();
+
+            var templateEngine = html.ViewContext.HttpContext.RequestServices.GetRequiredService<IYuzuTemplateEngine>();
+            var markup = templateEngine.Render(templateName, model);
 
             return html.Raw(markup);
         }
