@@ -30,10 +30,6 @@ namespace YuzuDelivery.Core
 
     public interface IBaseSiteConfig
     {
-        IFileProvider TemplateFileProvider { get; }
-
-        IFileProvider SchemaFileProvider { get; }
-
         void Setup(IYuzuConfiguration _config);
     }
 }
