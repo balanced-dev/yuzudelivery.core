@@ -15,11 +15,11 @@ namespace YuzuDelivery.Core
     public class SchemaMetaService : ISchemaMetaService
     {
         protected ISchemaMetaPropertyService schemaMetaPropertyService;
-        private IYuzuConfiguration config;
+        private IOptions<YuzuConfiguration> config;
         private readonly CoreSettings coreSettings;
         private readonly IFileProvider fileProvider;
 
-        public SchemaMetaService(ISchemaMetaPropertyService schemaMetaPropertyService, IYuzuConfiguration config, IOptions<CoreSettings> coreSettings)
+        public SchemaMetaService(ISchemaMetaPropertyService schemaMetaPropertyService,  IOptions<YuzuConfiguration> config, IOptions<CoreSettings> coreSettings)
         {
             this.schemaMetaPropertyService = schemaMetaPropertyService;
             this.config = config;
@@ -51,7 +51,7 @@ namespace YuzuDelivery.Core
 
         public virtual string[] Get(Type propertyType, string area, string path, string ofType)
         {
-            var pathData = GetPathFileData(propertyType.GetComponent(config));
+            var pathData = GetPathFileData(propertyType.GetComponent(config.Value));
 
             if (pathData[ofType] != null && pathData[ofType][area] != null && pathData[ofType][area][path] != null)
             {
@@ -64,7 +64,7 @@ namespace YuzuDelivery.Core
 
         public virtual string[] Get(Type propertyType, string area, string path)
         {
-            var pathData = GetPathFileData(propertyType.GetComponent(config));
+            var pathData = GetPathFileData(propertyType.GetComponent(config.Value));
 
             if (pathData[area] != null && pathData[area][path] != null)
             {
@@ -77,7 +77,7 @@ namespace YuzuDelivery.Core
 
         public virtual string GetString(Type propertyType, string area, string path)
         {
-            var pathData = GetPathFileData(propertyType.GetComponent(config));
+            var pathData = GetPathFileData(propertyType.GetComponent(config.Value));
 
             if (pathData[area] != null && pathData[area][path] != null)
             {
@@ -133,14 +133,14 @@ namespace YuzuDelivery.Core
                 using var reader = new StreamReader(fileStream);
                 return JsonConvert.DeserializeObject<JObject>(reader.ReadToEnd());
             }
-            else 
+            else
                 throw new Exception(string.Format("Schema meta file not found for {0}", propertyType));
         }
 
         public virtual IFileInfo GetFileInfo(string declaringTypeName)
         {
             var files = new List<IFileInfo>();
-            fileProvider.GetPagesAndPartials(coreSettings.SchemaMetaFileExtension, coreSettings, 
+            fileProvider.GetPagesAndPartials(coreSettings.SchemaMetaFileExtension, coreSettings,
                 (bool isPartial, bool isLayout, string name, IFileInfo fileInfo) => {
                     if (isPartial) files.Add(fileInfo);
                     if (!isLayout && !isPartial) files.Add(fileInfo);

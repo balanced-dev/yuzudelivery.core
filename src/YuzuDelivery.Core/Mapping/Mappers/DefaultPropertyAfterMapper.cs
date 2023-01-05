@@ -15,7 +15,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
             YuzuPropertyAfterMapperSettings settings,
             IServiceProvider factory,
             AddedMapContext mapContext,
-            IYuzuConfiguration config)
+            YuzuConfiguration config)
             where TService : class, IYuzuPropertyAfterResolver<TMember>;
     }
 
@@ -31,7 +31,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
             YuzuPropertyAfterMapperSettings settings,
             IServiceProvider factory,
             AddedMapContext mapContext,
-            IYuzuConfiguration config)
+            YuzuConfiguration config)
             where TService : class, IYuzuPropertyAfterResolver<TMember>
         {
 

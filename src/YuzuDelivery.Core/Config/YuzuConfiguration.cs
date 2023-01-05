@@ -1,53 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Linq.Expressions;
 using System.Reflection;
 using YuzuDelivery.Core.Mapping;
 
 namespace YuzuDelivery.Core
 {
-    public class YuzuConfiguration : IYuzuConfiguration
+    public class YuzuConfiguration
     {
-        public YuzuConfiguration(IEnumerable<IUpdateableConfig> extraConfigs)
-        {
-            ViewModelAssemblies = new List<Assembly>();
-            ViewModels = new List<Type>();
-            CMSModels = new List<Type>();
+        public IList<Assembly> MappingAssemblies { get; } = new List<Assembly>();
+        public IList<Assembly> ViewModelAssemblies { get; } = new List<Assembly>();
+        public IList<Type> ViewModels { get; } = new List<Type>();
+        public IList<Type> CMSModels { get; } = new List<Type>();
 
-            MappingAssemblies = new List<Assembly>();
+        public IList<ManualMapInstalledType> InstalledManualMaps { get; } = new List<ManualMapInstalledType>();
+        public IList<ManualMapActiveType> ActiveManualMaps { get;  }= new List<ManualMapActiveType>();
 
-            InstalledManualMaps = new List<ManualMapInstalledType>();
-            ActiveManualMaps = new List<ManualMapActiveType>();
-            ViewmodelFactories = new Dictionary<Type, Func<IYuzuTypeFactory>>();
+        public IDictionary<Type, Func<IYuzuTypeFactory>> ViewmodelFactories { get; } = new Dictionary<Type, Func<IYuzuTypeFactory>>();
 
-            BaseSiteConfigFiles = new List<string>();
+        public IList<string> BaseSiteConfigFiles { get; } = new List<string>();
 
-            foreach (var i in extraConfigs)
-            {
-                MappingAssemblies = MappingAssemblies.Union(i.MappingAssemblies).ToList();
-            }
-        }
-
-        public List<Assembly> MappingAssemblies { get; set; }
-
-        public List<Assembly> ViewModelAssemblies { get; private set; }
-        public virtual List<Type> ViewModels { get; private set; }
-        public List<Type> CMSModels { get; set; }
-
-        public List<ManualMapInstalledType> InstalledManualMaps { get; private set; }
-        public List<ManualMapActiveType> ActiveManualMaps { get; private set; }
-        public Dictionary<Type, Func<IYuzuTypeFactory>> ViewmodelFactories { get; private set; }
-
-        public List<string> BaseSiteConfigFiles { get; }
 
         public void AddActiveManualMap<Resolver, Dest>(string destMemberName = null)
         {
             ActiveManualMaps.Add(new ManualMapActiveType()
             {
                 Resolver = typeof(Resolver),
-                Interface = typeof(Resolver).GetInterfaces().Where(x => !x.GetGenericArguments().Any()).FirstOrDefault(),
+                Interface = typeof(Resolver).GetInterfaces().FirstOrDefault(x => !x.GetGenericArguments().Any()),
                 Dest = typeof(Dest),
                 DestMemberName = destMemberName
             });
@@ -70,16 +49,6 @@ namespace YuzuDelivery.Core
     {
         public string Name { get; set; }
         public string Path { get; set; }
-    }
-
-    public abstract class UpdateableConfig : IUpdateableConfig
-    {
-        public UpdateableConfig()
-        {
-            MappingAssemblies = new List<Assembly>();
-        }
-
-        public List<Assembly> MappingAssemblies { get; set; }
     }
 
     public class ManualMapInstalledType

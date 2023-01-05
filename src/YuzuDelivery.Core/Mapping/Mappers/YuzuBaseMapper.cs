@@ -12,7 +12,7 @@ public abstract class YuzuBaseMapper<TSettings> : IYuzuBaseMapper
         YuzuMapperSettings baseSettings,
         IServiceProvider factory,
         AddedMapContext mapContext,
-        IYuzuConfiguration config)
+        YuzuConfiguration config)
     {
         if (baseSettings is not TSettings settings)
         {

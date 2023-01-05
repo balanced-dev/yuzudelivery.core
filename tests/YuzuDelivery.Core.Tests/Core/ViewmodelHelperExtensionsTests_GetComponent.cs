@@ -16,8 +16,6 @@ namespace YuzuDelivery.Core.Test
         public Type parentBlockType;
         public Type subExternalBlockType;
 
-        public List<Type> ViewModels;
-
         public YuzuConfiguration config;
 
         [OneTimeSetUp]
@@ -30,6 +28,8 @@ namespace YuzuDelivery.Core.Test
         [SetUp]
         public void Setup()
         {
+            config = new YuzuConfiguration();
+
             blockType = Substitute.For<Type>();
             blockType.Name.Returns("vmBlock_Name");
 
@@ -46,11 +46,7 @@ namespace YuzuDelivery.Core.Test
             subExternalBlockType = Substitute.For<Type>();
             subExternalBlockType.Name.Returns("vmBlock_External");
 
-            ViewModels = new List<Type>();
-            ViewModels.Add(blockType);
-
-            config = Substitute.ForPartsOf<YuzuConfiguration>(new List<IUpdateableConfig>());
-            config.ViewModels.Returns(ViewModels);
+            config.ViewModels.Add(blockType);
         }
 
         [Test]

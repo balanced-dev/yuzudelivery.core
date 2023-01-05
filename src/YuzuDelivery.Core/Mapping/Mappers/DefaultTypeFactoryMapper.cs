@@ -9,7 +9,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
     public interface IYuzuTypeFactoryMapper<out TContext> : IYuzuBaseMapper
         where TContext : YuzuMappingContext
     {
-        void CreateMap<Dest, TService>(MapperConfigurationExpression cfg, YuzuTypeFactoryMapperSettings baseSettings, IServiceProvider serviceProvider, AddedMapContext mapContext, IYuzuConfiguration config)
+        void CreateMap<Dest, TService>(MapperConfigurationExpression cfg, YuzuTypeFactoryMapperSettings baseSettings, IServiceProvider serviceProvider, AddedMapContext mapContext, YuzuConfiguration config)
             where TService : class, IYuzuTypeFactory<Dest, TContext>;
     }
 
@@ -21,7 +21,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
             YuzuTypeFactoryMapperSettings settings,
             IServiceProvider serviceProvider,
             AddedMapContext mapContext,
-            IYuzuConfiguration config)
+            YuzuConfiguration config)
             where TService : class, IYuzuTypeFactory<TDest, TContext>
         {
 

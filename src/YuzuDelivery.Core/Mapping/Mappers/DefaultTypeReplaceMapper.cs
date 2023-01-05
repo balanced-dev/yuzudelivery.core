@@ -15,7 +15,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
             YuzuTypeConvertorMapperSettings settings,
             IServiceProvider factory,
             AddedMapContext mapContext,
-            IYuzuConfiguration config)
+            YuzuConfiguration config)
             where TService : class, IYuzuTypeConvertor<Source, Dest, TContext>;
     }
 
@@ -34,7 +34,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
             YuzuTypeConvertorMapperSettings settings,
             IServiceProvider factory,
             AddedMapContext mapContext,
-            IYuzuConfiguration config)
+            YuzuConfiguration config)
             where TConverter : class, IYuzuTypeConvertor<TSource, TDest, TContext>
         {
             config.AddActiveManualMap<TConverter, TDest>();

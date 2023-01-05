@@ -15,7 +15,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
             YuzuPropertyReplaceMapperSettings settings,
             IServiceProvider factory,
             AddedMapContext mapContext,
-            IYuzuConfiguration config)
+            YuzuConfiguration config)
             where TService : class, IYuzuPropertyReplaceResolver<TSource, TMember, TContext>;
     }
 
@@ -34,7 +34,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
             YuzuPropertyReplaceMapperSettings settings,
             IServiceProvider factory,
             AddedMapContext mapContext,
-            IYuzuConfiguration config)
+            YuzuConfiguration config)
             where TResolver : class, IYuzuPropertyReplaceResolver<TSource, TMember, TContext>
         {
             config.AddActiveManualMap<TResolver, TDest>(settings.DestPropertyName);

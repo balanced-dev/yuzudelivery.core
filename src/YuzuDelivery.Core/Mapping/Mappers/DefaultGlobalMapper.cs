@@ -13,7 +13,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
             YuzuGlobalMapperSettings settings,
             IServiceProvider factory,
             AddedMapContext mapContext,
-            IYuzuConfiguration config);
+            YuzuConfiguration config);
     }
 
     public class DefaultGlobalMapper : YuzuBaseMapper<YuzuGlobalMapperSettings>, IYuzuGlobalMapper
@@ -23,7 +23,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
             YuzuGlobalMapperSettings settings,
             IServiceProvider factory,
             AddedMapContext mapContext,
-            IYuzuConfiguration config)
+            YuzuConfiguration config)
         {
             if (settings.GroupName != null)
             {

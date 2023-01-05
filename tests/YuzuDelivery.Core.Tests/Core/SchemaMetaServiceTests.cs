@@ -17,7 +17,7 @@ namespace YuzuDelivery.Core.Test
         public ISchemaMetaPropertyService schemaMetaPropertyService;
 
         public SchemaMetaService svc;
-        public IYuzuConfiguration config;
+        public YuzuConfiguration config;
         private IOptions<CoreSettings> coreSettings;
 
         private IFileProvider fileProvider;
@@ -37,7 +37,7 @@ namespace YuzuDelivery.Core.Test
         public void Setup()
         {
             schemaMetaPropertyService = Substitute.For<ISchemaMetaPropertyService>();
-            config = Substitute.For<IYuzuConfiguration>();
+            config = new YuzuConfiguration();
 
             fileProvider = Substitute.For<IFileProvider>();
 
@@ -45,7 +45,7 @@ namespace YuzuDelivery.Core.Test
             coreSettings.Value.Returns(Substitute.For<CoreSettings>());
             coreSettings.Value.SchemaFileProvider = fileProvider;
 
-            svc = Substitute.ForPartsOf<SchemaMetaService>(schemaMetaPropertyService, config, coreSettings);
+            svc = Substitute.ForPartsOf<SchemaMetaService>(schemaMetaPropertyService, Options.Create(config), coreSettings);
 
             jsonPaths = @"{
                 'refs': {
@@ -154,7 +154,7 @@ namespace YuzuDelivery.Core.Test
             var blockType = typeof(vmBlock_Test);
             var pathsJson = JObject.Parse(jsonOfTypeChild);
 
-            StubConfigViewmodels(blockType);
+            config.ViewModels.Add(blockType);
             svc.Configure().GetPathFileData(blockType).Returns(pathsJson);
 
             var output = svc.Get(p.PropertyType, "refs", "/rows/columns/items", "parGrid");
@@ -239,14 +239,6 @@ namespace YuzuDelivery.Core.Test
             }
             dc.Configure().GetEnumerator().Returns(fileInfos.GetEnumerator());
             fileProvider.Configure().GetDirectoryContents(String.Empty).Returns(dc);
-        }
-
-        public void StubConfigViewmodels(Type type)
-        {
-            var viewmodels = new List<Type>();
-            viewmodels.Add(type);
-
-            config.ViewModels.Returns(viewmodels);
         }
 
         public class vmBlock_Test

@@ -13,7 +13,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
             YuzuGroupMapperSettings settings,
             IServiceProvider factory,
             AddedMapContext mapContext,
-            IYuzuConfiguration config);
+            YuzuConfiguration config);
     }
 
     public class DefaultGroupMapper : YuzuBaseMapper<YuzuGroupMapperSettings>, IYuzuGroupMapper
@@ -23,7 +23,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
             YuzuGroupMapperSettings settings,
             IServiceProvider factory,
             AddedMapContext mapContext,
-            IYuzuConfiguration config)
+            YuzuConfiguration config)
         {
             var groupNameWithoutSpaces = settings.GroupName.Replace(" ", "");
 

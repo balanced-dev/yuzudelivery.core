@@ -3,25 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using YuzuDelivery.Core.Mapping.Mappers;
 
 namespace YuzuDelivery.Core.Mapping;
 
 public class DefaultYuzuMapperFactory
 {
-    private readonly IYuzuConfiguration _yuzuConfig;
+    private readonly IOptions<YuzuConfiguration> _yuzuConfig;
     private readonly IServiceProvider _serviceProvider;
 
     private AddedMapContext _addedMapContext;
 
-    public DefaultYuzuMapperFactory(IYuzuConfiguration yuzuConfig, IServiceProvider serviceProvider)
+    public DefaultYuzuMapperFactory(IOptions<YuzuConfiguration> yuzuConfig, IServiceProvider serviceProvider)
     {
         _yuzuConfig = yuzuConfig;
         _serviceProvider = serviceProvider;
         _addedMapContext = new AddedMapContext();
     }
 
-    public IMapper Create(Action<IYuzuConfiguration, global::AutoMapper.MapperConfigurationExpression, AddedMapContext> configure)
+    public IMapper Create(Action<YuzuConfiguration, global::AutoMapper.MapperConfigurationExpression, AddedMapContext> configure)
     {
         var cfg = new global::AutoMapper.MapperConfigurationExpression();
         cfg.ConstructServicesUsing(_serviceProvider.GetService);
@@ -29,7 +30,7 @@ public class DefaultYuzuMapperFactory
         AddYuzuMappersFromContainer(cfg);
         AddProfilesFromContainer(cfg);
 
-        configure(_yuzuConfig, cfg, _addedMapContext);
+        configure(_yuzuConfig.Value, cfg, _addedMapContext);
 
         var config = new global::AutoMapper.MapperConfiguration(cfg);
 
@@ -38,7 +39,7 @@ public class DefaultYuzuMapperFactory
 
     private void AddProfilesFromContainer(global::AutoMapper.MapperConfigurationExpression cfg)
     {
-        var loadedProfiles = GetProfiles(_yuzuConfig.MappingAssemblies);
+        var loadedProfiles = GetProfiles(_yuzuConfig.Value.MappingAssemblies);
 
         foreach (var profile in loadedProfiles)
         {
@@ -50,7 +51,7 @@ public class DefaultYuzuMapperFactory
     private void AddYuzuMappersFromContainer(global::AutoMapper.MapperConfigurationExpression cfg)
     {
         var mappingConfigs = _serviceProvider.GetServices<YuzuMappingConfig>();
-        var config = _serviceProvider.GetService<IYuzuConfiguration>();
+
 
         foreach (var mappingConfig in mappingConfigs)
         {
@@ -61,7 +62,7 @@ public class DefaultYuzuMapperFactory
                     continue;
                 }
 
-                mapper.CreateMapAbstraction(cfg, item, _serviceProvider, _addedMapContext, _yuzuConfig);
+                mapper.CreateMapAbstraction(cfg, item, _serviceProvider, _addedMapContext, _yuzuConfig.Value);
             }
         }
     }

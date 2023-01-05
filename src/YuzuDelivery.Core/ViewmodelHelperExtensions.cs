@@ -88,7 +88,7 @@ namespace YuzuDelivery.Core
             return refName.Replace(YuzuConstants.Configuration.BlockRefPrefix, YuzuConstants.Configuration.BlockPrefix);
         }
 
-        public static Type GetComponent(this Type type, IYuzuConfiguration config)
+        public static Type GetComponent(this Type type, YuzuConfiguration config)
         {
             if (type.Name.IsComponentVm())
                 return type;
@@ -123,5 +123,5 @@ namespace YuzuDelivery.Core
         }
 
     }
-        
+
 }

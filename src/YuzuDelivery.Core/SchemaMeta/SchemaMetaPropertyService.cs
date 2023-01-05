@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.Extensions.Options;
 
 namespace YuzuDelivery.Core
 {
     public class SchemaMetaPropertyService : ISchemaMetaPropertyService
     {
-        private readonly IYuzuConfiguration config;
+        private readonly IOptions<YuzuConfiguration> config;
 
-        public SchemaMetaPropertyService(IYuzuConfiguration config)
+        public SchemaMetaPropertyService(IOptions<YuzuConfiguration> config)
         {
             this.config = config;
         }
@@ -26,7 +27,7 @@ namespace YuzuDelivery.Core
             }
             else
             {
-                componentType = property.DeclaringType.GetComponent(config);
+                componentType = property.DeclaringType.GetComponent(config.Value);
                 List<string> paths = null;
                 FindSubVmPropertyPath(componentType, new List<PropertyInfo>(), property, ref paths);
 
@@ -74,5 +75,5 @@ namespace YuzuDelivery.Core
         }
 
     }
-        
+
 }

@@ -15,7 +15,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
             YuzuPropertyFactoryMapperSettings settings,
             IServiceProvider factory,
             AddedMapContext mapContext,
-            IYuzuConfiguration config)
+            YuzuConfiguration config)
             where TService : class, IYuzuTypeFactory<DestMember,TContext>;
     }
 
@@ -35,7 +35,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
             YuzuPropertyFactoryMapperSettings settings,
             IServiceProvider factory,
             AddedMapContext mapContext,
-            IYuzuConfiguration config)
+            YuzuConfiguration config)
             where TService : class, IYuzuTypeFactory<TMember, TContext>
         {
             config.AddActiveManualMap<TService, TDest>(settings.DestPropertyName);

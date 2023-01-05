@@ -10,5 +10,5 @@ public interface IYuzuBaseMapper
         YuzuMapperSettings baseSettings,
         IServiceProvider factory,
         AddedMapContext mapContext,
-        IYuzuConfiguration config);
+        YuzuConfiguration config);
 }

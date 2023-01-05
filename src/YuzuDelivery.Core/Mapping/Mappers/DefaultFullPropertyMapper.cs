@@ -15,7 +15,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
             YuzuFullPropertyMapperSettings settings,
             IServiceProvider factory,
             AddedMapContext mapContext,
-            IYuzuConfiguration _)
+            YuzuConfiguration _)
             where TService : class, IYuzuFullPropertyResolver<TSource, TDest, TSourceMember, TDestMember, TContext>;
     }
 
@@ -32,7 +32,7 @@ namespace YuzuDelivery.Core.Mapping.Mappers
             YuzuFullPropertyMapperSettings settings,
             IServiceProvider factory,
             AddedMapContext mapContext,
-            IYuzuConfiguration config)
+            YuzuConfiguration config)
             where TService : class, IYuzuFullPropertyResolver<TSource, TDest, TSourceMember, TDestMember, TContext>
         {
             if (!string.IsNullOrEmpty(settings.GroupName))
