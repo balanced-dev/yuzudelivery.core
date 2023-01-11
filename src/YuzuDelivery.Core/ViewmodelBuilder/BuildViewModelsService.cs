@@ -11,7 +11,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder
     public class BuildViewModelsService
     {
         private readonly GenerateViewmodelService generateViewmodelService;
-        private readonly IYuzuViewmodelsBuilderConfig builderConfig;
+        private readonly IOptions<ViewModelGenerationSettings> builderConfig;
         private readonly IFileProvider schemaFileProvider;
 
         private IDictionary<string, IFileInfo> pages;
@@ -22,7 +22,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder
         public BuildViewModelsService(
             GenerateViewmodelService generateViewmodelService,
             IOptions<CoreSettings> coreSettings,
-            IYuzuViewmodelsBuilderConfig builderConfig)
+            IOptions<ViewModelGenerationSettings> builderConfig)
         {
             this.generateViewmodelService = generateViewmodelService;
             this.builderConfig = builderConfig;
@@ -54,7 +54,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder
 
                 try
                 {
-                    file = generateViewmodelService.Create(i.Value, i.Value.Name.CleanFileExtension().RemoveFileSuffix(), viewModelType, blocks, builderConfig);
+                    file = generateViewmodelService.Create(i.Value, i.Value.Name.CleanFileExtension().RemoveFileSuffix(), viewModelType, blocks, builderConfig.Value);
                 }
                 catch (Exception ex)
                 {
@@ -77,7 +77,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder
         {
             var schemaFilename = $"par{schemaName}";
             var fileInfo = blocks.FirstOrDefault(x => x.Key == schemaFilename).Value;
-            return generateViewmodelService.Create(fileInfo, schemaName, viewModelType, blocks, builderConfig);
+            return generateViewmodelService.Create(fileInfo, schemaName, viewModelType, blocks, builderConfig.Value);
         }
 
         public virtual void WriteOutputFile(string outputFilename, string content)

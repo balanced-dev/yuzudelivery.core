@@ -1,15 +1,11 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using YuzuDelivery.Core;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using YuzuDelivery.Core.Settings;
+using YuzuDelivery.Core.Settings.Validators;
 
 namespace YuzuDelivery.Core
 {
@@ -23,7 +19,7 @@ namespace YuzuDelivery.Core
             services.AddTransient<ISchemaMetaPropertyService, SchemaMetaPropertyService>();
 
             services.AddOptions<CoreSettings>()
-                    .Configure<IConfiguration, IHostingEnvironment>((s, cfg, host) =>
+                    .Configure<IConfiguration, IHostEnvironment>((s, cfg, host) =>
                     {
                         if (s.SchemaFileProvider != null)
                         {
@@ -39,6 +35,8 @@ namespace YuzuDelivery.Core
 
                         s.SchemaFileProvider = new PhysicalFileProvider(s.SchemaPath);
                     });
+
+            services.AddSingleton<IValidateOptions<ViewModelGenerationSettings>, ViewModelGenerationUnsafeDirectoryValidator>();
 
             return services;
         }

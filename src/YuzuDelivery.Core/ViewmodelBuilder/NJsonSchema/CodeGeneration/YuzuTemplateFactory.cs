@@ -8,21 +8,23 @@ using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Fluid;
 using Fluid.Ast;
+using Microsoft.Extensions.Options;
 using NJsonSchema.CodeGeneration;
 using NJsonSchema.CodeGeneration.CSharp;
 using Parlot.Fluent;
+using YuzuDelivery.Core.Settings;
 using YuzuDelivery.Core.ViewModelBuilder;
 
 namespace YuzuDelivery.Core.ViewmodelBuilder.NJsonSchema.CodeGeneration;
 
 public class YuzuTemplateFactory : ITemplateFactory
 {
-    private readonly IYuzuViewmodelsBuilderConfig _config;
+    private readonly ViewModelGenerationSettings _config;
     private readonly TemplateOptions _templateOptions;
     private readonly Assembly[] _templateAssemblies;
     private readonly FluidParser _fluidParser;
 
-    public YuzuTemplateFactory(IYuzuViewmodelsBuilderConfig config)
+    public YuzuTemplateFactory(ViewModelGenerationSettings config)
     {
         _config = config;
         _templateOptions = new TemplateOptions();
@@ -119,11 +121,11 @@ public class YuzuTemplateFactory : ITemplateFactory
         private readonly string _language;
         private readonly string _templateName;
         private readonly TemplateOptions _templateOptions;
-        private readonly IYuzuViewmodelsBuilderConfig _yuzuConfig;
+        private readonly ViewModelGenerationSettings _yuzuConfig;
         private readonly object _model;
 
         public YuzuCodeTemplate(IFluidTemplate template, string language, string templateName,
-            TemplateOptions templateOptions, IYuzuViewmodelsBuilderConfig yuzuConfig, object model)
+            TemplateOptions templateOptions, ViewModelGenerationSettings yuzuConfig, object model)
         {
             _template = template;
             _language = language;

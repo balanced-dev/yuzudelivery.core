@@ -8,6 +8,7 @@ using YuzuDelivery.Core.ViewmodelBuilder.NJsonSchema.CodeGeneration;
 using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json.Serialization;
 using System.Text.RegularExpressions;
+using YuzuDelivery.Core.Settings;
 
 namespace YuzuDelivery.Core.ViewModelBuilder
 {
@@ -20,14 +21,14 @@ namespace YuzuDelivery.Core.ViewModelBuilder
             _referencesService = referencesService;
         }
 
-        public (string Name, string Content) Create(IFileInfo schemaFile, string outputFilename, ViewModelType viewModelType,  IDictionary<string, IFileInfo> blocks, IYuzuViewmodelsBuilderConfig config)
+        public (string Name, string Content) Create(IFileInfo schemaFile, string outputFilename, ViewModelType viewModelType,  IDictionary<string, IFileInfo> blocks, ViewModelGenerationSettings config)
         {
             var fileString = ReadFile(schemaFile);
             string fileOut = string.Empty;
 
             var excludedTypes = GetExcludedTypesFromFiles(outputFilename, blocks);
             excludedTypes.Add("DoNotApply");
-            excludedTypes = excludedTypes.Union(config.ExcludeViewmodelsAtGeneration).ToList();
+            excludedTypes = excludedTypes.Union(config.ExcludeViewModelsAtGeneration).ToList();
 
             var schema = JsonSchema.FromJsonAsync(fileString, ".", (JsonSchema schema) =>
             {
@@ -40,7 +41,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder
 
             var csharpSetting = new CSharpGeneratorSettings()
             {
-                Namespace = config.GeneratedViewmodelsNamespace,
+                Namespace = config.GeneratedViewModelsNamespace,
                 ArrayType = "System.Collections.Generic.List",
                 ArrayBaseType = "System.Collections.Generic.List",
                 ArrayInstanceType = "System.Collections.Generic.List",

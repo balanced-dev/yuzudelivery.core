@@ -18,7 +18,7 @@ namespace YuzuDelivery.Core.Test.ViewmodelBuilder
     {
         BuildViewModelsService Sut { get; set; }
 
-        IYuzuViewmodelsBuilderConfig BuilderConfig { get; set; }
+        IOptions<ViewModelGenerationSettings> BuilderConfig { get; set; }
 
         IOptions<CoreSettings> coreSettings;
 
@@ -31,7 +31,7 @@ namespace YuzuDelivery.Core.Test.ViewmodelBuilder
 
             var generate = new GenerateViewmodelService(Substitute.For<ReferencesService>());
 
-            BuilderConfig = new YuzuViewmodelsBuilderConfig();
+            BuilderConfig = Options.Create(new ViewModelGenerationSettings());
 
             var fileProvider = new EmbeddedFileProvider(Assembly.GetExecutingAssembly(), "YuzuDelivery.Core.ViewmodelBuilder.Input");
 
@@ -220,11 +220,9 @@ namespace YuzuDelivery.Core.Test.ViewmodelBuilder
         [Test]
         public void RunOneBlock_WithAdditionalNamespacesInConfig_IncludesUsingDirectives()
         {
-            BuilderConfig.AddNamespacesAtGeneration = new List<string>
-            {
-                "Yuzu.Test.Extra.One",
-                "using Yuzu.Test.Extra.Two;"
-            };
+            BuilderConfig.Value.AddNamespacesAtGeneration.Clear();
+            BuilderConfig.Value.AddNamespacesAtGeneration.Add( "Yuzu.Test.Extra.One");
+            BuilderConfig.Value.AddNamespacesAtGeneration.Add( "using Yuzu.Test.Extra.Two;");
 
             var file = Sut.RunOneBlock(ViewModelType.block, "1_JustRootNode");
 
@@ -237,10 +235,7 @@ namespace YuzuDelivery.Core.Test.ViewmodelBuilder
         [Test]
         public void RunOneBlock_ClassLevelAttributeTemplateInConfig_RendersAttribute()
         {
-            BuilderConfig.ClassLevelAttributeTemplates = new Dictionary<string, string>
-            {
-                ["testing"] = @"[Foo(""{{ ClassName | strip_vm_prefix }}"")]"
-            };
+            BuilderConfig.Value.ClassLevelAttributeTemplates.Add("testing", @"[Foo(""{{ ClassName | strip_vm_prefix }}"")]");
 
             var file = Sut.RunOneBlock(ViewModelType.block, "1_JustRootNode");
 
@@ -252,12 +247,9 @@ namespace YuzuDelivery.Core.Test.ViewmodelBuilder
         [Test]
         public void RunOneBlock_CustomFilterRegisteredInConfig_CustomFilterIsUsable()
         {
-            BuilderConfig.ClassLevelAttributeTemplates = new Dictionary<string, string>
-            {
-                ["testing"] = @"[Foo(""{{ ClassName | strip_vm_prefix | bar }}"")]"
-            };
+            BuilderConfig.Value.ClassLevelAttributeTemplates.Add("testing", @"[Foo(""{{ ClassName | strip_vm_prefix | bar }}"")]");
 
-            BuilderConfig.CustomFilters.Add(KeyValuePair.Create<string,FilterDelegate>("bar", (fv, fa, tc)
+            BuilderConfig.Value.CustomFilters.Add(KeyValuePair.Create<string,FilterDelegate>("bar", (fv, fa, tc)
                 => new ValueTask<FluidValue>(new StringValue("bar", encode: false))));
 
             var file = Sut.RunOneBlock(ViewModelType.block, "1_JustRootNode");
@@ -270,7 +262,7 @@ namespace YuzuDelivery.Core.Test.ViewmodelBuilder
         [Test]
         public void RunOneBlock_WithConfiguredTemplateAssemblies_RespectsDownstreamTemplates()
         {
-            BuilderConfig.TemplateAssemblies.Add(GetType().Assembly);
+            BuilderConfig.Value.TemplateAssemblies.Add(GetType().Assembly);
 
             var file = Sut.RunOneBlock(ViewModelType.block, "1_JustRootNode");
 
