@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using System.IO;
+using System.Reflection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using YuzuDelivery.Core.Settings;
@@ -14,7 +15,6 @@ namespace YuzuDelivery.Core
 
         public static IServiceCollection AddYuzuCore(this IServiceCollection services)
         {
-
             services.AddTransient<ISchemaMetaService, SchemaMetaService>();
             services.AddTransient<ISchemaMetaPropertyService, SchemaMetaPropertyService>();
 
@@ -37,6 +37,7 @@ namespace YuzuDelivery.Core
                     });
 
             services.AddSingleton<IValidateOptions<ViewModelGenerationSettings>, ViewModelGenerationUnsafeDirectoryValidator>();
+            services.RegisterYuzuManualMapping(Assembly.GetEntryAssembly());
 
             return services;
         }
