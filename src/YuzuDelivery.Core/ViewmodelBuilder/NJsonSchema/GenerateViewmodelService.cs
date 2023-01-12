@@ -9,6 +9,7 @@ using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json.Serialization;
 using System.Text.RegularExpressions;
 using YuzuDelivery.Core.Settings;
+using YuzuDelivery.Core.ViewmodelBuilder.NJsonSchema;
 
 namespace YuzuDelivery.Core.ViewModelBuilder
 {
