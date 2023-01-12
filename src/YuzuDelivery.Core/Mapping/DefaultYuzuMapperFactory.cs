@@ -5,6 +5,7 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using YuzuDelivery.Core.Mapping.Mappers;
+using YuzuDelivery.Core.Settings;
 
 namespace YuzuDelivery.Core.Mapping;
 
@@ -50,12 +51,12 @@ public class DefaultYuzuMapperFactory
 
     private void AddYuzuMappersFromContainer(global::AutoMapper.MapperConfigurationExpression cfg)
     {
-        var mappingConfigs = _serviceProvider.GetServices<YuzuMappingConfig>();
+        var mappingConfigs = _serviceProvider.GetServices<IOptions<ManualMapping>>();
 
 
         foreach (var mappingConfig in mappingConfigs)
         {
-            foreach (var item in mappingConfig.ManualMaps)
+            foreach (var item in mappingConfig.Value.ManualMaps)
             {
                 if (_serviceProvider.GetService(item.Mapper) is not IYuzuBaseMapper mapper)
                 {

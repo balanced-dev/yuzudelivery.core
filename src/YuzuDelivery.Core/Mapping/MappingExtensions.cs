@@ -7,14 +7,14 @@ namespace YuzuDelivery.Core.Mapping;
 
 public static class MappingExtensions
 {
-    public static void AddTypeAfterMapWithContext<TContext, TConverter>(this List<YuzuMapperSettings> resolvers, bool applyToDerivedTypes = false)
+    public static void AddTypeAfterMapWithContext<TContext, TConverter>(this IList<YuzuMapperSettings> resolvers, bool applyToDerivedTypes = false)
         where TContext : YuzuMappingContext
         where TConverter : IYuzuTypeAfterConvertor
     {
         resolvers.AddTypeAfterMapWithContext<TContext>(typeof(TConverter), applyToDerivedTypes);
     }
 
-    public static void AddTypeAfterMapWithContext<TContext>(this List<YuzuMapperSettings> resolvers, Type afterMapType, bool applyToDerivedTypes = false)
+    public static void AddTypeAfterMapWithContext<TContext>(this IList<YuzuMapperSettings> resolvers, Type afterMapType, bool applyToDerivedTypes = false)
         where TContext : YuzuMappingContext
     {
         resolvers.Add(new YuzuTypeAfterMapperSettings()
@@ -25,7 +25,7 @@ public static class MappingExtensions
         });
     }
 
-    public static void AddTypeReplaceWithContext<TContext, ConvertorType>(this List<YuzuMapperSettings> resolvers, bool ignoreReturnType = true)
+    public static void AddTypeReplaceWithContext<TContext, ConvertorType>(this IList<YuzuMapperSettings> resolvers, bool ignoreReturnType = true)
         where TContext : YuzuMappingContext
         where ConvertorType : IYuzuTypeConvertor
     {
@@ -33,7 +33,7 @@ public static class MappingExtensions
     }
 
     public static void AddTypeReplaceWithContext<TContext>(
-        this List<YuzuMapperSettings> resolvers,
+        this IList<YuzuMapperSettings> resolvers,
         Type convertorType,
         bool ignoreReturnType = true)
         where TContext : YuzuMappingContext
@@ -46,7 +46,7 @@ public static class MappingExtensions
         });
     }
 
-    public static void AddTypeFactoryWithContext<TContext, TFactory, TDest>(this List<YuzuMapperSettings> resolvers)
+    public static void AddTypeFactoryWithContext<TContext, TFactory, TDest>(this IList<YuzuMapperSettings> resolvers)
         where TContext : YuzuMappingContext
         where TFactory : IYuzuTypeFactory
     {
@@ -54,7 +54,7 @@ public static class MappingExtensions
     }
 
     public static void AddTypeFactoryWithContext<TContext>(
-        this List<YuzuMapperSettings> resolvers,
+        this IList<YuzuMapperSettings> resolvers,
         Type factoryType,
         Type destType)
         where TContext : YuzuMappingContext
@@ -68,7 +68,7 @@ public static class MappingExtensions
     }
 
     public static void AddPropertyReplaceWithContext<TContext>(
-        this List<YuzuMapperSettings> resolvers,
+        this IList<YuzuMapperSettings> resolvers,
         Type resolverType,
         Type destType,
         string destMemberName,
@@ -90,7 +90,7 @@ public static class MappingExtensions
     }
 
     public static void AddPropertyFactoryWithContext<TContext>(
-        this List<YuzuMapperSettings> resolvers,
+        this IList<YuzuMapperSettings> resolvers,
         Type factoryType,
         Type sourceType,
         Type destType,
@@ -108,7 +108,7 @@ public static class MappingExtensions
     }
 
     public static void AddFullPropertyWithContext<TContext>(
-        this List<YuzuMapperSettings> resolvers,
+        this IList<YuzuMapperSettings> resolvers,
         Type resolverType,
         string sourceMemberName,
         string destMemberName,

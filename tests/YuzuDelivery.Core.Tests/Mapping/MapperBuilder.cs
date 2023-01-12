@@ -5,6 +5,7 @@ using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using YuzuDelivery.Core.Mapping.Mappers;
+using YuzuDelivery.Core.Settings;
 
 namespace YuzuDelivery.Core.Mapping;
 
@@ -13,7 +14,7 @@ public class MapperBuilder
     public IServiceCollection Services { get; private set; }
     public YuzuConfiguration YuzuConfig { get; private set; }
 
-    private readonly YuzuMappingConfig _defaultMappingConfig;
+    private readonly IOptions<ManualMapping> _defaultMappingConfig;
 
     private Action<YuzuConfiguration, AutoMapper.MapperConfigurationExpression, AddedMapContext> _action;
 
@@ -23,7 +24,7 @@ public class MapperBuilder
         YuzuConfig = new YuzuConfiguration();
         Services = new ServiceCollection();
 
-        _defaultMappingConfig = new YuzuMappingConfig();
+        _defaultMappingConfig = Options.Create(new ManualMapping());
         _action = (_, _, _) => { };
     }
 
@@ -47,16 +48,11 @@ public class MapperBuilder
         return this;
     }
 
-    public MapperBuilder AddMappingConfig<TConfig>()
-        where TConfig : YuzuMappingConfig
-    {
-        Services.AddSingleton<YuzuMappingConfig, TConfig>();
-        return this;
-    }
 
-    public MapperBuilder AddManualMapper(Action<List<YuzuMapperSettings>> cfg)
+
+    public MapperBuilder AddManualMapper(Action<IList<YuzuMapperSettings>> cfg)
     {
-        cfg(_defaultMappingConfig.ManualMaps);
+        cfg(_defaultMappingConfig.Value.ManualMaps);
         return this;
     }
 
