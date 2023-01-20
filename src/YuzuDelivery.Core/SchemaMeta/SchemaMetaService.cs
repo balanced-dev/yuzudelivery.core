@@ -105,6 +105,20 @@ namespace YuzuDelivery.Core
                    .ToArray();
         }
 
+        public bool TryGetPathSegments(string viewModelName, out string[] result)
+        {
+            try
+            {
+                result = GetPathSegments(viewModelName);
+                return true;
+            }
+            catch (Exception e)
+            {
+                result = null;
+                return false;
+            }
+        }
+
         public virtual string[] Get(PropertyInfo property, string area)
         {
             var component = schemaMetaPropertyService.Get(property);
