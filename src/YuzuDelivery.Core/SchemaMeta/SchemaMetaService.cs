@@ -114,7 +114,7 @@ namespace YuzuDelivery.Core
             }
             catch (Exception e)
             {
-                result = null;
+                result = new string[] { };
                 return false;
             }
         }
