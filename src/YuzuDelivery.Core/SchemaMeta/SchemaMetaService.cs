@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -105,16 +106,16 @@ namespace YuzuDelivery.Core
                    .ToArray();
         }
 
-        public bool TryGetPathSegments(string viewModelName, out string[] result)
+        public bool TryGetPathSegments(string viewModelName, [MaybeNullWhen(false)] out string[] result)
         {
             try
             {
                 result = GetPathSegments(viewModelName);
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                result = new string[] { };
+                result = null;
                 return false;
             }
         }
