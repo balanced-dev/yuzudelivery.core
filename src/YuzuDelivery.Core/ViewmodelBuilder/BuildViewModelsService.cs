@@ -58,7 +58,7 @@ namespace YuzuDelivery.Core.ViewModelBuilder
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception(string.Format("Failed on schema file {0}", i.Key), ex);
+                    throw new Exception($"Failed on schema file {i.Key}", ex);
                 }
 
                 if (file.Content.Contains("public partial class") || file.Content.Contains("public enum"))
