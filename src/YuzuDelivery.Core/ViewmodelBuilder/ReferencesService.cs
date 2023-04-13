@@ -1,14 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Text.RegularExpressions;
-using System.IO;
-using YuzuDelivery.Core;
-using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Options;
-using YuzuDelivery.Core.Settings;
+﻿using System.Text.RegularExpressions;
 
 namespace YuzuDelivery.Core.ViewModelBuilder
 {
