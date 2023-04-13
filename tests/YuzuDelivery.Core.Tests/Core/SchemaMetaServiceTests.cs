@@ -94,15 +94,15 @@ namespace YuzuDelivery.Core.Test
         }
 
         [Test]
-        public void GetPathSegments_PathMissingFromSchemaMeta_Throws()
+        public void GetPathSegments_PathMissingFromSchemaMeta_ReturnsEmptyList()
         {
             var pathsJson = new JObject();
             var vmType = typeof(vmBlock_Test);
 
             svc.Configure().GetPathFileData(vmType.Name).Returns(pathsJson);
 
-            Action action = () => svc.GetPathSegments(vmType.Name);
-            action.Should().Throw<Exception>().WithMessage("* has no path configured");
+            var output = svc.GetPathSegments(vmType.Name);
+            output.Should().BeEmpty();
         }
 
         [Test]
