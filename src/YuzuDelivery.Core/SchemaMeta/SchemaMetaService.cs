@@ -90,20 +90,27 @@ namespace YuzuDelivery.Core
 
         public string[] GetPathSegments(string viewModelName)
         {
-            var meta = GetPathFileData(viewModelName);
-            if (!meta.ContainsKey("path"))
+            try
             {
-                throw new InvalidOperationException($"Schema meta for viewModel: '{viewModelName}' has no path configured");
-            }
-            var path = meta["path"].ToString();
+                var meta = GetPathFileData(viewModelName);
+                if (!meta.ContainsKey("path"))
+                {
+                    throw new InvalidOperationException($"Schema meta for viewModel: '{viewModelName}' has no path configured");
+                }
+                var path = meta["path"].ToString();
 
-            return path
-                   .TrimStart('/')
-                   .Split('/')
-                   .SkipLast(2)
-                   .Select(x => x.Replace("_", ""))
-                   .Select(StringExtensions.FirstCharacterToUpper)
-                   .ToArray();
+                return path
+                       .TrimStart('/')
+                       .Split('/')
+                       .SkipLast(2)
+                       .Select(x => x.Replace("_", ""))
+                       .Select(StringExtensions.FirstCharacterToUpper)
+                       .ToArray();
+            }
+            catch
+            {
+                return new string[] { };
+            }
         }
 
         public bool TryGetPathSegments(string viewModelName, [MaybeNullWhen(false)] out string[] result)
