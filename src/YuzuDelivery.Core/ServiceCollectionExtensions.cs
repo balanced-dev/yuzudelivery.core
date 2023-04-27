@@ -33,7 +33,10 @@ namespace YuzuDelivery.Core
                             s.SchemaPath = Path.Combine(host.ContentRootPath, s.SchemaPath);
                         }
 
-                        s.SchemaFileProvider = new PhysicalFileProvider(s.SchemaPath);
+                        if (Directory.Exists(s.SchemaPath))
+                        {
+                            s.SchemaFileProvider = new PhysicalFileProvider(s.SchemaPath);
+                        }
                     });
 
             services.AddSingleton<IValidateOptions<ViewModelGenerationSettings>, ViewModelGenerationUnsafeDirectoryValidator>();
