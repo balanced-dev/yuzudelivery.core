@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using YuzuDelivery.Core.Mapping.Mappers;
 using YuzuDelivery.Core.Settings;
@@ -13,29 +14,41 @@ public class DefaultYuzuMapperFactory
 {
     private readonly IOptions<YuzuConfiguration> _yuzuConfig;
     private readonly IServiceProvider _serviceProvider;
+    private readonly ILogger<DefaultYuzuMapperFactory> _logger;
 
     private AddedMapContext _addedMapContext;
 
-    public DefaultYuzuMapperFactory(IOptions<YuzuConfiguration> yuzuConfig, IServiceProvider serviceProvider)
+    public DefaultYuzuMapperFactory(IOptions<YuzuConfiguration> yuzuConfig, IServiceProvider serviceProvider, ILogger<DefaultYuzuMapperFactory> logger)
     {
         _yuzuConfig = yuzuConfig;
         _serviceProvider = serviceProvider;
+        _logger = logger;
         _addedMapContext = new AddedMapContext();
     }
 
     public IMapper Create(Action<YuzuConfiguration, global::AutoMapper.MapperConfigurationExpression, AddedMapContext> configure)
     {
-        var cfg = new global::AutoMapper.MapperConfigurationExpression();
-        cfg.ConstructServicesUsing(_serviceProvider.GetService);
+        try
+        {
+            var cfg = new global::AutoMapper.MapperConfigurationExpression();
+            cfg.ConstructServicesUsing(_serviceProvider.GetService);
 
-        AddYuzuMappersFromContainer(cfg);
-        AddProfilesFromContainer(cfg);
+            AddYuzuMappersFromContainer(cfg);
+            AddProfilesFromContainer(cfg);
 
-        configure(_yuzuConfig.Value, cfg, _addedMapContext);
+            configure(_yuzuConfig.Value, cfg, _addedMapContext);
 
-        var config = new global::AutoMapper.MapperConfiguration(cfg);
+            var config = new global::AutoMapper.MapperConfiguration(cfg);
 
-        return new DefaultYuzuMapper(config.CreateMapper());
+            return new DefaultYuzuMapper(config.CreateMapper());
+        }
+        catch (Exception ex)
+        {
+            // HACK: We have some registrations which cause issues on first boot.
+            // TODO: Investigate YuzuBlockListStartup etc (essentially all type replace mappers).
+            _logger.LogError(ex, "Failed to configure IMapper.");
+            return new BadConfigurationYuzuMapper(ex);
+        }
     }
 
     private void AddProfilesFromContainer(global::AutoMapper.MapperConfigurationExpression cfg)
@@ -76,6 +89,7 @@ public class DefaultYuzuMapperFactory
             var assemblyProfiles = assembly.ExportedTypes.Where(type => type.IsSubclassOf(typeof(global::AutoMapper.Profile)));
             profiles.AddRange(assemblyProfiles);
         }
+
         return profiles;
     }
 }
