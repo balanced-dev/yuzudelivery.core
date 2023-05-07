@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using YuzuDelivery.Core.Mapping.Mappers;
 using YuzuDelivery.Core.Settings;
@@ -91,7 +92,7 @@ public class MapperBuilder
         Services.RegisterYuzuManualMapping(Assembly.GetExecutingAssembly());
 
         _container = Services.BuildServiceProvider();
-        var factory = new DefaultYuzuMapperFactory(_container.GetRequiredService<IOptions<YuzuConfiguration>>(), _container);
+        var factory = new DefaultYuzuMapperFactory(_container.GetRequiredService<IOptions<YuzuConfiguration>>(), _container, _container.GetRequiredService<ILogger<DefaultYuzuMapperFactory>>());
 
         return factory.Create(_action);
     }
