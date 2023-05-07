@@ -92,7 +92,7 @@ public class MapperBuilder
         Services.RegisterYuzuManualMapping(Assembly.GetExecutingAssembly());
 
         _container = Services.BuildServiceProvider();
-        var factory = new DefaultYuzuMapperFactory(_container.GetRequiredService<IOptions<YuzuConfiguration>>(), _container, _container.GetRequiredService<ILogger<DefaultYuzuMapperFactory>>());
+        var factory = new DefaultYuzuMapperFactory(_container.GetRequiredService<IOptions<YuzuConfiguration>>(), _container, Substitute.For<ILogger<DefaultYuzuMapperFactory>>());
 
         return factory.Create(_action);
     }
